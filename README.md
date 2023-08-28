@@ -1,1 +1,0 @@
-# com.tiogiras.megapint-validators
