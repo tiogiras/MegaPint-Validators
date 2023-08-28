@@ -1,10 +1,16 @@
 {
-    "name": "MegaPintValidatorsRuntime",
+    "name": "SerializeReferenceDropdownEditor",
     "rootNamespace": "",
     "references": [
-        "GUID:0caab94c8c0a20b4e83e8dc1e4b2a416"
+        "UnityEditor.UI",
+        "UnityEngine.UI",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "SerializeReferenceDropdownRuntime"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
