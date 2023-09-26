@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <Style src="project://database/Packages/com.tiogiras.megapint/Editor/Resources/User%20Interface/MegaPint.uss?fileID=7433441132597879392&amp;guid=2f2b50e0e132e3a4989e6dbb646711fa&amp;type=3#MegaPint" />
+    <ui:GroupBox style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-direction: row; align-items: center; justify-content: space-between; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;);">
+        <ui:GroupBox style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; flex-direction: row;">
+            <ui:Label text="Label" display-tooltip-when-elided="true" name="Name" />
+            <ui:Label text="[" display-tooltip-when-elided="true" />
+            <ui:Label text="OK" display-tooltip-when-elided="true" name="Ok" style="-unity-font-style: bold; -unity-text-align: upper-center; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;); width: auto; font-size: 12px; white-space: normal; color: rgb(40, 178, 38);" />
+            <ui:Label text="WARNING" display-tooltip-when-elided="true" name="Warning" style="-unity-font-style: bold; -unity-text-align: upper-center; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;); width: auto; font-size: 12px; white-space: normal; color: rgb(178, 104, 38);" />
+            <ui:Label text="ERROR" display-tooltip-when-elided="true" name="Error" style="-unity-font-style: bold; -unity-text-align: upper-center; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;); width: auto; font-size: 12px; white-space: normal; color: rgb(178, 46, 38);" />
+            <ui:Label text="]" display-tooltip-when-elided="true" />
+        </ui:GroupBox>
+        <ui:Button text="Fix" display-tooltip-when-elided="true" />
+    </ui:GroupBox>
+</ui:UXML>

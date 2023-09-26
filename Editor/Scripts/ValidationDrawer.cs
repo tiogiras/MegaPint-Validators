@@ -10,10 +10,21 @@ namespace Editor.Scripts
 public class ValidationDrawer : UnityEditor.Editor
 {
     private const string Status = "User Interface/Status";
+    private const string BehaviourEntry = "User Interface/ValidatableMonoBehaviour";
+    private const string ErrorEntry = "User Interface/ValidationError";
+
+    private ValidatableMonoBehaviourStatus _status;
+
+    private VisualTreeAsset _behaviourEntry;
+    private VisualTreeAsset _errorEntry;
 
     private VisualElement _ok;
     private VisualElement _warning;
     private VisualElement _error;
+
+    private ListView _errorView;
+
+    private Foldout _errorFoldout;
 
     public override VisualElement CreateInspectorGUI()
     {
@@ -31,16 +42,71 @@ public class ValidationDrawer : UnityEditor.Editor
         _warning.style.display = DisplayStyle.None;
         _error.style.display = DisplayStyle.None;
 
-        var castedTarget = (ValidatableMonoBehaviourStatus)target;
+        _status = (ValidatableMonoBehaviourStatus)target;
 
-        castedTarget.onStatusUpdate += state =>
+        _status.onStatusUpdate += state =>
         {
             _ok.style.display = state == ValidationState.Ok ? DisplayStyle.Flex : DisplayStyle.None;
             _warning.style.display = state == ValidationState.Warning ? DisplayStyle.Flex : DisplayStyle.None;
             _error.style.display = state == ValidationState.Error ? DisplayStyle.Flex : DisplayStyle.None;
+
+            _errorFoldout.style.display = _status.invalidBehaviours.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            _errorView.itemsSource = _status.invalidBehaviours;
+            _errorView.RefreshItems();
         };
 
-        castedTarget.ValidateStatus();
+        root.Q <Button>("BTN_Validate").clicked += () => {_status.ValidateStatus();};
+
+        _behaviourEntry = Resources.Load <VisualTreeAsset>(BehaviourEntry);
+        _errorEntry = Resources.Load <VisualTreeAsset>(ErrorEntry);
+
+        _errorFoldout = root.Q <Foldout>("ErrorFoldout");
+
+        _errorView = root.Q <ListView>("ErrorView");
+
+        _errorView.makeItem = () => _behaviourEntry.Instantiate();
+
+        _errorView.bindItem = (element, i) =>
+        {
+            InvalidBehaviour invalidBehaviour = _status.invalidBehaviours[i];
+
+            element.Q <Foldout>().text = invalidBehaviour.behaviourName;
+            var errors = element.Q <ListView>("Errors");
+
+            errors.makeItem = () => _errorEntry.Instantiate();
+
+            errors.bindItem = (visualElement, j) =>
+            {
+                InvalidBehaviour.ValidationError error = invalidBehaviour.errors[j];
+
+                var label = visualElement.Q <Label>("Name");
+                label.text = error.errorName;
+                label.tooltip = error.errorText;
+
+                visualElement.Q <Label>("Ok").style.display = error.severity == ValidationState.Ok 
+                    ? DisplayStyle.Flex 
+                    : DisplayStyle.None;
+
+                visualElement.Q <Label>("Warning").style.display = error.severity == ValidationState.Warning
+                    ? DisplayStyle.Flex
+                    : DisplayStyle.None;
+
+                visualElement.Q <Label>("Error").style.display = error.severity == ValidationState.Error 
+                    ? DisplayStyle.Flex 
+                    : DisplayStyle.None;
+
+                visualElement.Q <Button>().clicked += () =>
+                {
+                    error.fixAction.Invoke(error.gameObject);
+                    _status.ValidateStatus();
+                };
+            };
+
+            errors.itemsSource = invalidBehaviour.errors;
+            errors.RefreshItems();
+        };
+
+        _status.ValidateStatus();
 
         return root;
     }

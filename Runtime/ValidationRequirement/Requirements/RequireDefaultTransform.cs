@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using SerializeReferenceDropdown.Runtime;
 using UnityEngine;
 
@@ -13,15 +15,41 @@ public class RequireDefaultTransform : ValidationRequirementMetaData, IValidatio
     [SerializeField] private bool _defaultRotation;
     [SerializeField] private bool _defaultScale;
 
-    public ValidationState Validate(GameObject gameObject)
+    public ValidationState Validate(GameObject gameObject, out List <InvalidBehaviour.ValidationError> errors)
     {
+        errors = new List <InvalidBehaviour.ValidationError>();
         Transform transform = gameObject.transform;
 
-        return (transform.position == Vector3.zero || !_defaultPosition) &&
-               (transform.rotation == Quaternion.identity || !_defaultRotation) &&
-               (transform.localScale == Vector3.one || !_defaultScale)
-            ? ValidationState.Ok
-            : ValidationState.Warning;
+        var validPosition = transform.position == Vector3.zero || !_defaultPosition;
+        var validRotation = transform.rotation == Quaternion.identity || !_defaultRotation;
+        var validScale = transform.localScale == Vector3.one || !_defaultScale;
+
+        var valid = validPosition && validRotation && validScale;
+
+        if (valid)
+            return ValidationState.Ok;
+
+        var errorText = new StringBuilder();
+
+        if (!validPosition)
+            errorText.AppendLine("Position should be (0,0,0)");
+
+        if (!validRotation)
+            errorText.AppendLine("Rotation should be (0,0,0)");
+
+        if (!validScale)
+            errorText.AppendLine("Scale should be (1,1,1)");
+        
+        errors.Add(new InvalidBehaviour.ValidationError
+        {
+            fixAction = Fix,
+            gameObject = gameObject,
+            severity = ValidationState.Warning,
+            errorName = "Non-Default Transform",
+            errorText = errorText.ToString()
+        });
+
+        return ValidationState.Warning;
     }
 
     public void Fix(GameObject gameObject)

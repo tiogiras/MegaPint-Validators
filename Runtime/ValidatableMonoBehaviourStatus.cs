@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class ValidatableMonoBehaviourStatus : MonoBehaviour
 {
-    private readonly List <ValidatableMonoBehaviour> _behaviours = new ();
+    private List <ValidatableMonoBehaviour> _behaviours = new ();
     private ValidationState _state;
 
     public Action <ValidationState> onStatusUpdate;
+
+    public List <InvalidBehaviour> invalidBehaviours = new ();
 
     public void AddValidatableMonoBehaviour(ValidatableMonoBehaviour behaviour)
     {
@@ -20,6 +22,7 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour
     public void ValidateStatus()
     {
         _state = ValidationState.Ok;
+        invalidBehaviours.Clear();
 
         if (_behaviours.Count > 0)
         {
@@ -33,7 +36,16 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour
                     continue;
                 }
 
-                ValidationState behaviourState = behaviour.Validate();
+                ValidationState behaviourState = behaviour.Validate(out List <InvalidBehaviour.ValidationError> errors);
+
+                if (behaviourState != ValidationState.Ok)
+                {
+                    invalidBehaviours.Add(new InvalidBehaviour
+                    {
+                        behaviourName = $"{behaviour.name}.{behaviour.GetType()}",
+                        errors = errors
+                    });
+                }
 
                 if (behaviourState > _state)
                     _state = behaviourState;
