@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+namespace ValidationRequirement
+{
+
 public interface IValidationRequirement
 {
     public ValidationState Validate(GameObject gameObject);
@@ -7,4 +10,6 @@ public interface IValidationRequirement
     public void Fix(GameObject gameObject);
 
     public void OnValidate();
+}
+
 }

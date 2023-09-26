@@ -1,4 +1,7 @@
-﻿public abstract class ValidationRequirementMetaData
+﻿namespace ValidationRequirement
+{
+
+public abstract class ValidationRequirementMetaData
 {
     private bool _initialized;
 
@@ -6,10 +9,12 @@
     {
         if (_initialized)
             return;
-        
+
         Initialize();
         _initialized = true;
     }
 
     protected abstract void Initialize();
+}
+
 }

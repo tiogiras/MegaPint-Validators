@@ -1,8 +1,9 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Editor
+namespace Editor.Scripts
 {
 
 [CustomEditor(typeof(ValidatableMonoBehaviourStatus), true)]
@@ -30,15 +31,15 @@ public class ValidationDrawer : UnityEditor.Editor
         _warning.style.display = DisplayStyle.None;
         _error.style.display = DisplayStyle.None;
 
-        var castedTarget = ((ValidatableMonoBehaviourStatus)target);
-        
+        var castedTarget = (ValidatableMonoBehaviourStatus)target;
+
         castedTarget.onStatusUpdate += state =>
         {
             _ok.style.display = state == ValidationState.Ok ? DisplayStyle.Flex : DisplayStyle.None;
             _warning.style.display = state == ValidationState.Warning ? DisplayStyle.Flex : DisplayStyle.None;
             _error.style.display = state == ValidationState.Error ? DisplayStyle.Flex : DisplayStyle.None;
         };
-        
+
         castedTarget.ValidateStatus();
 
         return root;
@@ -46,3 +47,4 @@ public class ValidationDrawer : UnityEditor.Editor
 }
 
 }
+#endif

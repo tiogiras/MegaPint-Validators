@@ -1,9 +1,8 @@
 {
-    "name": "SerializeReferenceDropdownRuntime",
+    "name": "tiogiras.megapint-validators.Runtime.Scripts",
     "rootNamespace": "",
     "references": [
-        "UnityEditor.UI",
-        "UnityEngine.UI"
+        "GUID:0caab94c8c0a20b4e83e8dc1e4b2a416"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -11,9 +10,7 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [
-        "UNITY_2019_3_OR_NEWER "
-    ],
+    "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false
 }

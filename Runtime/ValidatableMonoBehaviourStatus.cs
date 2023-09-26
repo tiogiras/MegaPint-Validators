@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ValidatableMonoBehaviourStatus : MonoBehaviour
 {
-    private List <ValidatableMonoBehaviour> _behaviours = new ();
+    private readonly List <ValidatableMonoBehaviour> _behaviours = new ();
     private ValidationState _state;
 
     public Action <ValidationState> onStatusUpdate;

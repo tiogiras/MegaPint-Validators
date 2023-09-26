@@ -1,12 +1,12 @@
 {
-    "name": "SerializeReferenceDropdownEditor",
+    "name": "tiogiras.megapint-validators.Runtime.Scripts.SerializeReferenceDropdown.Editor",
     "rootNamespace": "",
     "references": [
         "UnityEditor.UI",
         "UnityEngine.UI",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "SerializeReferenceDropdownRuntime"
+        "tiogiras.megapint-validators.Runtime.Scripts.SerializeReferenceDropdown.Runtime"
     ],
     "includePlatforms": [
         "Editor"
