@@ -2,7 +2,9 @@
 
 public interface IValidationRequirement
 {
-    public bool Validate(GameObject gameObject);
+    public ValidationState Validate(GameObject gameObject);
 
     public void Fix(GameObject gameObject);
+
+    public void OnValidate();
 }

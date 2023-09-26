@@ -1,27 +1,31 @@
 ﻿using System;
+using SerializeReferenceDropdown.Runtime;
 using UnityEngine;
 
 namespace Requirements
 {
     [Serializable]
-    public class RequireDefaultTransform : IValidationRequirement
+    [SerializeReferenceDropdownName("Require Default Transform")]
+    public class RequireDefaultTransform : ValidationRequirementMetaData, IValidationRequirement
     {
-        public bool defaultPosition = true;
-        public bool defaultRotation = true;
+        public bool defaultPosition;
+        public bool defaultRotation;
         public bool defaultScale;
 
-        public bool Validate(GameObject gameObject)
+        public ValidationState Validate(GameObject gameObject)
         {
-            var transform = gameObject.transform;
-
+            Transform transform = gameObject.transform;
+            
             return (transform.position == Vector3.zero || !defaultPosition) &&
                    (transform.rotation == Quaternion.identity || !defaultRotation) &&
-                   (transform.localScale == Vector3.one || !defaultScale);
+                   (transform.localScale == Vector3.one || !defaultScale)
+                ? ValidationState.Ok
+                : ValidationState.Warning;
         }
 
         public void Fix(GameObject gameObject)
         {
-            var transform = gameObject.transform;
+            Transform transform = gameObject.transform;
 
             if (defaultPosition)
                 transform.position = Vector3.zero;
@@ -31,6 +35,18 @@ namespace Requirements
             
             if (defaultScale)
                 transform.localScale = Vector3.one;
+        }
+
+        public void OnValidate()
+        {
+            TryInitialize();
+        }
+
+        protected override void Initialize()
+        {
+            defaultPosition = true;
+            defaultRotation = true;
+            defaultScale = false;
         }
     }
 }
