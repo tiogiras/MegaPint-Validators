@@ -11,7 +11,7 @@ public class ValidatableMonoBehaviour : MonoBehaviour
 
     // TODO works but validation of the whole gameObject is not working
     // TODO when changing the position the validation should update immediatly
-    
+
     private void OnValidate()
     {
         if (_status == null)
@@ -37,6 +37,9 @@ public class ValidatableMonoBehaviour : MonoBehaviour
 
         foreach (IValidationRequirement requirement in _requirements)
         {
+            if (requirement == null)
+                continue;
+            
             ValidationState requirementState = requirement.Validate(gameObject);
 
             if (requirementState > state)

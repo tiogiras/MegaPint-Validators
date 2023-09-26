@@ -30,12 +30,16 @@ public class ValidationDrawer : UnityEditor.Editor
         _warning.style.display = DisplayStyle.None;
         _error.style.display = DisplayStyle.None;
 
-        ((ValidatableMonoBehaviourStatus)target).onStatusUpdate += state =>
+        var castedTarget = ((ValidatableMonoBehaviourStatus)target);
+        
+        castedTarget.onStatusUpdate += state =>
         {
             _ok.style.display = state == ValidationState.Ok ? DisplayStyle.Flex : DisplayStyle.None;
             _warning.style.display = state == ValidationState.Warning ? DisplayStyle.Flex : DisplayStyle.None;
             _error.style.display = state == ValidationState.Error ? DisplayStyle.Flex : DisplayStyle.None;
         };
+        
+        castedTarget.ValidateStatus();
 
         return root;
     }

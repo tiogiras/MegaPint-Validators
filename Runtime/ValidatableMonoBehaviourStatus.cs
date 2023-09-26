@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ValidatableMonoBehaviourStatus : MonoBehaviour
 {
-    private readonly List <ValidatableMonoBehaviour> _behaviours = new ();
+    private List <ValidatableMonoBehaviour> _behaviours = new ();
     private ValidationState _state;
 
     public Action <ValidationState> onStatusUpdate;
@@ -19,10 +19,6 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour
 
     public void ValidateStatus()
     {
-        Debug.Log("validating");
-        
-        ValidationState originalState = _state;
-        
         _state = ValidationState.Ok;
 
         if (_behaviours.Count > 0)
@@ -44,7 +40,6 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour
             }
         }
 
-        if (originalState != _state)
-            onStatusUpdate?.Invoke(_state);
+        onStatusUpdate?.Invoke(_state);
     }
 }
