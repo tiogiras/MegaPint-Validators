@@ -55,7 +55,7 @@ public class ValidationDrawer : UnityEditor.Editor
 
             List <InvalidBehaviour> invalidBehaviours = _status.invalidBehaviours;
             invalidBehaviours.Sort();
-            
+
             _errorView.itemsSource = invalidBehaviours;
             _errorView.RefreshItems();
         };
@@ -88,23 +88,30 @@ public class ValidationDrawer : UnityEditor.Editor
                 label.text = error.errorName;
                 label.tooltip = error.errorText;
 
-                visualElement.Q <Label>("Ok").style.display = error.severity == ValidationState.Ok 
-                    ? DisplayStyle.Flex 
+                visualElement.Q <Label>("Ok").style.display = error.severity == ValidationState.Ok
+                    ? DisplayStyle.Flex
                     : DisplayStyle.None;
 
                 visualElement.Q <Label>("Warning").style.display = error.severity == ValidationState.Warning
                     ? DisplayStyle.Flex
                     : DisplayStyle.None;
 
-                visualElement.Q <Label>("Error").style.display = error.severity == ValidationState.Error 
-                    ? DisplayStyle.Flex 
+                visualElement.Q <Label>("Error").style.display = error.severity == ValidationState.Error
+                    ? DisplayStyle.Flex
                     : DisplayStyle.None;
 
-                visualElement.Q <Button>().clicked += () =>
+                var button = visualElement.Q <Button>();
+
+                if (error.fixAction == null)
+                    button.style.display = DisplayStyle.None;
+                else
                 {
-                    error.fixAction.Invoke(error.gameObject);
-                    _status.ValidateStatus();
-                };
+                    button.clicked += () =>
+                    {
+                        error.fixAction.Invoke(error.gameObject);
+                        _status.ValidateStatus();
+                    };
+                }
             };
 
             errors.itemsSource = invalidBehaviour.errors;

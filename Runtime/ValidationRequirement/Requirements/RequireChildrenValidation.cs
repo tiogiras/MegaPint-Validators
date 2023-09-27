@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using SerializeReferenceDropdown.Runtime;
 using UnityEngine;
 
@@ -17,7 +16,8 @@ public class RequireChildrenValidation : ValidationRequirementMetaData, IValidat
 
         List <ValidatableMonoBehaviourStatus> behaviourStates = new();
 
-        var highestState = ValidationState.Unknown;
+        var highestState = ValidationState.Ok;
+        List <GameObject> invalidStates = new();
         
         foreach (Transform tr in gameObject.transform)
         {
@@ -25,6 +25,13 @@ public class RequireChildrenValidation : ValidationRequirementMetaData, IValidat
 
             foreach (ValidatableMonoBehaviourStatus behaviourStatus in states)
             {
+                behaviourStatus.ValidateStatus();
+                
+                if (behaviourStatus.State <= ValidationState.Ok)
+                    continue;
+                    
+                invalidStates.Add(behaviourStatus.gameObject);
+                
                 if (behaviourStatus.State > highestState)
                     highestState = behaviourStatus.State;
             }
@@ -42,6 +49,17 @@ public class RequireChildrenValidation : ValidationRequirementMetaData, IValidat
             myStatus.invalidBehaviours.AddRange(behaviourStatus.invalidBehaviours);
         }
 
+        var errorText = $"Errors found under the following gameObjects:\n{string.Join("\n", invalidStates)}";
+        
+        errors.Add(new ValidationError
+        {
+            errorName = "Invalid monoBehaviours in children",
+            errorText = errorText,
+            fixAction = null,
+            gameObject = null,
+            severity = highestState
+        });
+        
         return highestState;
     }
 
