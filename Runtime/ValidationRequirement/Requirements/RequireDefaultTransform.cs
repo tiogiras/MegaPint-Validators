@@ -11,22 +11,25 @@ namespace ValidationRequirement.Requirements
 [SerializeReferenceDropdownName("Require Default Transform")]
 public class RequireDefaultTransform : ValidationRequirementMetaData, IValidationRequirement
 {
-    [SerializeField] private bool _defaultPosition;
-    [SerializeField] private bool _defaultRotation;
-    [SerializeField] private bool _defaultScale;
+    [SerializeField, Tooltip("If true the transform is required to have a local position of (0,0,0)")] 
+    private bool _defaultPosition;
+    
+    [SerializeField, Tooltip("If true the transform is required to have a local rotation of (0,0,0)")] 
+    private bool _defaultRotation;
+    
+    [SerializeField, Tooltip("If true the transform is required to have a local scale of (1,1,1)")] 
+    private bool _defaultScale;
 
     public ValidationState Validate(GameObject gameObject, out List <ValidationError> errors)
     {
         errors = new List <ValidationError>();
         Transform transform = gameObject.transform;
 
-        var validPosition = transform.position == Vector3.zero || !_defaultPosition;
-        var validRotation = transform.rotation == Quaternion.identity || !_defaultRotation;
+        var validPosition = transform.localPosition == Vector3.zero || !_defaultPosition;
+        var validRotation = transform.localRotation == Quaternion.identity || !_defaultRotation;
         var validScale = transform.localScale == Vector3.one || !_defaultScale;
-
-        var valid = validPosition && validRotation && validScale;
-
-        if (valid)
+        
+        if (validPosition && validRotation && validScale)
             return ValidationState.Ok;
 
         var errorText = new StringBuilder();
@@ -52,15 +55,15 @@ public class RequireDefaultTransform : ValidationRequirementMetaData, IValidatio
         return ValidationState.Warning;
     }
 
-    public void FixAction(GameObject gameObject)
+    private void FixAction(GameObject gameObject)
     {
         Transform transform = gameObject.transform;
 
         if (_defaultPosition)
-            transform.position = Vector3.zero;
+            transform.localPosition = Vector3.zero;
 
         if (_defaultRotation)
-            transform.rotation = Quaternion.identity;
+            transform.localRotation = Quaternion.identity;
 
         if (_defaultScale)
             transform.localScale = Vector3.one;

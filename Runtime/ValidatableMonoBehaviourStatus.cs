@@ -4,24 +4,25 @@ using UnityEngine;
 
 public class ValidatableMonoBehaviourStatus : MonoBehaviour
 {
-    private List <ValidatableMonoBehaviour> _behaviours = new ();
-    private ValidationState _state;
+    private List <ValidatableMonoBehaviour> _behaviours = new();
+
+    public ValidationState State {get; private set;}
 
     public Action <ValidationState> onStatusUpdate;
 
-    public readonly List <InvalidBehaviour> invalidBehaviours = new ();
+    public readonly List <InvalidBehaviour> invalidBehaviours = new();
 
     public void AddValidatableMonoBehaviour(ValidatableMonoBehaviour behaviour)
     {
         if (_behaviours.Contains(behaviour))
             return;
-        
+
         _behaviours.Add(behaviour);
     }
 
     public void ValidateStatus()
     {
-        _state = ValidationState.Ok;
+        State = ValidationState.Ok;
         invalidBehaviours.Clear();
 
         if (_behaviours.Count > 0)
@@ -29,10 +30,11 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour
             for (var i = _behaviours.Count - 1; i >= 0; i--)
             {
                 ValidatableMonoBehaviour behaviour = _behaviours[i];
-            
+
                 if (behaviour == null)
                 {
                     _behaviours.RemoveAt(i);
+
                     continue;
                 }
 
@@ -40,18 +42,39 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour
 
                 if (behaviourState != ValidationState.Ok)
                 {
-                    invalidBehaviours.Add(new InvalidBehaviour
-                    {
-                        behaviourName = $"{behaviour.name}.{behaviour.GetType()}",
-                        errors = errors
-                    });
+                    invalidBehaviours.Add(
+                        new InvalidBehaviour
+                        {
+                            behaviourName = $"{GetFullBehaviourName(behaviour)} : {behaviour.GetType()}",
+                            errors = errors
+                        });
                 }
 
-                if (behaviourState > _state)
-                    _state = behaviourState;
+                if (behaviourState > State)
+                    State = behaviourState;
             }
         }
 
-        onStatusUpdate?.Invoke(_state);
+        onStatusUpdate?.Invoke(State);
+    }
+
+    private static string GetFullBehaviourName(Component behaviour)
+    {
+        if (behaviour.transform.parent == null)
+            return behaviour.name;
+
+        List <string> nameParts = new() {behaviour.name};
+
+        Transform parent = behaviour.transform.parent;
+
+        while (parent != null)
+        {
+            nameParts.Add(parent.name);
+            parent = parent.transform.parent;
+        }
+
+        nameParts.Reverse();
+
+        return string.Join(".", nameParts);
     }
 }

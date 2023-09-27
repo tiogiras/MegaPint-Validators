@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -51,7 +52,11 @@ public class ValidationDrawer : UnityEditor.Editor
             _error.style.display = state == ValidationState.Error ? DisplayStyle.Flex : DisplayStyle.None;
 
             _errorFoldout.style.display = _status.invalidBehaviours.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
-            _errorView.itemsSource = _status.invalidBehaviours;
+
+            List <InvalidBehaviour> invalidBehaviours = _status.invalidBehaviours;
+            invalidBehaviours.Sort();
+            
+            _errorView.itemsSource = invalidBehaviours;
             _errorView.RefreshItems();
         };
 
