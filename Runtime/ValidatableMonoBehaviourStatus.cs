@@ -9,7 +9,7 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour
 
     public Action <ValidationState> onStatusUpdate;
 
-    public List <InvalidBehaviour> invalidBehaviours = new ();
+    public readonly List <InvalidBehaviour> invalidBehaviours = new ();
 
     public void AddValidatableMonoBehaviour(ValidatableMonoBehaviour behaviour)
     {
@@ -36,7 +36,7 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour
                     continue;
                 }
 
-                ValidationState behaviourState = behaviour.Validate(out List <InvalidBehaviour.ValidationError> errors);
+                ValidationState behaviourState = behaviour.Validate(out List <ValidationError> errors);
 
                 if (behaviourState != ValidationState.Ok)
                 {

@@ -30,10 +30,10 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         _status.ValidateStatus();
     }
 
-    public ValidationState Validate(out List<InvalidBehaviour.ValidationError> errors)
+    public ValidationState Validate(out List<ValidationError> errors)
     {
         var state = ValidationState.Ok;
-        errors = new List <InvalidBehaviour.ValidationError>();
+        errors = new List <ValidationError>();
 
         if (_requirements is not {Count: > 0})
             return state;
@@ -43,7 +43,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
             if (requirement == null)
                 continue;
 
-            ValidationState requirementState = requirement.Validate(gameObject, out List <InvalidBehaviour.ValidationError> additionalErrors);
+            ValidationState requirementState = requirement.Validate(gameObject, out List <ValidationError> additionalErrors);
             
             if (additionalErrors.Count > 0)
                 errors.AddRange(additionalErrors);

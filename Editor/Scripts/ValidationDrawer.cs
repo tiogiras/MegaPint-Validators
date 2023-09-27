@@ -77,7 +77,7 @@ public class ValidationDrawer : UnityEditor.Editor
 
             errors.bindItem = (visualElement, j) =>
             {
-                InvalidBehaviour.ValidationError error = invalidBehaviour.errors[j];
+                ValidationError error = invalidBehaviour.errors[j];
 
                 var label = visualElement.Q <Label>("Name");
                 label.text = error.errorName;

@@ -15,9 +15,9 @@ public class RequireDefaultTransform : ValidationRequirementMetaData, IValidatio
     [SerializeField] private bool _defaultRotation;
     [SerializeField] private bool _defaultScale;
 
-    public ValidationState Validate(GameObject gameObject, out List <InvalidBehaviour.ValidationError> errors)
+    public ValidationState Validate(GameObject gameObject, out List <ValidationError> errors)
     {
-        errors = new List <InvalidBehaviour.ValidationError>();
+        errors = new List <ValidationError>();
         Transform transform = gameObject.transform;
 
         var validPosition = transform.position == Vector3.zero || !_defaultPosition;
@@ -40,9 +40,9 @@ public class RequireDefaultTransform : ValidationRequirementMetaData, IValidatio
         if (!validScale)
             errorText.AppendLine("Scale should be (1,1,1)");
         
-        errors.Add(new InvalidBehaviour.ValidationError
+        errors.Add(new ValidationError
         {
-            fixAction = Fix,
+            fixAction = FixAction,
             gameObject = gameObject,
             severity = ValidationState.Warning,
             errorName = "Non-Default Transform",
@@ -52,7 +52,7 @@ public class RequireDefaultTransform : ValidationRequirementMetaData, IValidatio
         return ValidationState.Warning;
     }
 
-    public void Fix(GameObject gameObject)
+    public void FixAction(GameObject gameObject)
     {
         Transform transform = gameObject.transform;
 
