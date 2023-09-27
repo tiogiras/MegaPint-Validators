@@ -7,7 +7,7 @@ namespace ValidationRequirement.Requirements
 {
 
 [Serializable]
-[SerializeReferenceDropdownName("Require Children Validation")]
+[SerializeReferenceDropdownName("Child Validation")]
 public class RequireChildrenValidation : ValidationRequirementMetaData, IValidationRequirement
 {
     public ValidationState Validate(GameObject gameObject, out List <ValidationError> errors)
