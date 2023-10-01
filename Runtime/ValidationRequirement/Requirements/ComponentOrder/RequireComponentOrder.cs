@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Codice.CM.SEIDInfo;
 using SerializeReferenceDropdown.Runtime;
 using UnityEditorInternal;
 using UnityEngine;
@@ -25,9 +24,9 @@ public class RequireComponentOrder : ScriptableValidationRequirement
     {
         if (_config == null)
             return;
-        
+
         List <Component> components = gameObject.GetComponents <Component>().ToList();
-        
+
         if (components[0] is Transform or RectTransform)
             components.RemoveAt(0);
 
@@ -37,10 +36,10 @@ public class RequireComponentOrder : ScriptableValidationRequirement
 
         if (valid)
             valid = CheckOrderFromBottom(components, belowFillTypes);
-        
+
         if (valid)
             return;
-        
+
         AddError(
             "Incorrect Component Order",
             "",
@@ -48,41 +47,11 @@ public class RequireComponentOrder : ScriptableValidationRequirement
             FixAction);
     }
 
-    private void GetComponentStructure(out List <string> aboveFillTypes, out List <string> belowFillTypes)
-    {
-        aboveFillTypes = new();
-        belowFillTypes = new();
+    #endregion
 
-        var reachedFill = false;
-        foreach (ComponentOrderConfig.Type type in _config.types)
-        {
-            if (type.function == ComponentOrderConfig.SpecialFunction.Fill)
-            {
-                reachedFill = true;
-                continue;
-            }
+    #region Private Methods
 
-            if (!reachedFill)
-                aboveFillTypes.Add(type.componentName);
-            else
-                belowFillTypes.Add(type.componentName);
-        }
-    }
-
-    private bool CheckOrderFromTop(IReadOnlyList <Component> components, List <string> componentTypes)
-    {
-        List <string> existingComponents = GetExistingComponents(components, componentTypes);
-        
-        for (var i = 0; i < existingComponents.Count; i++)
-        {
-            if (!components[i].GetType().Name.Equals(existingComponents[i]))
-                return false;
-        }
-
-        return true;
-    }
-
-    private bool CheckOrderFromBottom(List<Component> components, List <string> componentTypes)
+    private bool CheckOrderFromBottom(List <Component> components, List <string> componentTypes)
     {
         List <string> existingComponents = GetExistingComponents(components, componentTypes);
         existingComponents.Reverse();
@@ -95,7 +64,74 @@ public class RequireComponentOrder : ScriptableValidationRequirement
 
         return true;
     }
-    
+
+    private bool CheckOrderFromTop(IReadOnlyList <Component> components, List <string> componentTypes)
+    {
+        List <string> existingComponents = GetExistingComponents(components, componentTypes);
+
+        for (var i = 0; i < existingComponents.Count; i++)
+        {
+            if (!components[i].GetType().Name.Equals(existingComponents[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    private void FixAction(GameObject gameObject)
+    {
+        if (_config == null)
+            return;
+
+        List <Component> components = gameObject.GetComponents <Component>().ToList();
+        Dictionary <string, List <Component>> componentDictionary = new();
+
+        foreach (Component component in components)
+        {
+            var componentName = component.GetType().Name;
+            componentDictionary.TryAdd(componentName, new List <Component>());
+
+            componentDictionary[componentName].Add(component);
+        }
+
+        if (components[0] is Transform or RectTransform)
+            components.RemoveAt(0);
+
+        GetComponentStructure(out List <string> aboveFillTypes, out List <string> belowFillTypes);
+
+        List <string> aboveComponents = GetExistingComponents(components, aboveFillTypes);
+        aboveComponents.Reverse();
+
+        MoveAllToTop(componentDictionary, aboveComponents);
+
+        List <string> belowComponents = GetExistingComponents(components, belowFillTypes);
+
+        MoveAllToBottom(componentDictionary, belowComponents);
+    }
+
+    private void GetComponentStructure(out List <string> aboveFillTypes, out List <string> belowFillTypes)
+    {
+        aboveFillTypes = new List <string>();
+        belowFillTypes = new List <string>();
+
+        var reachedFill = false;
+
+        foreach (ComponentOrderConfig.Type type in _config.types)
+        {
+            if (type.function == ComponentOrderConfig.SpecialFunction.Fill)
+            {
+                reachedFill = true;
+
+                continue;
+            }
+
+            if (!reachedFill)
+                aboveFillTypes.Add(type.componentName);
+            else
+                belowFillTypes.Add(type.componentName);
+        }
+    }
+
     private List <string> GetExistingComponents(IEnumerable <Component> components, List <string> componentTypes)
     {
         Dictionary <string, int> types = new();
@@ -126,71 +162,10 @@ public class RequireComponentOrder : ScriptableValidationRequirement
             }
             catch (KeyNotFoundException)
             {
-                
             }
         }
 
         return existingComponents;
-    }
-
-    private void FixAction(GameObject gameObject)
-    {
-        if (_config == null)
-            return;
-
-        List <Component> components = gameObject.GetComponents <Component>().ToList();
-        Dictionary <string, List <Component>> componentDictionary = new();
-
-        foreach (Component component in components)
-        {
-            var componentName = component.GetType().Name;
-            componentDictionary.TryAdd(componentName, new List <Component>());
-            
-            componentDictionary[componentName].Add(component);
-        }
-
-        if (components[0] is Transform or RectTransform)
-            components.RemoveAt(0);
-
-        GetComponentStructure(out List <string> aboveFillTypes, out List <string> belowFillTypes);
-        
-        List <string> aboveComponents = GetExistingComponents(components, aboveFillTypes);
-        aboveComponents.Reverse();
-
-        MoveAllToTop(componentDictionary, aboveComponents);
-        
-        List <string> belowComponents = GetExistingComponents(components, belowFillTypes);
-
-        MoveAllToBottom(componentDictionary, belowComponents);
-    }
-
-    private void MoveAllToTop(IReadOnlyDictionary <string, List <Component>> componentDictionary, List <string> aboveComponents)
-    {
-        foreach (var aboveComponent in aboveComponents)
-        {
-            try
-            {
-                foreach (Component component in componentDictionary[aboveComponent])
-                {
-                    MoveToTop(component);
-                }
-            }
-            catch (KeyNotFoundException)
-            {
-                
-            }
-        }
-    }
-
-    private void MoveToTop(Component component)
-    {
-#if UNITY_EDITOR
-        while (true)
-        {
-            if (!ComponentUtility.MoveComponentUp(component))
-                return;
-        }  
-#endif
     }
 
     private void MoveAllToBottom(IReadOnlyDictionary <string, List <Component>> componentDictionary, List <string> belowComponents)
@@ -200,13 +175,25 @@ public class RequireComponentOrder : ScriptableValidationRequirement
             try
             {
                 foreach (Component component in componentDictionary[belowComponent])
-                {
                     MoveToBottom(component);
-                }
             }
             catch (KeyNotFoundException)
             {
-                
+            }
+        }
+    }
+
+    private void MoveAllToTop(IReadOnlyDictionary <string, List <Component>> componentDictionary, List <string> aboveComponents)
+    {
+        foreach (var aboveComponent in aboveComponents)
+        {
+            try
+            {
+                foreach (Component component in componentDictionary[aboveComponent])
+                    MoveToTop(component);
+            }
+            catch (KeyNotFoundException)
+            {
             }
         }
     }
@@ -218,7 +205,18 @@ public class RequireComponentOrder : ScriptableValidationRequirement
         {
             if (!ComponentUtility.MoveComponentDown(component))
                 return;
-        }  
+        }
+#endif
+    }
+
+    private void MoveToTop(Component component)
+    {
+#if UNITY_EDITOR
+        while (true)
+        {
+            if (!ComponentUtility.MoveComponentUp(component))
+                return;
+        }
 #endif
     }
 
