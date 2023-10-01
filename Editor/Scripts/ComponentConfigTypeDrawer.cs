@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using ValidationRequirement.Requirements.ComponentOrder;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Editor.Scripts
 {
@@ -31,6 +33,8 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
         _configTemplate = Resources.Load <VisualTreeAsset>(ConfigPath);
         TemplateContainer configBase = _configTemplate.Instantiate();
         root.Add(configBase);
+        
+        root.RegisterCallback <FocusOutEvent>(Save);
 
         var addButton = root.Q <Button>("BTN_Add");
         addButton.clicked += AddListElement;
@@ -60,6 +64,8 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
     private void AddListElement()
     {
         _types.Add(new ComponentOrderConfig.Type());
+        _isDirty = true;
+        
         _listView.RefreshItems();
     }
 
@@ -71,6 +77,8 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
             return;
         
         _types.RemoveAt(index);
+        _isDirty = true;
+        
         _listView.RefreshItems();
     }
 
@@ -90,7 +98,23 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
             evt =>
             {
                 _types[(int)element.userData].componentName = evt.newValue;
+                _isDirty = true;
             });
+    }
+
+    private void Save(FocusOutEvent evt)
+    {
+        if (!_isDirty)
+            return;
+
+        _isDirty = false;
+        
+        serializedObject.ApplyModifiedProperties();
+        Debug.Log("Saving");
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(serializedObject.targetObject);
+        AssetDatabase.SaveAssetIfDirty(serializedObject.targetObject);   
+#endif
     }
 }
 
