@@ -7,6 +7,6 @@
         </ui:GroupBox>
     </ui:VisualElement>
     <ui:GroupBox>
-        <ui:ListView virtualization-method="DynamicHeight" selection-type="None" show-border="true" show-alternating-row-backgrounds="ContentOnly" show-foldout-header="false" header-title="Component Order Configuration" show-add-remove-footer="false" reorder-mode="Animated" reorderable="true" horizontal-scrolling="false" show-bound-collection-size="false" />
+        <ui:ListView virtualization-method="DynamicHeight" selection-type="None" show-border="true" show-alternating-row-backgrounds="ContentOnly" show-foldout-header="false" header-title="Component Order Configuration" show-add-remove-footer="true" reorder-mode="Animated" reorderable="true" horizontal-scrolling="false" show-bound-collection-size="false" focusable="false" />
     </ui:GroupBox>
 </ui:UXML>
