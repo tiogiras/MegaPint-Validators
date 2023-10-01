@@ -2,7 +2,6 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using ValidationRequirement.Requirements.ComponentOrder;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -18,36 +17,38 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
     private const string TypeEntryPath = BasePath + "TypeEntry";
 
     private VisualTreeAsset _configTemplate;
-    private VisualTreeAsset _typeEntryTemplate;
-    
-    private ListView _listView;
-
-    private List<ComponentOrderConfig.Type> _types;
 
     private bool _isDirty;
-    
+
+    private ListView _listView;
+    private VisualTreeAsset _typeEntryTemplate;
+
+    private List <ComponentOrderConfig.Type> _types;
+
+    #region Public Methods
+
     public override VisualElement CreateInspectorGUI()
     {
         var root = new VisualElement();
-        
+
         _configTemplate = Resources.Load <VisualTreeAsset>(ConfigPath);
         TemplateContainer configBase = _configTemplate.Instantiate();
         root.Add(configBase);
-        
+
         root.RegisterCallback <FocusOutEvent>(Save);
 
         var addButton = root.Q <Button>("BTN_Add");
         addButton.clicked += AddListElement;
-        
+
         var removeButton = root.Q <Button>("BTN_Remove");
         removeButton.clicked += RemoveListElement;
 
         _listView = root.Q <ListView>();
 
         _typeEntryTemplate = Resources.Load <VisualTreeAsset>(TypeEntryPath);
-        
+
         _listView.makeItem = () => _typeEntryTemplate.Instantiate();
-        
+
         _listView.bindItem = (element, i) =>
         {
             element.userData = i;
@@ -60,12 +61,16 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
 
         return root;
     }
-    
+
+    #endregion
+
+    #region Private Methods
+
     private void AddListElement()
     {
         _types.Add(new ComponentOrderConfig.Type());
         _isDirty = true;
-        
+
         _listView.RefreshItems();
     }
 
@@ -75,11 +80,25 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
 
         if (!_types[index].canBeModified)
             return;
-        
+
         _types.RemoveAt(index);
         _isDirty = true;
-        
+
         _listView.RefreshItems();
+    }
+
+    private void Save(FocusOutEvent evt)
+    {
+        if (!_isDirty)
+            return;
+
+        _isDirty = false;
+
+        serializedObject.ApplyModifiedProperties();
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(serializedObject.targetObject);
+        AssetDatabase.SaveAssetIfDirty(serializedObject.targetObject);
+#endif
     }
 
     private void UpdateEntry(VisualElement element, int i)
@@ -93,7 +112,7 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
         componentName.style.opacity = entry.canBeModified ? 1 : .5f;
         componentName.isReadOnly = !entry.canBeModified;
         componentName.value = entry.componentName;
-        
+
         componentName.RegisterValueChangedCallback(
             evt =>
             {
@@ -102,20 +121,7 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
             });
     }
 
-    private void Save(FocusOutEvent evt)
-    {
-        if (!_isDirty)
-            return;
-
-        _isDirty = false;
-        
-        serializedObject.ApplyModifiedProperties();
-        Debug.Log("Saving");
-#if UNITY_EDITOR
-        EditorUtility.SetDirty(serializedObject.targetObject);
-        AssetDatabase.SaveAssetIfDirty(serializedObject.targetObject);   
-#endif
-    }
+    #endregion
 }
 
 }
