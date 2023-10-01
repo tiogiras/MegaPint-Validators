@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using SerializeReferenceDropdown.Runtime;
 using UnityEngine;
@@ -9,30 +8,36 @@ namespace ValidationRequirement.Requirements
 
 [Serializable]
 [SerializeReferenceDropdownName("Custom Global Transform")]
-public class RequireGlobalTransform : ValidationRequirementMetaData, IValidationRequirement
+public class RequireGlobalTransform : ScriptableValidationRequirement
 {
-    [SerializeField, Tooltip("If true the transform position requirement is used")]
+    [SerializeField] [Tooltip("If true the transform position requirement is used")]
     private bool _requireGlobalPosition;
-    
-    [SerializeField, Tooltip("If true the transform position requirement is used")]
+
+    [SerializeField] [Tooltip("If true the transform position requirement is used")]
     private bool _requireGlobalRotation;
-    
-    [SerializeField, Tooltip("If true the transform position requirement is used")]
+
+    [SerializeField] [Tooltip("If true the transform position requirement is used")]
     private bool _requireGlobalScale;
-    
+
     [Space]
-    [SerializeField, Tooltip("The transform is required to have this specified global position")]
+    [SerializeField] [Tooltip("The transform is required to have this specified global position")]
     private Vector3 _globalPosition;
-    
-    [SerializeField, Tooltip("The transform is required to have this specified global rotation")]
+
+    [SerializeField] [Tooltip("The transform is required to have this specified global rotation")]
     private Vector3 _globalRotation;
 
-    [SerializeField, Tooltip("The transform is required to have this specified global scale")]
+    [SerializeField] [Tooltip("The transform is required to have this specified global scale")]
     private Vector3 _globalScale;
 
-    public ValidationState Validate(GameObject gameObject, out List <ValidationError> errors)
+    #region Protected Methods
+
+    protected override void OnInitialization()
     {
-        errors = new List <ValidationError>();
+        _globalScale = Vector3.one;
+    }
+
+    protected override void Validate(GameObject gameObject)
+    {
         Transform transform = gameObject.transform;
 
         var validPosition = transform.position == _globalPosition || !_requireGlobalPosition;
@@ -40,8 +45,8 @@ public class RequireGlobalTransform : ValidationRequirementMetaData, IValidation
         var validScale = transform.lossyScale == _globalScale || !_requireGlobalScale;
 
         if (validPosition && validRotation && validScale)
-            return ValidationState.Ok;
-        
+            return;
+
         var errorText = new StringBuilder();
 
         if (!validPosition)
@@ -52,26 +57,21 @@ public class RequireGlobalTransform : ValidationRequirementMetaData, IValidation
 
         if (!validScale)
             errorText.AppendLine($"Scale should be {_globalScale}");
-        
-        errors.Add(new ValidationError
-        {
-            errorName = "Transform differs from specifications",
-            errorText = errorText.ToString(),
-            fixAction = FixAction,
-            gameObject = gameObject,
-            severity = ValidationState.Warning
-        });
 
-        return ValidationState.Warning;
+        AddError("Transform differs from specifications", errorText.ToString(), ValidationState.Warning, FixAction);
     }
+
+    #endregion
+
+    #region Private Methods
 
     private void FixAction(GameObject gameObject)
     {
         Transform transform = gameObject.transform;
-        
+
         if (_requireGlobalPosition)
             transform.position = _globalPosition;
-        
+
         if (_requireGlobalRotation)
             transform.rotation = Quaternion.Euler(_globalRotation);
 
@@ -84,15 +84,7 @@ public class RequireGlobalTransform : ValidationRequirementMetaData, IValidation
         transform.SetParent(originalParent);
     }
 
-    public void OnValidate()
-    {
-        TryInitialize();
-    }
-
-    protected override void Initialize()
-    {
-        _globalScale = Vector3.one;
-    }
+    #endregion
 }
 
 }

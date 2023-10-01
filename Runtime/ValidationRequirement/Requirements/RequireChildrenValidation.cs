@@ -8,69 +8,72 @@ namespace ValidationRequirement.Requirements
 
 [Serializable]
 [SerializeReferenceDropdownName("Child Validation")]
-public class RequireChildrenValidation : ValidationRequirementMetaData, IValidationRequirement
+public class RequireChildrenValidation : ScriptableValidationRequirement
 {
-    public ValidationState Validate(GameObject gameObject, out List <ValidationError> errors)
-    {
-        errors = new List <ValidationError>();
+    #region Protected Methods
 
+    protected override void OnInitialization()
+    {
+    }
+
+    protected override void Validate(GameObject gameObject)
+    {
+        List <ValidatableMonoBehaviourStatus> behaviourStates = CollectBehaviourStates(
+            gameObject.transform,
+            out List <GameObject> invalidGameObjects,
+            out ValidationState severity);
+
+        if (behaviourStates.Count == 0)
+            return;
+
+        var myStatus = gameObject.GetComponent <ValidatableMonoBehaviourStatus>();
+
+        foreach (ValidatableMonoBehaviourStatus behaviourStatus in behaviourStates)
+            myStatus.invalidBehaviours.AddRange(behaviourStatus.invalidBehaviours);
+
+        var errorText = $"Errors found under the following gameObjects:\n{string.Join("\n", invalidGameObjects)}";
+
+        AddError("Invalid monoBehaviours in children", errorText, severity, null);
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private List <ValidatableMonoBehaviourStatus> CollectBehaviourStates(
+        Transform transform,
+        out List <GameObject> invalidGameObjects,
+        out ValidationState severity)
+    {
         List <ValidatableMonoBehaviourStatus> behaviourStates = new();
 
-        var highestState = ValidationState.Ok;
-        List <GameObject> invalidStates = new();
-        
-        foreach (Transform tr in gameObject.transform)
+        severity = ValidationState.Ok;
+        invalidGameObjects = new List <GameObject>();
+
+        foreach (Transform tr in transform)
         {
             ValidatableMonoBehaviourStatus[] states = tr.GetComponentsInChildren <ValidatableMonoBehaviourStatus>();
 
             foreach (ValidatableMonoBehaviourStatus behaviourStatus in states)
             {
                 behaviourStatus.ValidateStatus();
-                
+
                 if (behaviourStatus.State <= ValidationState.Ok)
                     continue;
-                    
-                invalidStates.Add(behaviourStatus.gameObject);
-                
-                if (behaviourStatus.State > highestState)
-                    highestState = behaviourStatus.State;
+
+                invalidGameObjects.Add(behaviourStatus.gameObject);
+
+                if (behaviourStatus.State > severity)
+                    severity = behaviourStatus.State;
             }
-            
+
             behaviourStates.AddRange(states);
         }
 
-        if (behaviourStates.Count <= 0)
-            return ValidationState.Ok;
-
-        var myStatus = gameObject.GetComponent<ValidatableMonoBehaviourStatus>();
-
-        foreach (ValidatableMonoBehaviourStatus behaviourStatus in behaviourStates)
-        {
-            myStatus.invalidBehaviours.AddRange(behaviourStatus.invalidBehaviours);
-        }
-
-        var errorText = $"Errors found under the following gameObjects:\n{string.Join("\n", invalidStates)}";
-        
-        errors.Add(new ValidationError
-        {
-            errorName = "Invalid monoBehaviours in children",
-            errorText = errorText,
-            fixAction = null,
-            gameObject = null,
-            severity = highestState
-        });
-        
-        return highestState;
+        return behaviourStates;
     }
 
-    public void OnValidate()
-    {
-        TryInitialize();
-    }
-
-    protected override void Initialize()
-    {
-    }
+    #endregion
 }
 
 }
