@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -31,6 +32,12 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
         TemplateContainer configBase = _configTemplate.Instantiate();
         root.Add(configBase);
 
+        var addButton = root.Q <Button>("BTN_Add");
+        addButton.clicked += AddListElement;
+        
+        var removeButton = root.Q <Button>("BTN_Remove");
+        removeButton.clicked += RemoveListElement;
+
         _listView = root.Q <ListView>();
 
         _typeEntryTemplate = Resources.Load <VisualTreeAsset>(TypeEntryPath);
@@ -49,21 +56,36 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
 
         return root;
     }
+    
+    private void AddListElement()
+    {
+        _types.Add(new ComponentOrderConfig.Type());
+        _listView.RefreshItems();
+    }
+
+    private void RemoveListElement()
+    {
+        var index = _listView.selectedItem == null ? _types.Count - 1 : _listView.selectedIndex;
+
+        if (!_types[index].canBeModified)
+            return;
+        
+        _types.RemoveAt(index);
+        _listView.RefreshItems();
+    }
 
     private void UpdateEntry(VisualElement element, int i)
     {
         ComponentOrderConfig.Type entry = _types[i];
 
         element.tooltip = entry.tooltip;
-        
         element.Q <Label>("Index").text = (i + 1).ToString();
 
         var componentName = element.Q <TextField>("ComponentName");
-
         componentName.style.opacity = entry.canBeModified ? 1 : .5f;
         componentName.isReadOnly = !entry.canBeModified;
         componentName.value = entry.componentName;
-
+        
         componentName.RegisterValueChangedCallback(
             evt =>
             {
