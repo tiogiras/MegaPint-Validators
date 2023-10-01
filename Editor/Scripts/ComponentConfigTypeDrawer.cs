@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -21,6 +20,8 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
     private ListView _listView;
 
     private List<ComponentOrderConfig.Type> _types;
+
+    private bool _isDirty;
     
     public override VisualElement CreateInspectorGUI()
     {
@@ -38,22 +39,7 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
         
         _listView.bindItem = (element, i) =>
         {
-            ComponentOrderConfig.Type entry = _types[i];
-
-            /*element.Q <TextField>("NiceName").RegisterValueChangedCallback(
-                evt =>
-                {
-                    entry.name = evt.newValue;
-                    UpdateEntry(element, i);
-                });
-            
-            element.Q <TextField>("ComponentName").RegisterValueChangedCallback(
-                evt =>
-                {
-                    entry.componentName = evt.newValue;
-                    UpdateEntry(element, i);
-                });*/
-            
+            element.userData = i;
             UpdateEntry(element, i);
         };
 
@@ -67,19 +53,22 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
     private void UpdateEntry(VisualElement element, int i)
     {
         ComponentOrderConfig.Type entry = _types[i];
-        
-        element.Q <Foldout>().text = entry.name;
 
-        var niceName = element.Q <TextField>("NiceName");
-        niceName.value = entry.name;
-        niceName.style.display = entry.canBeModified ? DisplayStyle.Flex : DisplayStyle.None;
+        element.tooltip = entry.tooltip;
+        
+        element.Q <Label>("Index").text = (i + 1).ToString();
 
         var componentName = element.Q <TextField>("ComponentName");
-        componentName.value = entry.componentName;
-        componentName.style.display = entry.canBeModified ? DisplayStyle.Flex : DisplayStyle.None;
 
-        var notModification = element.Q <VisualElement>("NoModification");
-        notModification.style.display = !entry.canBeModified ? DisplayStyle.Flex : DisplayStyle.None;
+        componentName.style.opacity = entry.canBeModified ? 1 : .5f;
+        componentName.isReadOnly = !entry.canBeModified;
+        componentName.value = entry.componentName;
+
+        componentName.RegisterValueChangedCallback(
+            evt =>
+            {
+                _types[(int)element.userData].componentName = evt.newValue;
+            });
     }
 }
 
