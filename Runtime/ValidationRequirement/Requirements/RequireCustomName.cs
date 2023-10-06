@@ -10,8 +10,10 @@ namespace ValidationRequirement.Requirements
 [SerializeReferenceDropdownName("Regex Naming Validation")]
 public class RequireCustomName : ScriptableValidationRequirement
 {
+    [HideInInspector] public string name;
+
     [SerializeField] [Tooltip("Regex expression after which the name of the gameObject is validated")]
-    private string _regexPattern;
+    [TextArea] private string _regexPattern;
 
     #region Protected Methods
 
