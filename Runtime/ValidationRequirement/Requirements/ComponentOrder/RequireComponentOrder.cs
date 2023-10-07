@@ -27,6 +27,11 @@ public class RequireComponentOrder : ScriptableValidationRequirement
 
         List <Component> components = gameObject.GetComponents <Component>().ToList();
 
+        foreach (Component component in components)
+        {
+            Debug.Log(component.GetType().Namespace);
+        }
+
         if (components[0] is Transform or RectTransform)
             components.RemoveAt(0);
 
