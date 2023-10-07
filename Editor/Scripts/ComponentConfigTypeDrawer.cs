@@ -78,11 +78,7 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
 
         _listView.makeItem = () => _typeEntryTemplate.Instantiate();
 
-        _listView.bindItem = (element, i) =>
-        {
-            element.userData = i;
-            UpdateEntry(element, i);
-        };
+        _listView.bindItem = UpdateEntry;
 
         _types = ((ComponentOrderConfig)target).types;
         _listView.itemsSource = _types;
@@ -194,6 +190,7 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
         ComponentOrderConfig.Type entry = _types[i];
 
         element.tooltip = entry.tooltip;
+        element.Q <Label>("Index").text = (i + 1).ToString();
 
         var componentContent = element.Q <GroupBox>("Component");
         var categoryContent = element.Q <GroupBox>("Category");
@@ -203,21 +200,18 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
         
         componentContent.style.opacity = entry.canBeModified ? 1 : .5f;
         categoryContent.style.opacity = entry.canBeModified ? 1 : .5f;
-
+        
         if (entry.isCategory)
         {
-            categoryContent.Q <Label>("Index").text = (i + 1).ToString();
             categoryContent.Q <Label>("CategoryTitle").text = entry.componentName;
 
             var customContent = categoryContent.Q <GroupBox>("CustomContent");
             customContent.Clear();
-            
+
             UpdateCategoryContent(element, customContent, entry);
         }
         else
         {
-            componentContent.Q <Label>("Index").text = (i + 1).ToString();
-            
             var componentName = componentContent.Q <TextField>();
             componentName.isReadOnly = !entry.canBeModified;
             componentName.value = entry.componentName;
@@ -225,10 +219,10 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
             componentName.RegisterValueChangedCallback(
                 evt =>
                 {
-                    if (_types[(int)element.userData].isCategory)
+                    if (_types[i].isCategory)
                         return;
                     
-                    _types[(int)element.userData].componentName = evt.newValue;
+                    _types[i].componentName = evt.newValue;
                     _isDirty = true;
                 });   
         }
@@ -251,6 +245,7 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
                 var namespaceField = new TextField(title)
                 {
                     value = entry.category.nameSpaceString,
+                    
                     style =
                     {
                         flexGrow = 1
@@ -262,7 +257,7 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
                 namespaceField.RegisterValueChangedCallback(
                     evt =>
                     {
-                        _types[(int)root.userData].category.nameSpaceString = evt.newValue;
+                        entry.category.nameSpaceString = evt.newValue;
                         _isDirty = true;
                     });
                 

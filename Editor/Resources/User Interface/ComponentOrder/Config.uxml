@@ -7,7 +7,7 @@
         </ui:GroupBox>
     </ui:VisualElement>
     <ui:GroupBox>
-        <ui:ListView virtualization-method="DynamicHeight" selection-type="Single" show-border="true" show-alternating-row-backgrounds="ContentOnly" show-foldout-header="false" header-title="Component Order Configuration" show-add-remove-footer="false" reorder-mode="Animated" reorderable="true" horizontal-scrolling="false" show-bound-collection-size="false" />
+        <ui:ListView reorderable="true" show-alternating-row-backgrounds="ContentOnly" show-border="true" reorder-mode="Animated" fixed-item-height="50" />
         <ui:GroupBox style="flex-direction: row-reverse; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;">
             <ui:Button text="-" display-tooltip-when-elided="true" name="BTN_Remove" style="-unity-font-style: bold; font-size: 16px;" />
             <ui:Button text="+" display-tooltip-when-elided="true" name="BTN_Add" style="font-size: 16px; -unity-font-style: bold;" />

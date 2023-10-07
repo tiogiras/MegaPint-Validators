@@ -19,6 +19,7 @@ public class ComponentOrderConfig : ScriptableObject
         public bool isCategory;
         public CategorySettings category;
         
+        [Serializable]
         public struct CategorySettings
         {
             public CategoryFunction function;
@@ -26,6 +27,7 @@ public class ComponentOrderConfig : ScriptableObject
         }
     }
 
+    
     public enum CategoryFunction
     {
         Fill, AddCategory, NonUnityComponents, NamespaceContains, NamespaceEquals
