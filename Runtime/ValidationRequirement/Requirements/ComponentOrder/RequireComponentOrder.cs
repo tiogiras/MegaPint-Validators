@@ -123,7 +123,7 @@ public class RequireComponentOrder : ScriptableValidationRequirement
 
         foreach (ComponentOrderConfig.Type type in _config.types)
         {
-            if (type.function == ComponentOrderConfig.SpecialFunction.Fill)
+            if (type.category.function == ComponentOrderConfig.CategoryFunction.Fill)
             {
                 reachedFill = true;
 
@@ -135,6 +135,12 @@ public class RequireComponentOrder : ScriptableValidationRequirement
             else
                 belowFillTypes.Add(type.componentName);
         }
+
+        Debug.Log("Above");
+        Debug.Log(string.Join("\n", aboveFillTypes));
+        
+        Debug.Log("Below");
+        Debug.Log(string.Join("\n", belowFillTypes));
     }
 
     private List <string> GetExistingComponents(IEnumerable <Component> components, List <string> componentTypes)

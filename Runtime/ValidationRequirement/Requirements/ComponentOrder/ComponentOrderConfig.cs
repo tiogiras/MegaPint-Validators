@@ -15,24 +15,20 @@ public class ComponentOrderConfig : ScriptableObject
         public bool canBeDeleted = true;
         public string componentName;
         public string tooltip;
-        public SpecialFunction function;
-        
-        // Category Specifics
-        public CategoryFunction categoryFunction;
+
         public bool isCategory;
+        public CategorySettings category;
         
-        // Namespace Categories
-        public string nameSpaceString;
+        public struct CategorySettings
+        {
+            public CategoryFunction function;
+            public string nameSpaceString;
+        }
     }
 
     public enum CategoryFunction
     {
-        AddCategory, NonUnityComponents, NamespaceContains, NamespaceEquals
-    }
-
-    public enum SpecialFunction
-    {
-        None, Fill
+        Fill, AddCategory, NonUnityComponents, NamespaceContains, NamespaceEquals
     }
 
     public List <Type> types = new()
@@ -50,7 +46,11 @@ public class ComponentOrderConfig : ScriptableObject
             canBeDeleted = false,
             componentName = "Fill",
             tooltip = "All non specified monoBehaviours will be placed here",
-            function = SpecialFunction.Fill
+            isCategory = true,
+            category =
+            {
+                function = CategoryFunction.Fill
+            }
         }
     };
 }

@@ -52,6 +52,7 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
 
         var categoryDropdown = root.Q <DropdownField>("CategoryDropdown");
         categoryDropdown.choices = Enum.GetNames(typeof(ComponentOrderConfig.CategoryFunction)).ToList();
+        categoryDropdown.choices.Remove("Fill");
 
         for (var i = 0; i < categoryDropdown.choices.Count; i++)
         {
@@ -102,11 +103,14 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
             new ComponentOrderConfig.Type
             {
                 componentName = categoryFunction,
-                categoryFunction = function,
                 tooltip = CategoryFunctionTooltip(function),
                 canBeDeleted = true,
-                canBeModified = false,
-                isCategory = true
+                canBeModified = true,
+                isCategory = true,
+                category =
+                {
+                    function = function
+                }
             });
 
         _isDirty = true;
@@ -196,6 +200,9 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
 
         componentContent.style.display = entry.isCategory ? DisplayStyle.None : DisplayStyle.Flex;
         categoryContent.style.display = entry.isCategory ? DisplayStyle.Flex : DisplayStyle.None;
+        
+        componentContent.style.opacity = entry.canBeModified ? 1 : .5f;
+        categoryContent.style.opacity = entry.canBeModified ? 1 : .5f;
 
         if (entry.isCategory)
         {
@@ -212,13 +219,15 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
             componentContent.Q <Label>("Index").text = (i + 1).ToString();
             
             var componentName = componentContent.Q <TextField>();
-            componentName.style.opacity = entry.canBeModified ? 1 : .5f;
             componentName.isReadOnly = !entry.canBeModified;
             componentName.value = entry.componentName;
 
             componentName.RegisterValueChangedCallback(
                 evt =>
                 {
+                    if (_types[(int)element.userData].isCategory)
+                        return;
+                    
                     _types[(int)element.userData].componentName = evt.newValue;
                     _isDirty = true;
                 });   
@@ -227,20 +236,21 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
 
     private void UpdateCategoryContent(VisualElement root, VisualElement element, ComponentOrderConfig.Type entry)
     {
-        switch (entry.categoryFunction)
+        switch (entry.category.function)
         {
             case ComponentOrderConfig.CategoryFunction.AddCategory: break;
+            case ComponentOrderConfig.CategoryFunction.Fill: break;
             case ComponentOrderConfig.CategoryFunction.NonUnityComponents: break;
             case ComponentOrderConfig.CategoryFunction.NamespaceContains or 
                 ComponentOrderConfig.CategoryFunction.NamespaceEquals:
 
-                var title = entry.categoryFunction == ComponentOrderConfig.CategoryFunction.NamespaceContains
+                var title = entry.category.function == ComponentOrderConfig.CategoryFunction.NamespaceContains
                     ? "Control String"
                     : "Namespace";
 
                 var namespaceField = new TextField(title)
                 {
-                    value = entry.nameSpaceString,
+                    value = entry.category.nameSpaceString,
                     style =
                     {
                         flexGrow = 1
@@ -252,7 +262,7 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
                 namespaceField.RegisterValueChangedCallback(
                     evt =>
                     {
-                        _types[(int)root.userData].nameSpaceString = evt.newValue;
+                        _types[(int)root.userData].category.nameSpaceString = evt.newValue;
                         _isDirty = true;
                     });
                 
