@@ -27,6 +27,8 @@ public class ValidationDrawer : UnityEditor.Editor
 
     private Foldout _errorFoldout;
 
+    private Button _fixAllButton;
+
     public override VisualElement CreateInspectorGUI()
     {
         var root = new VisualElement();
@@ -53,6 +55,8 @@ public class ValidationDrawer : UnityEditor.Editor
 
             _errorFoldout.style.display = _status.invalidBehaviours.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
 
+            _fixAllButton.style.display = _status.State == ValidationState.Ok ? DisplayStyle.None : DisplayStyle.Flex;
+            
             List <InvalidBehaviour> invalidBehaviours = _status.invalidBehaviours;
             invalidBehaviours.Sort();
 
@@ -61,6 +65,20 @@ public class ValidationDrawer : UnityEditor.Editor
         };
 
         root.Q <Button>("BTN_Validate").clicked += () => {_status.ValidateStatus();};
+
+        _fixAllButton = root.Q <Button>("BTN_FixAll");
+        _fixAllButton.style.display = _status.State == ValidationState.Ok ? DisplayStyle.None : DisplayStyle.Flex;
+        
+        _fixAllButton.clicked += () =>
+        {
+            foreach (InvalidBehaviour invalidBehaviour in _status.invalidBehaviours)
+            {
+                foreach (ValidationError error in invalidBehaviour.errors)
+                {
+                    error.fixAction.Invoke(error.gameObject);
+                }
+            }
+        };
 
         _behaviourEntry = Resources.Load <VisualTreeAsset>(BehaviourEntry);
         _errorEntry = Resources.Load <VisualTreeAsset>(ErrorEntry);

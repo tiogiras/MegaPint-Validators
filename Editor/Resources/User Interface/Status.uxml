@@ -9,6 +9,7 @@
                 <ui:Label text="ERROR" display-tooltip-when-elided="true" name="Error" style="-unity-font-style: bold; -unity-text-align: upper-center; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;); padding-top: 5px; padding-bottom: 5px; width: auto; font-size: 12px; white-space: normal; margin-left: 5px; color: rgb(178, 46, 38);" />
             </ui:GroupBox>
             <ui:GroupBox style="margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-direction: row; align-items: center;">
+                <ui:Button text="Fix All" display-tooltip-when-elided="true" name="BTN_FixAll" style="margin-left: 0; margin-right: 5px; margin-top: 0; margin-bottom: 0;" />
                 <ui:Button text="Validate" display-tooltip-when-elided="true" name="BTN_Validate" style="margin-left: 0; margin-right: 10px; margin-top: 0; margin-bottom: 0;" />
             </ui:GroupBox>
         </ui:GroupBox>
