@@ -12,7 +12,21 @@ namespace ValidationRequirement.Requirements.ComponentOrder
 [SerializeReferenceDropdownName("Component Order")]
 public class RequireComponentOrder : ScriptableValidationRequirement
 {
+    private struct Category : IComparable <Category>
+    {
+        public ComponentOrderConfig.Type type;
+        public List <Component> components;
+        public int priority;
+
+        public int CompareTo(Category other)
+        {
+            return -priority.CompareTo(other.priority);
+        }
+    }
+
     [SerializeField] private ComponentOrderConfig _config;
+
+    private List <Category> _allCategories;
 
     #region Protected Methods
 
@@ -25,25 +39,30 @@ public class RequireComponentOrder : ScriptableValidationRequirement
         if (_config == null)
             return;
 
-        List <Component> components = gameObject.GetComponents <Component>().ToList();
+        List <Component> components = GetAllComponents(gameObject);
 
-        foreach (Component component in components)
-        {
-            Debug.Log(component.GetType().Namespace);
-        }
+        ConvertCategories(
+            out List <Category> allCategories,
+            out List <Category> categories,
+            out List <Category> specificComponents,
+            out Category fill);
 
-        if (components[0] is Transform or RectTransform)
-            components.RemoveAt(0);
+        CollectComponentsForSpecifics(specificComponents, ref components);
 
-        GetComponentStructure(out List <string> aboveFillTypes, out List <string> belowFillTypes);
+        categories.Sort();
 
-        var valid = CheckOrderFromTop(components, aboveFillTypes);
+        CollectComponentsForCategories(categories, ref components);
 
-        if (valid)
-            valid = CheckOrderFromBottom(components, belowFillTypes);
+        if (components.Count > 0)
+            fill.components.AddRange(components);
 
-        if (valid)
+        components = GetAllComponents(gameObject);
+
+        if (CheckComponentOrder(components, allCategories))
             return;
+
+        allCategories.Reverse();
+        _allCategories = allCategories;
 
         AddError(
             "Incorrect Component Order",
@@ -56,168 +75,163 @@ public class RequireComponentOrder : ScriptableValidationRequirement
 
     #region Private Methods
 
-    private bool CheckOrderFromBottom(List <Component> components, List <string> componentTypes)
+    private bool CheckComponentOrder(List <Component> components, List <Category> allCategories)
     {
-        List <string> existingComponents = GetExistingComponents(components, componentTypes);
-        existingComponents.Reverse();
+        Category currentCategory = allCategories[0];
+        var currentCategoryIndex = 0;
+        var currentCategoryElementIndex = 0;
 
-        for (var i = 0; i < existingComponents.Count; i++)
+        foreach (Component component in components)
         {
-            if (!components[^(i + 1)].GetType().Name.Equals(existingComponents[i]))
+            if (currentCategoryElementIndex >= currentCategory.components.Count)
+            {
+                currentCategory = GetNextCategory(allCategories, ref currentCategoryIndex);
+                currentCategoryElementIndex = 0;
+            }
+
+            if (!currentCategory.components.Contains(component))
                 return false;
+
+            currentCategoryElementIndex++;
         }
 
         return true;
     }
 
-    private bool CheckOrderFromTop(IReadOnlyList <Component> components, List <string> componentTypes)
+    private void CollectComponentsForCategories(List <Category> categories, ref List <Component> components)
     {
-        List <string> existingComponents = GetExistingComponents(components, componentTypes);
-
-        for (var i = 0; i < existingComponents.Count; i++)
+        foreach (Category category in categories)
         {
-            if (!components[i].GetType().Name.Equals(existingComponents[i]))
-                return false;
-        }
+            if (category.type.category.function
+                    is ComponentOrderConfig.CategoryFunction.NamespaceContains
+                    or ComponentOrderConfig.CategoryFunction.NamespaceEquals &&
+                string.IsNullOrEmpty(category.type.category.nameSpaceString))
+                continue;
 
-        return true;
+            for (var i = components.Count - 1; i >= 0; i--)
+            {
+                var nameSpace = components[i].GetType().Namespace;
+
+                if (!IsInCategory(nameSpace, category))
+                    continue;
+
+                category.components.Add(components[i]);
+                components.RemoveAt(i);
+            }
+        }
+    }
+
+    private void CollectComponentsForSpecifics(List <Category> specificComponents, ref List <Component> components)
+    {
+        foreach (Category category in specificComponents)
+        {
+            for (var i = components.Count - 1; i >= 0; i--)
+            {
+                if (!components[i].GetType().Name.Equals(category.type.componentName))
+                    continue;
+
+                category.components.Add(components[i]);
+                components.RemoveAt(i);
+            }
+        }
+    }
+
+    private void ConvertCategories(
+        out List <Category> allCategories,
+        out List <Category> categories,
+        out List <Category> specificComponents,
+        out Category fill)
+    {
+        allCategories = new List <Category>();
+        categories = new List <Category>();
+        specificComponents = new List <Category>();
+        fill = new Category();
+
+        foreach (ComponentOrderConfig.Type type in _config.types)
+        {
+            var category = new Category
+            {
+                type = type,
+                components = new List <Component>(),
+                priority = type.category.function switch
+                           {
+                               ComponentOrderConfig.CategoryFunction.AddCategory => 0,
+                               ComponentOrderConfig.CategoryFunction.NonUnityComponents => 0,
+                               ComponentOrderConfig.CategoryFunction.NamespaceContains => 1,
+                               ComponentOrderConfig.CategoryFunction.NamespaceEquals => 2,
+                               ComponentOrderConfig.CategoryFunction.Fill => 0,
+                               var _ => throw new ArgumentOutOfRangeException()
+                           }
+            };
+
+            if (type.isCategory)
+            {
+                if (type.category.function == ComponentOrderConfig.CategoryFunction.Fill)
+                    fill = category;
+                else
+                    categories.Add(category);
+            }
+            else
+                specificComponents.Add(category);
+
+            allCategories.Add(category);
+        }
     }
 
     private void FixAction(GameObject gameObject)
     {
-        if (_config == null)
-            return;
-
-        List <Component> components = gameObject.GetComponents <Component>().ToList();
-        Dictionary <string, List <Component>> componentDictionary = new();
-
-        foreach (Component component in components)
+        foreach (Category category in _allCategories)
         {
-            var componentName = component.GetType().Name;
-            componentDictionary.TryAdd(componentName, new List <Component>());
-
-            componentDictionary[componentName].Add(component);
+            foreach (Component component in category.components)
+                MoveToTop(component);
         }
+    }
+
+    private List <Component> GetAllComponents(GameObject gameObject)
+    {
+        List <Component> components = gameObject.GetComponents <Component>().ToList();
 
         if (components[0] is Transform or RectTransform)
             components.RemoveAt(0);
 
-        GetComponentStructure(out List <string> aboveFillTypes, out List <string> belowFillTypes);
-
-        List <string> aboveComponents = GetExistingComponents(components, aboveFillTypes);
-        aboveComponents.Reverse();
-
-        MoveAllToTop(componentDictionary, aboveComponents);
-
-        List <string> belowComponents = GetExistingComponents(components, belowFillTypes);
-
-        MoveAllToBottom(componentDictionary, belowComponents);
+        return components;
     }
 
-    private void GetComponentStructure(out List <string> aboveFillTypes, out List <string> belowFillTypes)
+    private Category GetNextCategory(IReadOnlyList <Category> allCategories, ref int currentCategoryIndex)
     {
-        aboveFillTypes = new List <string>();
-        belowFillTypes = new List <string>();
+        Category newCategory;
 
-        var reachedFill = false;
-
-        foreach (ComponentOrderConfig.Type type in _config.types)
-        {
-            if (type.category.function == ComponentOrderConfig.CategoryFunction.Fill)
-            {
-                reachedFill = true;
-
-                continue;
-            }
-
-            if (!reachedFill)
-                aboveFillTypes.Add(type.componentName);
-            else
-                belowFillTypes.Add(type.componentName);
-        }
-
-        Debug.Log("Above");
-        Debug.Log(string.Join("\n", aboveFillTypes));
-        
-        Debug.Log("Below");
-        Debug.Log(string.Join("\n", belowFillTypes));
-    }
-
-    private List <string> GetExistingComponents(IEnumerable <Component> components, List <string> componentTypes)
-    {
-        Dictionary <string, int> types = new();
-
-        foreach (var componentType in componentTypes)
-        {
-            types.TryAdd(componentType, 0);
-            types[componentType]++;
-        }
-
-        List <string> componentTypeNames = components.Select(component => component.GetType().Name).ToList();
-        componentTypeNames = componentTypeNames.Distinct().ToList();
-
-        foreach (var componentType in componentTypeNames)
-        {
-            types.TryAdd(componentType, 0);
-            types[componentType]++;
-        }
-
-        List <string> existingComponents = new();
-
-        foreach (var componentType in componentTypes)
-        {
-            try
-            {
-                if (types[componentType] > 1)
-                    existingComponents.Add(componentType);
-            }
-            catch (KeyNotFoundException)
-            {
-            }
-        }
-
-        return existingComponents;
-    }
-
-    private void MoveAllToBottom(IReadOnlyDictionary <string, List <Component>> componentDictionary, List <string> belowComponents)
-    {
-        foreach (var belowComponent in belowComponents)
-        {
-            try
-            {
-                foreach (Component component in componentDictionary[belowComponent])
-                    MoveToBottom(component);
-            }
-            catch (KeyNotFoundException)
-            {
-            }
-        }
-    }
-
-    private void MoveAllToTop(IReadOnlyDictionary <string, List <Component>> componentDictionary, List <string> aboveComponents)
-    {
-        foreach (var aboveComponent in aboveComponents)
-        {
-            try
-            {
-                foreach (Component component in componentDictionary[aboveComponent])
-                    MoveToTop(component);
-            }
-            catch (KeyNotFoundException)
-            {
-            }
-        }
-    }
-
-    private void MoveToBottom(Component component)
-    {
-#if UNITY_EDITOR
         while (true)
         {
-            if (!ComponentUtility.MoveComponentDown(component))
-                return;
+            currentCategoryIndex++;
+            newCategory = allCategories[currentCategoryIndex];
+
+            if (newCategory.components.Count > 0)
+                break;
         }
-#endif
+
+        return newCategory;
+    }
+
+    private bool IsInCategory(string nameSpace, Category category)
+    {
+        return category.type.category.function switch
+               {
+                   ComponentOrderConfig.CategoryFunction.AddCategory => false,
+                   ComponentOrderConfig.CategoryFunction.Fill => false,
+                   ComponentOrderConfig.CategoryFunction.NonUnityComponents => IsNonUnityComponent(nameSpace),
+                   ComponentOrderConfig.CategoryFunction.NamespaceContains => NamespaceContains(nameSpace, category),
+                   ComponentOrderConfig.CategoryFunction.NamespaceEquals => NamespaceEquals(nameSpace, category),
+                   var _ => false
+               };
+    }
+
+    private bool IsNonUnityComponent(string nameSpace)
+    {
+        if (string.IsNullOrEmpty(nameSpace))
+            return false;
+
+        return !nameSpace.StartsWith("UnityEngine");
     }
 
     private void MoveToTop(Component component)
@@ -229,6 +243,22 @@ public class RequireComponentOrder : ScriptableValidationRequirement
                 return;
         }
 #endif
+    }
+
+    private bool NamespaceContains(string nameSpace, Category category)
+    {
+        if (string.IsNullOrEmpty(nameSpace))
+            return false;
+
+        return nameSpace.Contains(category.type.category.nameSpaceString);
+    }
+
+    private bool NamespaceEquals(string nameSpace, Category category)
+    {
+        if (string.IsNullOrEmpty(nameSpace))
+            return false;
+
+        return nameSpace.Equals(category.type.category.nameSpaceString);
     }
 
     #endregion
