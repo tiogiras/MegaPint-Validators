@@ -7,7 +7,7 @@ namespace ValidationRequirement.Requirements
 {
 
 [Serializable]
-[SerializeReferenceDropdownName("Custom Global Transform")]
+[SerializeReferenceDropdownName("Transform/Custom Global")]
 public class RequireGlobalTransform : ScriptableValidationRequirement
 {
     [SerializeField] [Tooltip("If true the transform position requirement is used")]
