@@ -61,13 +61,14 @@ namespace SerializeReferenceDropdown.Editor
             EditorGUI.EndDisabledGroup();
 
             var dropdownTypeContent = new GUIContent(
-                text: GetTypeName(referenceType),
+                text: GetType(referenceType).name,
                 tooltip: GetTypeTooltip(referenceType));
             if (EditorGUI.DropdownButton(dropdownRect,dropdownTypeContent, FocusType.Keyboard))
             {
                 var dropdown = new SerializeReferenceDropdownAdvancedDropdown(new AdvancedDropdownState(),
-                    _assignableTypes.Select(GetTypeName),
+                    _assignableTypes.Select(GetType),
                     index => WriteNewInstanceByIndexType(index, property));
+
                 dropdown.Show(dropdownRect);
             }
 
@@ -85,18 +86,20 @@ namespace SerializeReferenceDropdown.Editor
             }
         }
 
-        private static string GetTypeName(Type type)
+        private static SerializeReferenceDropdownNameAttribute GetType(Type type)
         {
             if (type == null)
-                return NullName;
+                return new SerializeReferenceDropdownNameAttribute(NullName, -1);
 
-            var typesWithNames = TypeCache.GetTypesWithAttribute(typeof(SerializeReferenceDropdownNameAttribute));
-            if (!typesWithNames.Contains(type)) 
-                return ObjectNames.NicifyVariableName(type.Name);
+            /*var typesWithNames = TypeCache.GetTypesWithAttribute(typeof(SerializeReferenceDropdownNameAttribute));
             
-            var dropdownNameAttribute = type.GetCustomAttribute<SerializeReferenceDropdownNameAttribute>();
-            return dropdownNameAttribute.Name;
-
+            if (!typesWithNames.Contains(type)) 
+                return new SerializeReferenceDropdownAdvancedDropdown.Type
+                {
+                    name = ObjectNames.NicifyVariableName(type.Name)
+                };*/
+            
+            return type.GetCustomAttribute<SerializeReferenceDropdownNameAttribute>();
         }
 
         private static string GetTypeTooltip(Type type)

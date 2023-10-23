@@ -7,7 +7,7 @@ namespace ValidationRequirement.Requirements
 {
 
 [Serializable]
-[SerializeReferenceDropdownName("Transform/Default")]
+[SerializeReferenceDropdownName("Transform/Default", 10, 0)]
 public class RequireDefaultTransform : ScriptableValidationRequirement
 {
     [SerializeField] [Tooltip("If true the transform is required to have a local position of (0,0,0)")]

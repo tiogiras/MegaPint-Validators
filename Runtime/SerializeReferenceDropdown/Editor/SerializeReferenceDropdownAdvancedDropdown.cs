@@ -1,37 +1,62 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SerializeReferenceDropdown.Runtime;
+using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SerializeReferenceDropdown.Editor
 {
     public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
     {
-        private readonly IEnumerable<string> _typeNames;
+        private readonly IEnumerable<SerializeReferenceDropdownNameAttribute> _attributes;
         private readonly Dictionary<AdvancedDropdownItem, int> _itemAndIndexes = new();
         private readonly Dictionary <string, TreeElement> _dropdownTree = new();
         
         private readonly Action<int> _onSelectedTypeIndex;
 
-        private class TreeElement
+        private class TreeElement : IComparable <TreeElement>
         {
             public AdvancedDropdownItem item;
             public Dictionary <string, TreeElement> subItems;
+            
+            public int order;
 
-            public TreeElement(string typeName)
+            public TreeElement(string typeName, int order)
             {
                 item = new AdvancedDropdownItem(typeName);
                 subItems = new Dictionary <string, TreeElement>();
+                this.order = order;
+            }
+
+            public int CompareTo(TreeElement other)
+            {
+                if (order > other.order)
+                    return 1;
+
+                if (order < other.order)
+                    return -1;
+
+                if (subItems.Count > 0 && other.subItems.Count == 0)
+                    return -1;
+
+                if (subItems.Count == 0 && other.subItems.Count > 0)
+                    return 1;
+
+                return 0;
             }
         }
 
-        public SerializeReferenceDropdownAdvancedDropdown(AdvancedDropdownState state, IEnumerable<string> typeNames,
+        public SerializeReferenceDropdownAdvancedDropdown(AdvancedDropdownState state, IEnumerable<SerializeReferenceDropdownNameAttribute> attributes,
             Action<int> onSelectedNewType) :
             base(state)
         {
-            _typeNames = typeNames;
+            _attributes = attributes;
             _onSelectedTypeIndex = onSelectedNewType;
+
+            minimumSize = new Vector2(minimumSize.x, 300);
         }
 
         protected override AdvancedDropdownItem BuildRoot()
@@ -42,18 +67,27 @@ namespace SerializeReferenceDropdown.Editor
 
             var index = 0;
             
-            foreach (var typeName in _typeNames)
+            foreach (var attribute in _attributes)
             {
-                if (typeName.Contains("/"))
+                if (attribute.name.Contains("/"))
                 {
-                    var parts = typeName.Split("/");
+                    var parts = attribute.name.Split("/");
 
                     TreeElement parent = null;
 
                     for (var i = 0; i < parts.Length; i++)
                     {
                         var part = parts[i];
-                        var element = new TreeElement(part);
+
+                        int order = default;
+
+                        if (attribute.menuOrder != null)
+                        {
+                            if (attribute.menuOrder.Length >= i + 1)
+                                order = attribute.menuOrder[i];
+                        }
+                        
+                        var element = new TreeElement(part, order);
 
                         if (i == parts.Length - 1)
                         {
@@ -75,14 +109,16 @@ namespace SerializeReferenceDropdown.Editor
                 }
                 else
                 {
-                    var element = new TreeElement(typeName);
-                    _dropdownTree.TryAdd(typeName, element);
+                    var element = new TreeElement(attribute.name, attribute.menuOrder is {Length: > 0}
+                                                      ? attribute.menuOrder[0]
+                                                      : default);
+                    
+                    _dropdownTree.TryAdd(attribute.name, element);
                     
                     _itemAndIndexes.Add(element.item, index);
                     index++;
                 }
             }
-            
             
             AddItems(root, _dropdownTree.Values.ToList());
 
@@ -91,8 +127,17 @@ namespace SerializeReferenceDropdown.Editor
 
         private void AddItems(AdvancedDropdownItem parent, List <TreeElement> elements)
         {
+            elements.Sort();
+
+            var lastOrder = elements[0].order;
+            
             foreach (TreeElement element in elements)
             {
+                if (Mathf.Abs(Mathf.Abs(lastOrder) - Mathf.Abs(element.order)) >= 10)
+                    parent.AddSeparator();
+
+                lastOrder = element.order;
+                
                 AddItem(parent, element);
                 
                 if (element.subItems.Count > 0)

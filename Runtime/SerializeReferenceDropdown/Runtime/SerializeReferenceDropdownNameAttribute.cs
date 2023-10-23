@@ -6,11 +6,13 @@ namespace SerializeReferenceDropdown.Runtime
     [AttributeUsage(AttributeTargets.Class)]
     public class SerializeReferenceDropdownNameAttribute : PropertyAttribute
     {
-        public readonly string Name;
-    
-        public SerializeReferenceDropdownNameAttribute(string name)
+        public readonly string name;
+        public readonly int[] menuOrder;
+
+        public SerializeReferenceDropdownNameAttribute(string name, params int[] menuOrder)
         {
-            Name = name;
+            this.name = name;
+            this.menuOrder = menuOrder;
         }
     }
 }

@@ -9,7 +9,7 @@ namespace ValidationRequirement.Requirements.ComponentOrder
 {
 
 [Serializable]
-[SerializeReferenceDropdownName("Component Order")]
+[SerializeReferenceDropdownName("Component Order", 11)]
 public class RequireComponentOrder : ScriptableValidationRequirement
 {
     private struct Category : IComparable <Category>

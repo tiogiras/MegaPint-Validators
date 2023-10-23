@@ -7,7 +7,7 @@ namespace ValidationRequirement.Requirements
 {
 
 [Serializable]
-[SerializeReferenceDropdownName("Transform/Custom Local")]
+[SerializeReferenceDropdownName("Transform/Custom Local", default, 1)]
 public class RequireLocalTransform : ScriptableValidationRequirement
 {
     [SerializeField] [Tooltip("If true the transform position requirement is used")]
