@@ -2,162 +2,176 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SerializeReferenceDropdown.Runtime;
-using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace SerializeReferenceDropdown.Editor
 {
-    public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
+
+public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
+{
+    private class TreeElement : IComparable <TreeElement>
     {
-        private readonly IEnumerable<SerializeReferenceDropdownNameAttribute> _attributes;
-        private readonly Dictionary<AdvancedDropdownItem, int> _itemAndIndexes = new();
-        private readonly Dictionary <string, TreeElement> _dropdownTree = new();
-        
-        private readonly Action<int> _onSelectedTypeIndex;
+        public readonly AdvancedDropdownItem item;
 
-        private class TreeElement : IComparable <TreeElement>
+        public readonly int order;
+        public readonly Dictionary <string, TreeElement> subItems;
+
+        public TreeElement(string typeName, int order)
         {
-            public AdvancedDropdownItem item;
-            public Dictionary <string, TreeElement> subItems;
-            
-            public int order;
-
-            public TreeElement(string typeName, int order)
-            {
-                item = new AdvancedDropdownItem(typeName);
-                subItems = new Dictionary <string, TreeElement>();
-                this.order = order;
-            }
-
-            public int CompareTo(TreeElement other)
-            {
-                if (order > other.order)
-                    return 1;
-
-                if (order < other.order)
-                    return -1;
-
-                if (subItems.Count > 0 && other.subItems.Count == 0)
-                    return -1;
-
-                if (subItems.Count == 0 && other.subItems.Count > 0)
-                    return 1;
-
-                return 0;
-            }
+            item = new AdvancedDropdownItem(typeName);
+            subItems = new Dictionary <string, TreeElement>();
+            this.order = order;
         }
 
-        public SerializeReferenceDropdownAdvancedDropdown(AdvancedDropdownState state, IEnumerable<SerializeReferenceDropdownNameAttribute> attributes,
-            Action<int> onSelectedNewType) :
-            base(state)
-        {
-            _attributes = attributes;
-            _onSelectedTypeIndex = onSelectedNewType;
+        #region Public Methods
 
-            minimumSize = new Vector2(minimumSize.x, 300);
+        public int CompareTo(TreeElement other)
+        {
+            if (order > other.order)
+                return 1;
+
+            if (order < other.order)
+                return -1;
+
+            return subItems.Count switch
+                   {
+                       > 0 when other.subItems.Count == 0 => -1,
+                       0 when other.subItems.Count > 0 => 1,
+                       var _ => string.CompareOrdinal(item.name, other.item.name)
+                   };
         }
 
-        protected override AdvancedDropdownItem BuildRoot()
-        {
-            var root = new AdvancedDropdownItem("Requirements");
-            _itemAndIndexes.Clear();
-            _dropdownTree.Clear();
+        #endregion
+    }
 
-            var index = 0;
-            
-            foreach (var attribute in _attributes)
+    private readonly IEnumerable <SerializeReferenceDropdownNameAttribute> _attributes;
+    private readonly Dictionary <string, TreeElement> _dropdownTree = new();
+    private readonly Dictionary <AdvancedDropdownItem, int> _itemAndIndexes = new();
+
+    private readonly Action <int> _onSelectedTypeIndex;
+
+    public SerializeReferenceDropdownAdvancedDropdown(
+        AdvancedDropdownState state,
+        IEnumerable <SerializeReferenceDropdownNameAttribute> attributes,
+        Action <int> onSelectedNewType) :
+        base(state)
+    {
+        _attributes = attributes;
+        _onSelectedTypeIndex = onSelectedNewType;
+
+        minimumSize = new Vector2(minimumSize.x, 300);
+    }
+
+    #region Protected Methods
+
+    protected override AdvancedDropdownItem BuildRoot()
+    {
+        var root = new AdvancedDropdownItem("Requirements");
+        _itemAndIndexes.Clear();
+        _dropdownTree.Clear();
+
+        var index = 0;
+
+        foreach (SerializeReferenceDropdownNameAttribute attribute in _attributes)
+        {
+            if (attribute.name.Contains("/"))
             {
-                if (attribute.name.Contains("/"))
+                var parts = attribute.name.Split("/");
+
+                TreeElement parent = null;
+
+                for (var i = 0; i < parts.Length; i++)
                 {
-                    var parts = attribute.name.Split("/");
+                    var part = parts[i];
 
-                    TreeElement parent = null;
+                    int order = default;
 
-                    for (var i = 0; i < parts.Length; i++)
+                    if (attribute.menuOrder != null)
                     {
-                        var part = parts[i];
+                        if (attribute.menuOrder.Length >= i + 1)
+                            order = attribute.menuOrder[i];
+                    }
 
-                        int order = default;
+                    var element = new TreeElement(part, order);
+                    var key = $"{part}{element.order}";
 
-                        if (attribute.menuOrder != null)
-                        {
-                            if (attribute.menuOrder.Length >= i + 1)
-                                order = attribute.menuOrder[i];
-                        }
-                        
-                        var element = new TreeElement(part, order);
+                    if (i == parts.Length - 1)
+                    {
+                        _itemAndIndexes.Add(element.item, index);
+                        index++;
+                    }
 
-                        if (i == parts.Length - 1)
-                        {
-                            _itemAndIndexes.Add(element.item, index);
-                            index++;
-                        }
-
-                        if (parent == null)
-                        {
-                            _dropdownTree.TryAdd(part, element);
-                            parent = _dropdownTree[part];
-                        }
-                        else
-                        {
-                            parent.subItems.TryAdd(part, element);
-                            parent = parent.subItems[part];
-                        }
+                    if (parent == null)
+                    {
+                        _dropdownTree.TryAdd(key, element);
+                        parent = _dropdownTree[key];
+                    }
+                    else
+                    {
+                        parent.subItems.TryAdd(key, element);
+                        parent = parent.subItems[key];
                     }
                 }
-                else
-                {
-                    var element = new TreeElement(attribute.name, attribute.menuOrder is {Length: > 0}
-                                                      ? attribute.menuOrder[0]
-                                                      : default);
-                    
-                    _dropdownTree.TryAdd(attribute.name, element);
-                    
-                    _itemAndIndexes.Add(element.item, index);
-                    index++;
-                }
             }
-            
-            AddItems(root, _dropdownTree.Values.ToList());
-
-            return root;
-        }
-
-        private void AddItems(AdvancedDropdownItem parent, List <TreeElement> elements)
-        {
-            elements.Sort();
-
-            var lastOrder = elements[0].order;
-            
-            foreach (TreeElement element in elements)
+            else
             {
-                if (Mathf.Abs(Mathf.Abs(lastOrder) - Mathf.Abs(element.order)) >= 10)
-                    parent.AddSeparator();
+                var element = new TreeElement(
+                    attribute.name,
+                    attribute.menuOrder is {Length: > 0}
+                        ? attribute.menuOrder[0]
+                        : default);
 
-                lastOrder = element.order;
-                
-                AddItem(parent, element);
-                
-                if (element.subItems.Count > 0)
-                    AddItems(element.item, element.subItems.Values.ToList());
+                _dropdownTree.TryAdd($"{attribute.name}{element.order}", element);
+
+                _itemAndIndexes.Add(element.item, index);
+                index++;
             }
         }
-        
-        private void AddItem(AdvancedDropdownItem parent, TreeElement element)
-        {
-            parent.AddChild(element.item);
-        }
-        
 
-        protected override void ItemSelected(AdvancedDropdownItem item)
+        AddItems(root, _dropdownTree.Values.ToList());
+
+        return root;
+    }
+
+    protected override void ItemSelected(AdvancedDropdownItem item)
+    {
+        base.ItemSelected(item);
+
+        if (_itemAndIndexes.TryGetValue(item, out var index))
+            _onSelectedTypeIndex.Invoke(index);
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private void AddItem(AdvancedDropdownItem parent, TreeElement element)
+    {
+        parent.AddChild(element.item);
+    }
+
+    private void AddItems(AdvancedDropdownItem parent, List <TreeElement> elements)
+    {
+        elements.Sort();
+
+        var lastOrder = elements[0].order;
+
+        foreach (TreeElement element in elements)
         {
-            base.ItemSelected(item);
-            if (_itemAndIndexes.TryGetValue(item, out var index))
-            {
-                _onSelectedTypeIndex.Invoke(index);
-            }
+            if (Mathf.Abs(Mathf.Abs(lastOrder) - Mathf.Abs(element.order)) >= 10)
+                parent.AddSeparator();
+
+            lastOrder = element.order;
+
+            AddItem(parent, element);
+
+            if (element.subItems.Count > 0)
+                AddItems(element.item, element.subItems.Values.ToList());
         }
     }
+
+    #endregion
+}
+
 }

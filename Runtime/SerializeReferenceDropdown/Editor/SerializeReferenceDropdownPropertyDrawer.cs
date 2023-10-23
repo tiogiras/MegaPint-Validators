@@ -89,7 +89,7 @@ namespace SerializeReferenceDropdown.Editor
         private static SerializeReferenceDropdownNameAttribute GetType(Type type)
         {
             if (type == null)
-                return new SerializeReferenceDropdownNameAttribute(NullName, -1);
+                return new SerializeReferenceDropdownNameAttribute(NullName, -30);
 
             /*var typesWithNames = TypeCache.GetTypesWithAttribute(typeof(SerializeReferenceDropdownNameAttribute));
             

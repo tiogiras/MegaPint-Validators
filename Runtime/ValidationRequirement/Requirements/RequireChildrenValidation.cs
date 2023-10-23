@@ -7,7 +7,7 @@ namespace ValidationRequirement.Requirements
 {
 
 [Serializable]
-[SerializeReferenceDropdownName("Child Validation", 0)]
+[SerializeReferenceDropdownName("Child Validation", -29)]
 public class RequireChildrenValidation : ScriptableValidationRequirement
 {
     #region Protected Methods
