@@ -78,6 +78,8 @@ public class ValidationDrawer : UnityEditor.Editor
                     error.fixAction.Invoke(error.gameObject);
                 }
             }
+            
+            _status.ValidateStatus();
         };
 
         _behaviourEntry = Resources.Load <VisualTreeAsset>(BehaviourEntry);
