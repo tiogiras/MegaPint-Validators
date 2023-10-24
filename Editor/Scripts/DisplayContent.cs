@@ -20,6 +20,8 @@ public static partial class DisplayContent
             "User Interface/Display Content Tabs/Tab0",
             "User Interface/Display Content Tabs/Tab1",
             "User Interface/Display Content Tabs/Tab2");
+        
+        SwitchTab(tabContentParent, 0);
     }
 
     #endregion
