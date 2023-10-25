@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ValidatableMonoBehaviourStatus : MonoBehaviour
+public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <ValidatableMonoBehaviourStatus>
 {
     private List <ValidatableMonoBehaviour> _behaviours = new();
 
@@ -76,5 +76,16 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour
         nameParts.Reverse();
 
         return string.Join(".", nameParts);
+    }
+
+    public int CompareTo(ValidatableMonoBehaviourStatus other)
+    {
+        if ((int)State > (int)other.State)
+            return -1;
+
+        if ((int)State < (int)other.State)
+            return 1;
+
+        return string.CompareOrdinal(gameObject.name, other.gameObject.name);
     }
 }
