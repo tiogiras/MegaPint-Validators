@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using SerializeReferenceDropdown.Runtime;
 using UnityEngine;
 using ValidationRequirement;
+using ValidationRequirement.Requirements;
 
 [RequireComponent(typeof(ValidatableMonoBehaviourStatus))]
 public abstract class ValidatableMonoBehaviour : MonoBehaviour
@@ -11,6 +13,11 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
     private ValidatableMonoBehaviourStatus _status;
 
+    public bool ValidatesChildren()
+    {
+        return _requirements.Any(requirement => requirement.GetType() == typeof(RequireChildrenValidation));
+    }
+    
     private void OnValidate()
     {
         if (_status == null)

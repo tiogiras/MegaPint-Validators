@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <ValidatableMonoBehaviourStatus>
@@ -18,6 +19,11 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
             return;
 
         _behaviours.Add(behaviour);
+    }
+
+    public bool ValidatesChildren()
+    {
+        return _behaviours.Any(behaviour => behaviour.ValidatesChildren());
     }
 
     public void ValidateStatus()
