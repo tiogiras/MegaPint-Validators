@@ -9,6 +9,7 @@
             <ui:GroupBox name="Settings" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
                 <ui:Toggle label="Show Children" name="ShowChildren" tooltip="Show Child GameObjects even if the parent contains a ChildValidation requirement." />
                 <ui:DropdownField label="Search Mode" index="0" choices="In Project,Single Folder, Including Subfolders" name="ProjectSearchMode" />
+                <ui:Toggle label="Show Children" name="ShowChildren_Project" tooltip="Show Child GameObjects even if the parent contains a ChildValidation requirement." />
                 <ui:GroupBox name="ChangeButtonParent" style="flex-direction: row; margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
                     <ui:Button text="Choose Folder in Project" display-tooltip-when-elided="true" name="BTN_Change" />
                 </ui:GroupBox>

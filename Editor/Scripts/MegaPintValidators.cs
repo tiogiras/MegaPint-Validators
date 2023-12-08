@@ -40,6 +40,7 @@ public class MegaPintValidators : MegaPintEditorWindowBase
     private MegaPintSettingsBase _validatorsSettings;
     
     private List <ValidatableMonoBehaviourStatus> _validatableMonoBehaviours = new();
+    private List <ValidatableMonoBehaviourStatus> _displayedItems = new();
 
     protected override string BasePath() => "User Interface/ValidatorView/ValidatorView";
 
@@ -89,8 +90,8 @@ public class MegaPintValidators : MegaPintEditorWindowBase
 
         _mainList.bindItem = (element, i) =>
         {
-            element.Q <Label>("ObjectName").text = _validatableMonoBehaviours[i].gameObject.name;
-            element.Q <Label>("Status").text = $"[{_validatableMonoBehaviours[i].State}]";
+            element.Q <Label>("ObjectName").text = _displayedItems[i].gameObject.name;
+            element.Q <Label>("Status").text = $"[{_displayedItems[i].State}]";
         };
 
         _mainList.style.display = DisplayStyle.None;
@@ -133,7 +134,9 @@ public class MegaPintValidators : MegaPintEditorWindowBase
         _projectSearchMode.RegisterValueChangedCallback(OnProjectSearchModeChanged);
         _showChildrenProject.RegisterValueChangedCallback(OnShowChildrenProjectChanged);
 
-        _btnChange.clickable = new Clickable(() => {ChangeFolderPath();});
+        _searchField.RegisterValueChangedCallback(_ => {DisplayBySearchField();});
+        
+        _btnChange.clickable = new Clickable(ChangeFolderPath);
     }
 
     private void ChangeFolderPath()
@@ -178,6 +181,8 @@ public class MegaPintValidators : MegaPintEditorWindowBase
         
         _projectSearchMode.UnregisterValueChangedCallback(OnProjectSearchModeChanged);
         _showChildrenProject.UnregisterValueChangedCallback(OnShowChildrenProjectChanged);
+
+        _btnChange.clickable = null;
     }
 
     private void PerformSearch(SearchMode mode)
@@ -284,14 +289,32 @@ public class MegaPintValidators : MegaPintEditorWindowBase
 
             validatableMonoBehaviourStatus.ValidateStatus();
         }
+        
+        DisplayBySearchField();
 
-        _validatableMonoBehaviours.Sort();
-        
-        _mainList.itemsSource = _validatableMonoBehaviours;
-        _mainList.RefreshItems();
-        
         _mainList.style.display = DisplayStyle.Flex;
         _searchField.style.display = DisplayStyle.Flex;
+    }
+
+    private void DisplayBySearchField()
+    {
+        _displayedItems.Clear();
+
+        if (string.IsNullOrEmpty(_searchField.value))
+            _displayedItems.AddRange(_validatableMonoBehaviours); 
+        else
+        {
+            foreach (ValidatableMonoBehaviourStatus validatableMonoBehaviour in _validatableMonoBehaviours)
+            {
+                if (!validatableMonoBehaviour.gameObject.name.Contains(_searchField.value))
+                    continue;
+            
+                _displayedItems.Add(validatableMonoBehaviour);
+            }   
+        }
+
+        _mainList.itemsSource = _displayedItems;
+        _mainList.RefreshItems();
     }
 
     private List <string> GetSubFolders(string folderPath)
