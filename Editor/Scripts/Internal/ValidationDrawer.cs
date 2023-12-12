@@ -75,7 +75,10 @@ public class ValidationDrawer : UnityEditor.Editor
             {
                 foreach (ValidationError error in invalidBehaviour.errors)
                 {
-                    error.fixAction.Invoke(error.gameObject);
+                    if (error.fixAction == null)
+                        Debug.LogWarning($"No FixAction specified for [{error.errorName}], requires manual attention!");
+                    else 
+                        error.fixAction.Invoke(error.gameObject);
                 }
             }
             
