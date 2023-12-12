@@ -8,8 +8,10 @@ using ValidationRequirement.Requirements;
 [RequireComponent(typeof(ValidatableMonoBehaviourStatus))]
 public abstract class ValidatableMonoBehaviour : MonoBehaviour
 {
+    public ValidatorSettings _importedSettings;
+    
     [SerializeReferenceDropdown] [SerializeReference]
-    private List <IValidationRequirement> _requirements;
+    public List <IValidationRequirement> _requirements;
 
     private ValidatableMonoBehaviourStatus _status;
 
