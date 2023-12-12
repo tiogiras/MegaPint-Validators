@@ -7,7 +7,7 @@ using ValidationRequirement;
 public class ValidatorSettings : ScriptableObject
 {
     [SerializeReferenceDropdown] [SerializeReference]
-    private List <IValidationRequirement> _requirements;
+    public List <IValidationRequirement> _requirements;
 
     public void SetRequirements(List <IValidationRequirement> requirements)
     {

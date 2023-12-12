@@ -66,8 +66,11 @@ public class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
             var commandName = Event.current.commandName;
 
             if (commandName == "ObjectSelectorClosed")
-                ((ValidatableMonoBehaviour)target)._importedSettings = (ValidatorSettings)EditorGUIUtility.GetObjectPickerObject();
-            
+            {
+                ((ValidatableMonoBehaviour)target)._importedSettings = (ValidatorSettings)EditorGUIUtility.GetObjectPickerObject();   
+                ((ValidatableMonoBehaviour)target).OnValidate();  
+            }
+
             EditorGUILayout.EndHorizontal();
         }
 

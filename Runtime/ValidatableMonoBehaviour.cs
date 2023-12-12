@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SerializeReferenceDropdown.Runtime;
 using UnityEngine;
+using UnityEngine.Serialization;
 using ValidationRequirement;
 using ValidationRequirement.Requirements;
 
@@ -10,17 +11,20 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 {
     public ValidatorSettings _importedSettings;
     
+    [FormerlySerializedAs("_requirementss")]
     [SerializeReferenceDropdown] [SerializeReference]
     public List <IValidationRequirement> _requirements;
 
     private ValidatableMonoBehaviourStatus _status;
 
+    private List <IValidationRequirement> Requiremtents => _importedSettings == null ? _requirements : _importedSettings._requirements;
+
     public bool ValidatesChildren()
     {
-        return _requirements.Any(requirement => requirement.GetType() == typeof(RequireChildrenValidation));
+        return Requiremtents.Any(requirement => requirement.GetType() == typeof(RequireChildrenValidation));
     }
     
-    private void OnValidate()
+    public void OnValidate()
     {
         if (_status == null)
         {
@@ -28,10 +32,10 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
             _status.AddValidatableMonoBehaviour(this);
         }
 
-        if (_requirements is not {Count: > 0})
+        if (Requiremtents is not {Count: > 0})
             return;
 
-        foreach (IValidationRequirement requirement in _requirements)
+        foreach (IValidationRequirement requirement in Requiremtents)
         {
             requirement?.OnValidate();
         }
@@ -44,10 +48,10 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         var state = ValidationState.Ok;
         errors = new List <ValidationError>();
 
-        if (_requirements is not {Count: > 0})
+        if (Requiremtents is not {Count: > 0})
             return state;
         
-        foreach (IValidationRequirement requirement in _requirements)
+        foreach (IValidationRequirement requirement in Requiremtents)
         {
             if (requirement == null)
                 continue;
