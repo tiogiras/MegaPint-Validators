@@ -31,6 +31,9 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
         State = ValidationState.Ok;
         invalidBehaviours.Clear();
 
+        if (gameObject.scene.name == null) // If prefab asset in project
+            _behaviours = gameObject.GetComponents <ValidatableMonoBehaviour>().ToList();
+
         if (_behaviours.Count > 0)
         {
             for (var i = _behaviours.Count - 1; i >= 0; i--)
@@ -43,9 +46,9 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
 
                     continue;
                 }
-
+                
                 ValidationState behaviourState = behaviour.Validate(out List <ValidationError> errors);
-
+                
                 if (behaviourState != ValidationState.Ok)
                 {
                     invalidBehaviours.Add(

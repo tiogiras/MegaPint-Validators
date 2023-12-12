@@ -90,8 +90,27 @@ public class MegaPintValidators : MegaPintEditorWindowBase
 
         _mainList.bindItem = (element, i) =>
         {
-            element.Q <Label>("ObjectName").text = _displayedItems[i].gameObject.name;
-            element.Q <Label>("Status").text = $"[{_displayedItems[i].State}]";
+            ValidatableMonoBehaviourStatus item = _displayedItems[i];
+            
+            element.Q <Label>("ObjectName").text = item.gameObject.name;
+
+            element.Q <Label>("Ok").style.display = item.State == ValidationState.Ok ? DisplayStyle.Flex : DisplayStyle.None;
+            element.Q <Label>("Warning").style.display = item.State == ValidationState.Warning ? DisplayStyle.Flex : DisplayStyle.None;
+            element.Q <Label>("Error").style.display = item.State == ValidationState.Error ? DisplayStyle.Flex : DisplayStyle.None;
+
+            Transform transform = item.transform;
+            var name = transform.name;
+
+            if (transform.parent != null)
+            {
+                while (transform.parent != null)
+                {
+                    transform = transform.parent;
+                    name = $"{transform.name}/{name}";
+                }
+            }
+            
+            element.tooltip = name;
         };
 
         _mainList.style.display = DisplayStyle.None;
@@ -301,7 +320,7 @@ public class MegaPintValidators : MegaPintEditorWindowBase
         _displayedItems.Clear();
 
         if (string.IsNullOrEmpty(_searchField.value))
-            _displayedItems.AddRange(_validatableMonoBehaviours); 
+            _displayedItems.AddRange(_validatableMonoBehaviours);
         else
         {
             foreach (ValidatableMonoBehaviourStatus validatableMonoBehaviour in _validatableMonoBehaviours)
@@ -313,6 +332,8 @@ public class MegaPintValidators : MegaPintEditorWindowBase
             }   
         }
 
+        _displayedItems.Sort();
+        
         _mainList.itemsSource = _displayedItems;
         _mainList.RefreshItems();
     }
@@ -356,10 +377,6 @@ public class MegaPintValidators : MegaPintEditorWindowBase
         _changeButtonParent.style.display = folderSettingsVisibility ? DisplayStyle.Flex : DisplayStyle.None;
         _btnChange.style.display = folderSettingsVisibility ? DisplayStyle.Flex : DisplayStyle.None;
     }
-    
-    // TODO
-    // Searchbar working
-    // GameObject Name in project view as tooltip on the List Entries
 }
 
 }
