@@ -38,16 +38,29 @@ public class MegaPintValidators : MegaPintEditorWindowBase
     private ToolbarSearchField _searchField;
 
     private MegaPintSettingsBase _validatorsSettings;
+
+    private VisualElement _rightPane;
+    private Label _gameObjectName;
+    private Label _path;
+    private VisualElement _errorPanel;
+    private Button _btnFixAll;
+    private Label _noIssue;
+    private ListView _errorView;
     
     private List <ValidatableMonoBehaviourStatus> _validatableMonoBehaviours = new();
     private List <ValidatableMonoBehaviourStatus> _displayedItems = new();
+
+    private SearchMode _currentSearchMode;
+    private VisualTreeAsset _behaviourEntry;
+    private VisualTreeAsset _errorEntry;
+    
+    private const string BehaviourEntry = "User Interface/ValidatableMonoBehaviour";
+    private const string ErrorEntry = "User Interface/ValidationError";
 
     protected override string BasePath() => "User Interface/ValidatorView/ValidatorView";
 
     private const string MainListEntryPath = "User Interface/ValidatorView/ValidatorViewElement";
 
-    private SearchMode _currentSearchMode;
-    
     private enum SearchMode
     {
         None, Scene, Project
@@ -82,6 +95,15 @@ public class MegaPintValidators : MegaPintEditorWindowBase
         _btnChange = _changeButtonParent.Q <Button>("BTN_Change");
         _folderPath = content.Q <TextField>("FolderPath");
 
+        _rightPane = content.Q <VisualElement>("RightPane");
+        _gameObjectName = content.Q <Label>("GameObjectName");
+        _path = content.Q <Label>("Path");
+        _errorPanel = content.Q <VisualElement>("ErrorPanel");
+        _btnFixAll = content.Q <Button>("BTN_FixAll");
+        _noIssue = content.Q <Label>("NoIssue");
+
+        _errorView = content.Q <ListView>("ErrorView");
+
         #endregion
 
         #region MainList
@@ -98,25 +120,73 @@ public class MegaPintValidators : MegaPintEditorWindowBase
             element.Q <Label>("Warning").style.display = item.State == ValidationState.Warning ? DisplayStyle.Flex : DisplayStyle.None;
             element.Q <Label>("Error").style.display = item.State == ValidationState.Error ? DisplayStyle.Flex : DisplayStyle.None;
 
-            Transform transform = item.transform;
-            var name = transform.name;
-
-            if (transform.parent != null)
-            {
-                while (transform.parent != null)
-                {
-                    transform = transform.parent;
-                    name = $"{transform.name}/{name}";
-                }
-            }
-            
-            element.tooltip = name;
+            element.tooltip = GetParentPath(item.transform);
         };
 
         _mainList.style.display = DisplayStyle.None;
         _searchField.style.display = DisplayStyle.None;
 
         #endregion
+
+        #region ErrorView
+
+        _behaviourEntry = Resources.Load <VisualTreeAsset>(BehaviourEntry);
+        _errorEntry = Resources.Load <VisualTreeAsset>(ErrorEntry);
+        
+        _errorView.makeItem = () => _behaviourEntry.Instantiate();
+
+        _errorView.bindItem = (element, i) =>
+        {
+            ValidatableMonoBehaviourStatus status = _displayedItems[_mainList.selectedIndex];
+            InvalidBehaviour invalidBehaviour = status.invalidBehaviours[i];
+
+            element.Q <Foldout>().text = invalidBehaviour.behaviourName;
+            var errors = element.Q <ListView>("Errors");
+
+            errors.makeItem = () => _errorEntry.Instantiate();
+
+            errors.bindItem = (visualElement, j) =>
+            {
+                ValidationError error = invalidBehaviour.errors[j];
+
+                var label = visualElement.Q <Label>("Name");
+                label.text = error.errorName;
+                label.tooltip = error.errorText;
+
+                visualElement.Q <Label>("Ok").style.display = error.severity == ValidationState.Ok
+                    ? DisplayStyle.Flex
+                    : DisplayStyle.None;
+
+                visualElement.Q <Label>("Warning").style.display = error.severity == ValidationState.Warning
+                    ? DisplayStyle.Flex
+                    : DisplayStyle.None;
+
+                visualElement.Q <Label>("Error").style.display = error.severity == ValidationState.Error
+                    ? DisplayStyle.Flex
+                    : DisplayStyle.None;
+
+                var button = visualElement.Q <Button>();
+
+                if (error.fixAction == null)
+                    button.style.display = DisplayStyle.None;
+                else
+                {
+                    button.clicked += () =>
+                    {
+                        error.fixAction.Invoke(error.gameObject);
+                        status.ValidateStatus();
+                        UpdateErrorView();
+                    };
+                }
+            };
+
+            errors.itemsSource = invalidBehaviour.errors;
+            errors.RefreshItems();
+        };
+
+        #endregion
+
+        _rightPane.style.display = DisplayStyle.None;
         
         RegisterCallbacks();
 
@@ -133,6 +203,23 @@ public class MegaPintValidators : MegaPintEditorWindowBase
         UpdateCurrentSearchMode(_currentSearchMode);
         
         root.Add(content);
+    }
+
+    private static string GetParentPath(Transform startTransform)
+    {
+        Transform transform = startTransform;
+        var path = transform.name;
+
+        if (transform.parent == null)
+            return path;
+
+        while (transform.parent != null)
+        {
+            transform = transform.parent;
+            path = $"{transform.name}/{path}";
+        }
+
+        return path;
     }
 
     protected override bool LoadResources()
@@ -156,6 +243,70 @@ public class MegaPintValidators : MegaPintEditorWindowBase
         _searchField.RegisterValueChangedCallback(_ => {DisplayBySearchField();});
         
         _btnChange.clickable = new Clickable(ChangeFolderPath);
+
+        _mainList.onSelectionChange += _ => OnSelectionChange();
+        _mainList.onItemsChosen += OnItemChosen;
+
+        _btnFixAll.clickable = new Clickable(FixAll);
+    }
+
+    private void OnItemChosen(IEnumerable <object> obj)
+    {
+        ValidatableMonoBehaviourStatus status = _displayedItems[_mainList.selectedIndex];
+        
+        Selection.SetActiveObjectWithContext(status, null);
+    }
+
+    private void FixAll()
+    {
+        ValidatableMonoBehaviourStatus status = _displayedItems[_mainList.selectedIndex];
+        
+        foreach (ValidationError error in status.invalidBehaviours.SelectMany(invalidBehaviour => invalidBehaviour.errors))
+        {
+            if (error.fixAction == null)
+                Debug.LogWarning($"No FixAction specified for [{error.errorName}], requires manual attention!");
+            else 
+                error.fixAction.Invoke(error.gameObject);
+        }
+            
+        status.ValidateStatus();
+    }
+
+    private void OnSelectionChange()
+    {
+        if (_mainList.selectedItem == null)
+            return;
+        
+        _rightPane.style.display = DisplayStyle.Flex;
+
+        ValidatableMonoBehaviourStatus item = _displayedItems[_mainList.selectedIndex];
+
+        _gameObjectName.text = item.gameObject.name;
+
+        var path = GetParentPath(item.transform);
+        _path.text = path;
+        _path.tooltip = path;
+
+        UpdateErrorView();
+    }
+
+    private void UpdateErrorView()
+    {
+        List <InvalidBehaviour> invalidBehaviours = _displayedItems[_mainList.selectedIndex].invalidBehaviours;
+        invalidBehaviours.Sort();
+        
+        var hasErrors = invalidBehaviours.Count > 0;
+        
+        _errorPanel.style.display = !hasErrors ? DisplayStyle.None : DisplayStyle.Flex;
+        _noIssue.style.display = hasErrors ? DisplayStyle.None : DisplayStyle.Flex;
+
+        DisplayBySearchField();
+        
+        if (!hasErrors)
+            return;
+        
+        _errorView.itemsSource = invalidBehaviours;
+        _errorView.RefreshItems();
     }
 
     private void ChangeFolderPath()
@@ -202,11 +353,16 @@ public class MegaPintValidators : MegaPintEditorWindowBase
         _showChildrenProject.UnregisterValueChangedCallback(OnShowChildrenProjectChanged);
 
         _btnChange.clickable = null;
+
+        _btnFixAll.clickable = null;
     }
 
     private void PerformSearch(SearchMode mode)
     {
         UpdateCurrentSearchMode(mode);
+        
+        _rightPane.style.display = DisplayStyle.None;
+        _mainList.ClearSelection();
         
         _validatableMonoBehaviours.Clear();
         _mainList.Clear();
