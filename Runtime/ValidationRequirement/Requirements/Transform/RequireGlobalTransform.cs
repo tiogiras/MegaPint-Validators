@@ -10,39 +10,29 @@ namespace ValidationRequirement.Requirements
 [SerializeReferenceDropdownName("Transform/Custom Global", -10, 2)]
 public class RequireGlobalTransform : ScriptableValidationRequirement
 {
-    [SerializeField] [Tooltip("If true the transform position requirement is used")]
-    private bool _requireGlobalPosition;
-
-    [SerializeField] [Tooltip("If true the transform position requirement is used")]
-    private bool _requireGlobalRotation;
-
-    [SerializeField] [Tooltip("If true the transform position requirement is used")]
-    private bool _requireGlobalScale;
-
-    [Space]
     [SerializeField] [Tooltip("The transform is required to have this specified global position")]
-    private Vector3 _globalPosition;
+    private ToggleableSetting<Vector3> _globalPosition;
 
     [SerializeField] [Tooltip("The transform is required to have this specified global rotation")]
-    private Vector3 _globalRotation;
+    private ToggleableSetting<Vector3> _globalRotation;
 
     [SerializeField] [Tooltip("The transform is required to have this specified global scale")]
-    private Vector3 _globalScale;
+    private ToggleableSetting<Vector3> _globalScale;
 
     #region Protected Methods
 
     protected override void OnInitialization()
     {
-        _globalScale = Vector3.one;
+        _globalScale.value = Vector3.one;
     }
 
     protected override void Validate(GameObject gameObject)
     {
         Transform transform = gameObject.transform;
 
-        var validPosition = transform.position == _globalPosition || !_requireGlobalPosition;
-        var validRotation = transform.rotation == Quaternion.Euler(_globalRotation) || !_requireGlobalRotation;
-        var validScale = transform.lossyScale == _globalScale || !_requireGlobalScale;
+        var validPosition = transform.position == _globalPosition.value || !_globalPosition.enabled;
+        var validRotation = transform.rotation == Quaternion.Euler(_globalRotation.value) || !_globalRotation.enabled;
+        var validScale = transform.lossyScale == _globalScale.value || !_globalScale.enabled;
 
         if (validPosition && validRotation && validScale)
             return;
@@ -69,18 +59,18 @@ public class RequireGlobalTransform : ScriptableValidationRequirement
     {
         Transform transform = gameObject.transform;
 
-        if (_requireGlobalPosition)
-            transform.position = _globalPosition;
+        if (_globalPosition.enabled)
+            transform.position = _globalPosition.value;
 
-        if (_requireGlobalRotation)
-            transform.rotation = Quaternion.Euler(_globalRotation);
+        if (_globalRotation.enabled)
+            transform.rotation = Quaternion.Euler(_globalRotation.value);
 
-        if (!_requireGlobalScale)
+        if (!_globalScale.enabled)
             return;
 
         Transform originalParent = transform.parent;
         transform.SetParent(null);
-        transform.localScale = _globalScale;
+        transform.localScale = _globalScale.value;
         transform.SetParent(originalParent);
     }
 

@@ -7,7 +7,7 @@ namespace ValidationRequirement.Requirements
 {
 
 [Serializable]
-[SerializeReferenceDropdownName("Regex Naming Validation")]
+[SerializeReferenceDropdownName("Regex Naming Validation", 101)]
 public class RequireCustomName : ScriptableValidationRequirement
 {
     [HideInInspector] public string name;

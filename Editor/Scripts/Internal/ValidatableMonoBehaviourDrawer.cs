@@ -9,23 +9,10 @@ namespace Editor.Scripts.Internal
 [CustomEditor(typeof(ValidatableMonoBehaviour), true)]
 public class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 {
-    /*public override VisualElement CreateInspectorGUI()
-    {
-        /*var root = new VisualElement();
-
-        root.Add(
-            ((ValidatableMonoBehaviour)target)._importedSettings != null
-                ? new IMGUIContainer(() => DrawPropertiesExcluding(serializedObject, "_requirements"))
-                : new IMGUIContainer(() => DrawDefaultInspector()));
-
-        serializedObject.Update();
-        serializedObject.ApplyModifiedProperties();
-        
-        return root;#1#
-    }*/
-
     private static readonly string[] s_exclusion = {"m_Script", "_importedSettings"};
     private static readonly string[] s_exclusionFull = {"m_Script", "_requirements"};
+
+    private bool _listening;
     
     public override void OnInspectorGUI()
     {
@@ -59,16 +46,18 @@ public class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 
             if (GUILayout.Button("Import Requirements"))
             {
+                _listening = true;
                 var controlID = GUIUtility.GetControlID (FocusType.Passive);
                 EditorGUIUtility.ShowObjectPicker<ValidatorSettings> (null, false, "", controlID);
             }
             
             var commandName = Event.current.commandName;
 
-            if (commandName == "ObjectSelectorClosed")
+            if (commandName == "ObjectSelectorClosed" && _listening)
             {
+                _listening = false;
                 ((ValidatableMonoBehaviour)target)._importedSettings = (ValidatorSettings)EditorGUIUtility.GetObjectPickerObject();   
-                ((ValidatableMonoBehaviour)target).OnValidate();  
+                ((ValidatableMonoBehaviour)target).OnValidate();
             }
 
             EditorGUILayout.EndHorizontal();

@@ -10,39 +10,29 @@ namespace ValidationRequirement.Requirements
 [SerializeReferenceDropdownName("Transform/Custom Local", -10, 1)]
 public class RequireLocalTransform : ScriptableValidationRequirement
 {
-    [SerializeField] [Tooltip("If true the transform position requirement is used")]
-    private bool _requireLocalPosition;
-
-    [SerializeField] [Tooltip("If true the transform position requirement is used")]
-    private bool _requireLocalRotation;
-
-    [SerializeField] [Tooltip("If true the transform position requirement is used")]
-    private bool _requireLocalScale;
-
-    [Space]
     [SerializeField] [Tooltip("The transform is required to have this specified local position")]
-    private Vector3 _localPosition;
+    private ToggleableSetting<Vector3> _localPosition;
 
     [SerializeField] [Tooltip("The transform is required to have this specified local rotation")]
-    private Vector3 _localRotation;
+    private ToggleableSetting<Vector3> _localRotation;
 
     [SerializeField] [Tooltip("The transform is required to have this specified local scale")]
-    private Vector3 _localScale;
+    private ToggleableSetting<Vector3> _localScale;
 
     #region Protected Methods
 
     protected override void OnInitialization()
     {
-        _localScale = Vector3.one;
+        _localScale.value = Vector3.one;
     }
 
     protected override void Validate(GameObject gameObject)
     {
         Transform transform = gameObject.transform;
 
-        var validPosition = transform.localPosition == _localPosition || !_requireLocalPosition;
-        var validRotation = transform.localRotation == Quaternion.Euler(_localRotation) || !_requireLocalRotation;
-        var validScale = transform.localScale == _localScale || !_requireLocalScale;
+        var validPosition = transform.localPosition == _localPosition.value || !_localPosition.enabled;
+        var validRotation = transform.localRotation == Quaternion.Euler(_localRotation.value) || !_localRotation.enabled;
+        var validScale = transform.localScale == _localScale.value || !_localScale.enabled;
 
         if (validPosition && validRotation && validScale)
             return;
@@ -50,13 +40,13 @@ public class RequireLocalTransform : ScriptableValidationRequirement
         var errorText = new StringBuilder();
 
         if (!validPosition)
-            errorText.AppendLine($"Position should be {_localPosition}");
+            errorText.AppendLine($"Position should be {_localPosition.value}");
 
         if (!validRotation)
-            errorText.AppendLine($"Rotation should be {_localRotation}");
+            errorText.AppendLine($"Rotation should be {_localRotation.value}");
 
         if (!validScale)
-            errorText.AppendLine($"Scale should be {_localScale}");
+            errorText.AppendLine($"Scale should be {_localScale.value}");
 
         AddError("Transform differs from specifications", errorText.ToString(), ValidationState.Warning, FixAction);
     }
@@ -69,14 +59,14 @@ public class RequireLocalTransform : ScriptableValidationRequirement
     {
         Transform transform = gameObject.transform;
 
-        if (_requireLocalPosition)
-            transform.localPosition = _localPosition;
+        if (_localPosition.enabled)
+            transform.localPosition = _localPosition.value;
 
-        if (_requireLocalRotation)
-            transform.localRotation = Quaternion.Euler(_localRotation);
+        if (_localRotation.enabled)
+            transform.localRotation = Quaternion.Euler(_localRotation.value);
 
-        if (_requireLocalScale)
-            transform.localScale = _localScale;
+        if (_localScale.enabled)
+            transform.localScale = _localScale.value;
     }
 
     #endregion
