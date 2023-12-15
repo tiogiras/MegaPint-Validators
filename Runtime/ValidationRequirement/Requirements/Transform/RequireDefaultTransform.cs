@@ -28,7 +28,7 @@ public class RequireDefaultTransform : ScriptableValidationRequirement
         _defaultScale = false;
     }
 
-    protected override void Validate(GameObject gameObject)
+    protected override void Validate(UnityEngine.GameObject gameObject)
     {
         Transform transform = gameObject.transform;
 
@@ -61,7 +61,7 @@ public class RequireDefaultTransform : ScriptableValidationRequirement
 
     #region Private Methods
 
-    private void FixAction(GameObject gameObject)
+    private void FixAction(UnityEngine.GameObject gameObject)
     {
         Transform transform = gameObject.transform;
 

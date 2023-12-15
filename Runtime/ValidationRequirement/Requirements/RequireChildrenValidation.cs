@@ -16,11 +16,11 @@ public class RequireChildrenValidation : ScriptableValidationRequirement
     {
     }
 
-    protected override void Validate(GameObject gameObject)
+    protected override void Validate(UnityEngine.GameObject gameObject)
     {
         List <ValidatableMonoBehaviourStatus> behaviourStates = CollectBehaviourStates(
             gameObject.transform,
-            out List <GameObject> invalidGameObjects,
+            out List <UnityEngine.GameObject> invalidGameObjects,
             out ValidationState severity);
 
         if (behaviourStates.Count == 0)
@@ -42,13 +42,13 @@ public class RequireChildrenValidation : ScriptableValidationRequirement
 
     private List <ValidatableMonoBehaviourStatus> CollectBehaviourStates(
         Transform transform,
-        out List <GameObject> invalidGameObjects,
+        out List <UnityEngine.GameObject> invalidGameObjects,
         out ValidationState severity)
     {
         List <ValidatableMonoBehaviourStatus> behaviourStates = new();
 
         severity = ValidationState.Ok;
-        invalidGameObjects = new List <GameObject>();
+        invalidGameObjects = new List <UnityEngine.GameObject>();
 
         foreach (Transform tr in transform)
         {

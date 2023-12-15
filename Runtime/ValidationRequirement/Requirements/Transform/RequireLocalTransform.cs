@@ -26,7 +26,7 @@ public class RequireLocalTransform : ScriptableValidationRequirement
         _localScale.value = Vector3.one;
     }
 
-    protected override void Validate(GameObject gameObject)
+    protected override void Validate(UnityEngine.GameObject gameObject)
     {
         Transform transform = gameObject.transform;
 
@@ -55,7 +55,7 @@ public class RequireLocalTransform : ScriptableValidationRequirement
 
     #region Private Methods
 
-    private void FixAction(GameObject gameObject)
+    private void FixAction(UnityEngine.GameObject gameObject)
     {
         Transform transform = gameObject.transform;
 

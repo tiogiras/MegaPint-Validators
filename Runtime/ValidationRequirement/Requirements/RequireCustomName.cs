@@ -21,7 +21,7 @@ public class RequireCustomName : ScriptableValidationRequirement
     {
     }
 
-    protected override void Validate(GameObject gameObject)
+    protected override void Validate(UnityEngine.GameObject gameObject)
     {
         if (Regex.IsMatch(gameObject.name, _regexPattern))
             return;

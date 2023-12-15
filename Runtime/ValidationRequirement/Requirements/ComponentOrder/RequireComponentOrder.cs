@@ -34,7 +34,7 @@ public class RequireComponentOrder : ScriptableValidationRequirement
     {
     }
 
-    protected override void Validate(GameObject gameObject)
+    protected override void Validate(UnityEngine.GameObject gameObject)
     {
         if (_config == null)
             return;
@@ -178,7 +178,7 @@ public class RequireComponentOrder : ScriptableValidationRequirement
         }
     }
 
-    private void FixAction(GameObject gameObject)
+    private void FixAction(UnityEngine.GameObject gameObject)
     {
         foreach (Category category in _allCategories)
         {
@@ -187,7 +187,7 @@ public class RequireComponentOrder : ScriptableValidationRequirement
         }
     }
 
-    private List <Component> GetAllComponents(GameObject gameObject)
+    private List <Component> GetAllComponents(UnityEngine.GameObject gameObject)
     {
         List <Component> components = gameObject.GetComponents <Component>().ToList();
 

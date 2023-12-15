@@ -6,7 +6,7 @@
         "UnityEngine.UI",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "tiogiras.megapint-validators.Runtime.Scripts.SerializeReferenceDropdown.Runtime"
+        "tiogiras.megapint-validators.Runtime.Scripts"
     ],
     "includePlatforms": [
         "Editor"
