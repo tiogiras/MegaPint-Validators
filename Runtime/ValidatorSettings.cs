@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SerializeReferenceDropdown.Runtime;
 using UnityEngine;
 using ValidationRequirement;
@@ -19,4 +18,3 @@ public class ValidatorSettings : ScriptableObject
 
     #endregion
 }
-#endif

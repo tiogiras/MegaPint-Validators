@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using SerializeReferenceDropdown.Runtime;
-using UnityEditorInternal;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditorInternal;
+#endif
 
 namespace ValidationRequirement.Requirements.ComponentOrder
 {
