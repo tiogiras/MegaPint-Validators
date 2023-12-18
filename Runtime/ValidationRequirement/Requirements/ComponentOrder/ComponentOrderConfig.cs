@@ -11,6 +11,13 @@ public class ComponentOrderConfig : ScriptableObject
     [Serializable]
     public class Type
     {
+        [Serializable]
+        public struct CategorySettings
+        {
+            public CategoryFunction function;
+            public string nameSpaceString;
+        }
+
         public bool canBeModified = true;
         public bool canBeDeleted = true;
         public string componentName;
@@ -18,16 +25,8 @@ public class ComponentOrderConfig : ScriptableObject
 
         public bool isCategory;
         public CategorySettings category;
-        
-        [Serializable]
-        public struct CategorySettings
-        {
-            public CategoryFunction function;
-            public string nameSpaceString;
-        }
     }
 
-    
     public enum CategoryFunction
     {
         AddCategory, NonUnityComponents, NamespaceContains, NamespaceEquals, Fill
@@ -49,10 +48,7 @@ public class ComponentOrderConfig : ScriptableObject
             componentName = "Fill",
             tooltip = "All non specified monoBehaviours will be placed here",
             isCategory = true,
-            category =
-            {
-                function = CategoryFunction.Fill
-            }
+            category = {function = CategoryFunction.Fill}
         }
     };
 }

@@ -3,7 +3,7 @@ using System.Text;
 using SerializeReferenceDropdown.Runtime;
 using UnityEngine;
 
-namespace ValidationRequirement.Requirements
+namespace ValidationRequirement.Requirements.Transform
 {
 
 [Serializable]
@@ -30,7 +30,7 @@ public class RequireDefaultTransform : ScriptableValidationRequirement
 
     protected override void Validate(UnityEngine.GameObject gameObject)
     {
-        Transform transform = gameObject.transform;
+        UnityEngine.Transform transform = gameObject.transform;
 
         var validPosition = transform.localPosition == Vector3.zero || !_defaultPosition;
         var validRotation = transform.localRotation == Quaternion.identity || !_defaultRotation;
@@ -63,7 +63,7 @@ public class RequireDefaultTransform : ScriptableValidationRequirement
 
     private void FixAction(UnityEngine.GameObject gameObject)
     {
-        Transform transform = gameObject.transform;
+        UnityEngine.Transform transform = gameObject.transform;
 
         if (_defaultPosition)
             transform.localPosition = Vector3.zero;

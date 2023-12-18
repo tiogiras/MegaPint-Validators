@@ -3,10 +3,19 @@ using UnityEditor;
 
 namespace Editor.Scripts
 {
-    public static partial class ContextMenu
+
+internal static partial class ContextMenu
+{
+    #region Private Methods
+
+    [MenuItem(MenuItemPackages + "/Validators", false, 13)]
+    private static void OpenValidatorView()
     {
-        [MenuItem(MenuItemPackages + "/Validators", false, 13)]
-        private static void OpenValidatorView() => TryOpen<MegaPintValidators>(false);
+        TryOpen <MegaPintValidators>(false);
     }
+
+    #endregion
+}
+
 }
 #endif

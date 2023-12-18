@@ -5,13 +5,25 @@ using UnityEngine;
 
 public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <ValidatableMonoBehaviourStatus>
 {
-    private List <ValidatableMonoBehaviour> _behaviours = new();
-
     public ValidationState State {get; private set;}
 
-    public Action <ValidationState> onStatusUpdate;
-
     public readonly List <InvalidBehaviour> invalidBehaviours = new();
+
+    public Action <ValidationState> onStatusUpdate;
+    private List <ValidatableMonoBehaviour> _behaviours = new();
+
+    #region Public Methods
+
+    public int CompareTo(ValidatableMonoBehaviourStatus other)
+    {
+        if ((int)State > (int)other.State)
+            return -1;
+
+        if ((int)State < (int)other.State)
+            return 1;
+
+        return string.CompareOrdinal(gameObject.name, other.gameObject.name);
+    }
 
     public void AddValidatableMonoBehaviour(ValidatableMonoBehaviour behaviour)
     {
@@ -34,38 +46,42 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
         if (gameObject.scene.name == null) // If prefab asset in project
             _behaviours = gameObject.GetComponents <ValidatableMonoBehaviour>().ToList();
 
-        if (_behaviours.Count > 0)
+        if (_behaviours.Count == 0)
         {
-            for (var i = _behaviours.Count - 1; i >= 0; i--)
+            onStatusUpdate?.Invoke(State);
+
+            return;
+        }
+
+        for (var i = _behaviours.Count - 1; i >= 0; i--)
+        {
+            ValidatableMonoBehaviour behaviour = _behaviours[i];
+
+            if (behaviour == null)
             {
-                ValidatableMonoBehaviour behaviour = _behaviours[i];
+                _behaviours.RemoveAt(i);
 
-                if (behaviour == null)
-                {
-                    _behaviours.RemoveAt(i);
-
-                    continue;
-                }
-                
-                ValidationState behaviourState = behaviour.Validate(out List <ValidationError> errors);
-                
-                if (behaviourState != ValidationState.Ok)
-                {
-                    invalidBehaviours.Add(
-                        new InvalidBehaviour
-                        {
-                            behaviourName = $"{GetFullBehaviourName(behaviour)} : {behaviour.GetType()}",
-                            errors = errors
-                        });
-                }
-
-                if (behaviourState > State)
-                    State = behaviourState;
+                continue;
             }
+
+            ValidationState behaviourState = behaviour.Validate(out List <ValidationError> errors);
+
+            if (behaviourState != ValidationState.Ok)
+            {
+                invalidBehaviours.Add(
+                    new InvalidBehaviour {behaviourName = $"{GetFullBehaviourName(behaviour)} : {behaviour.GetType()}", errors = errors});
+            }
+
+            if (behaviourState > State)
+                State = behaviourState;
         }
 
         onStatusUpdate?.Invoke(State);
     }
+
+    #endregion
+
+    #region Private Methods
 
     private static string GetFullBehaviourName(Component behaviour)
     {
@@ -87,14 +103,5 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
         return string.Join(".", nameParts);
     }
 
-    public int CompareTo(ValidatableMonoBehaviourStatus other)
-    {
-        if ((int)State > (int)other.State)
-            return -1;
-
-        if ((int)State < (int)other.State)
-            return 1;
-
-        return string.CompareOrdinal(gameObject.name, other.gameObject.name);
-    }
+    #endregion
 }

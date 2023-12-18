@@ -1,33 +1,36 @@
 ﻿#if UNITY_EDITOR
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Editor.Scripts
+namespace Editor.Scripts.Internal
 {
 
 [CustomEditor(typeof(ValidatableMonoBehaviourStatus), true)]
-public class ValidationDrawer : UnityEditor.Editor
+internal class ValidationDrawer : UnityEditor.Editor
 {
     private const string Status = "User Interface/Status";
     private const string BehaviourEntry = "User Interface/ValidatableMonoBehaviour";
     private const string ErrorEntry = "User Interface/ValidationError";
 
-    private ValidatableMonoBehaviourStatus _status;
-
     private VisualTreeAsset _behaviourEntry;
-    private VisualTreeAsset _errorEntry;
-
-    private VisualElement _ok;
-    private VisualElement _warning;
     private VisualElement _error;
-
-    private ListView _errorView;
+    private VisualTreeAsset _errorEntry;
 
     private Foldout _errorFoldout;
 
+    private ListView _errorView;
+
     private Button _fixAllButton;
+
+    private VisualElement _ok;
+
+    private ValidatableMonoBehaviourStatus _status;
+    private VisualElement _warning;
+
+    #region Public Methods
 
     public override VisualElement CreateInspectorGUI()
     {
@@ -47,43 +50,14 @@ public class ValidationDrawer : UnityEditor.Editor
 
         _status = (ValidatableMonoBehaviourStatus)target;
 
-        _status.onStatusUpdate += state =>
-        {
-            _ok.style.display = state == ValidationState.Ok ? DisplayStyle.Flex : DisplayStyle.None;
-            _warning.style.display = state == ValidationState.Warning ? DisplayStyle.Flex : DisplayStyle.None;
-            _error.style.display = state == ValidationState.Error ? DisplayStyle.Flex : DisplayStyle.None;
-
-            _errorFoldout.style.display = _status.invalidBehaviours.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
-
-            _fixAllButton.style.display = _status.State == ValidationState.Ok ? DisplayStyle.None : DisplayStyle.Flex;
-            
-            List <InvalidBehaviour> invalidBehaviours = _status.invalidBehaviours;
-            invalidBehaviours.Sort();
-
-            _errorView.itemsSource = invalidBehaviours;
-            _errorView.RefreshItems();
-        };
+        _status.onStatusUpdate += StatusUpdate;
 
         root.Q <Button>("BTN_Validate").clicked += () => {_status.ValidateStatus();};
 
         _fixAllButton = root.Q <Button>("BTN_FixAll");
         _fixAllButton.style.display = _status.State == ValidationState.Ok ? DisplayStyle.None : DisplayStyle.Flex;
-        
-        _fixAllButton.clicked += () =>
-        {
-            foreach (InvalidBehaviour invalidBehaviour in _status.invalidBehaviours)
-            {
-                foreach (ValidationError error in invalidBehaviour.errors)
-                {
-                    if (error.fixAction == null)
-                        Debug.LogWarning($"No FixAction specified for [{error.errorName}], requires manual attention!");
-                    else 
-                        error.fixAction.Invoke(error.gameObject);
-                }
-            }
-            
-            _status.ValidateStatus();
-        };
+
+        _fixAllButton.clicked += FixAll;
 
         _behaviourEntry = Resources.Load <VisualTreeAsset>(BehaviourEntry);
         _errorEntry = Resources.Load <VisualTreeAsset>(ErrorEntry);
@@ -145,6 +119,42 @@ public class ValidationDrawer : UnityEditor.Editor
 
         return root;
     }
+
+    #endregion
+
+    #region Private Methods
+
+    private void FixAll()
+    {
+        foreach (ValidationError error in _status.invalidBehaviours.SelectMany(invalidBehaviour => invalidBehaviour.errors))
+        {
+            if (error.fixAction == null)
+                Debug.LogWarning($"No FixAction specified for [{error.errorName}], requires manual attention!");
+            else
+                error.fixAction.Invoke(error.gameObject);
+        }
+
+        _status.ValidateStatus();
+    }
+
+    private void StatusUpdate(ValidationState state)
+    {
+        _ok.style.display = state == ValidationState.Ok ? DisplayStyle.Flex : DisplayStyle.None;
+        _warning.style.display = state == ValidationState.Warning ? DisplayStyle.Flex : DisplayStyle.None;
+        _error.style.display = state == ValidationState.Error ? DisplayStyle.Flex : DisplayStyle.None;
+
+        _errorFoldout.style.display = _status.invalidBehaviours.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+
+        _fixAllButton.style.display = _status.State == ValidationState.Ok ? DisplayStyle.None : DisplayStyle.Flex;
+
+        List <InvalidBehaviour> invalidBehaviours = _status.invalidBehaviours;
+        invalidBehaviours.Sort();
+
+        _errorView.itemsSource = invalidBehaviours;
+        _errorView.RefreshItems();
+    }
+
+    #endregion
 }
 
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using SerializeReferenceDropdown.Runtime;
-using UnityEngine;
 
 namespace ValidationRequirement.Requirements
 {
@@ -41,7 +40,7 @@ public class RequireChildrenValidation : ScriptableValidationRequirement
     #region Private Methods
 
     private List <ValidatableMonoBehaviourStatus> CollectBehaviourStates(
-        Transform transform,
+        UnityEngine.Transform transform,
         out List <UnityEngine.GameObject> invalidGameObjects,
         out ValidationState severity)
     {
@@ -50,7 +49,7 @@ public class RequireChildrenValidation : ScriptableValidationRequirement
         severity = ValidationState.Ok;
         invalidGameObjects = new List <UnityEngine.GameObject>();
 
-        foreach (Transform tr in transform)
+        foreach (UnityEngine.Transform tr in transform)
         {
             ValidatableMonoBehaviourStatus[] states = tr.GetComponentsInChildren <ValidatableMonoBehaviourStatus>();
 

@@ -3,7 +3,7 @@ using System.Text;
 using SerializeReferenceDropdown.Runtime;
 using UnityEngine;
 
-namespace ValidationRequirement.Requirements
+namespace ValidationRequirement.Requirements.Transform
 {
 
 [Serializable]
@@ -11,13 +11,13 @@ namespace ValidationRequirement.Requirements
 public class RequireLocalTransform : ScriptableValidationRequirement
 {
     [SerializeField] [Tooltip("The transform is required to have this specified local position")]
-    private ToggleableSetting<Vector3> _localPosition;
+    private ToggleableSetting <Vector3> _localPosition;
 
     [SerializeField] [Tooltip("The transform is required to have this specified local rotation")]
-    private ToggleableSetting<Vector3> _localRotation;
+    private ToggleableSetting <Vector3> _localRotation;
 
     [SerializeField] [Tooltip("The transform is required to have this specified local scale")]
-    private ToggleableSetting<Vector3> _localScale;
+    private ToggleableSetting <Vector3> _localScale;
 
     #region Protected Methods
 
@@ -28,7 +28,7 @@ public class RequireLocalTransform : ScriptableValidationRequirement
 
     protected override void Validate(UnityEngine.GameObject gameObject)
     {
-        Transform transform = gameObject.transform;
+        UnityEngine.Transform transform = gameObject.transform;
 
         var validPosition = transform.localPosition == _localPosition.value || !_localPosition.enabled;
         var validRotation = transform.localRotation == Quaternion.Euler(_localRotation.value) || !_localRotation.enabled;
@@ -57,7 +57,7 @@ public class RequireLocalTransform : ScriptableValidationRequirement
 
     private void FixAction(UnityEngine.GameObject gameObject)
     {
-        Transform transform = gameObject.transform;
+        UnityEngine.Transform transform = gameObject.transform;
 
         if (_localPosition.enabled)
             transform.localPosition = _localPosition.value;

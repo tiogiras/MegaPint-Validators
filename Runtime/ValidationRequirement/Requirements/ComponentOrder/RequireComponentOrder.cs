@@ -98,16 +98,14 @@ public class RequireComponentOrder : ScriptableValidationRequirement
         return true;
     }
 
-    private void CollectComponentsForCategories(List <Category> categories, ref List <Component> components)
+    private void CollectComponentsForCategories(IEnumerable <Category> categories, ref List <Component> components)
     {
-        foreach (Category category in categories)
+        foreach (Category category in categories.Where(
+                     category => category.type.category.function
+                                     is not (ComponentOrderConfig.CategoryFunction.NamespaceContains
+                                     or ComponentOrderConfig.CategoryFunction.NamespaceEquals) ||
+                                 !string.IsNullOrEmpty(category.type.category.nameSpaceString)))
         {
-            if (category.type.category.function
-                    is ComponentOrderConfig.CategoryFunction.NamespaceContains
-                    or ComponentOrderConfig.CategoryFunction.NamespaceEquals &&
-                string.IsNullOrEmpty(category.type.category.nameSpaceString))
-                continue;
-
             for (var i = components.Count - 1; i >= 0; i--)
             {
                 var nameSpace = components[i].GetType().Namespace;
@@ -180,18 +178,15 @@ public class RequireComponentOrder : ScriptableValidationRequirement
 
     private void FixAction(UnityEngine.GameObject gameObject)
     {
-        foreach (Category category in _allCategories)
-        {
-            foreach (Component component in category.components)
-                MoveToTop(component);
-        }
+        foreach (Component component in _allCategories.SelectMany(category => category.components))
+            MoveToTop(component);
     }
 
     private List <Component> GetAllComponents(UnityEngine.GameObject gameObject)
     {
         List <Component> components = gameObject.GetComponents <Component>().ToList();
 
-        if (components[0] is Transform or RectTransform)
+        if (components[0] is UnityEngine.Transform or RectTransform)
             components.RemoveAt(0);
 
         return components;
@@ -247,18 +242,12 @@ public class RequireComponentOrder : ScriptableValidationRequirement
 
     private bool NamespaceContains(string nameSpace, Category category)
     {
-        if (string.IsNullOrEmpty(nameSpace))
-            return false;
-
-        return nameSpace.Contains(category.type.category.nameSpaceString);
+        return !string.IsNullOrEmpty(nameSpace) && nameSpace.Contains(category.type.category.nameSpaceString);
     }
 
     private bool NamespaceEquals(string nameSpace, Category category)
     {
-        if (string.IsNullOrEmpty(nameSpace))
-            return false;
-
-        return nameSpace.Equals(category.type.category.nameSpaceString);
+        return !string.IsNullOrEmpty(nameSpace) && nameSpace.Equals(category.type.category.nameSpaceString);
     }
 
     #endregion

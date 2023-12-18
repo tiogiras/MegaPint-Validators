@@ -3,7 +3,7 @@ using System.Text;
 using SerializeReferenceDropdown.Runtime;
 using UnityEngine;
 
-namespace ValidationRequirement.Requirements
+namespace ValidationRequirement.Requirements.Transform
 {
 
 [Serializable]
@@ -28,7 +28,7 @@ public class RequireGlobalTransform : ScriptableValidationRequirement
 
     protected override void Validate(UnityEngine.GameObject gameObject)
     {
-        Transform transform = gameObject.transform;
+        UnityEngine.Transform transform = gameObject.transform;
 
         var validPosition = transform.position == _globalPosition.value || !_globalPosition.enabled;
         var validRotation = transform.rotation == Quaternion.Euler(_globalRotation.value) || !_globalRotation.enabled;
@@ -57,7 +57,7 @@ public class RequireGlobalTransform : ScriptableValidationRequirement
 
     private void FixAction(UnityEngine.GameObject gameObject)
     {
-        Transform transform = gameObject.transform;
+        UnityEngine.Transform transform = gameObject.transform;
 
         if (_globalPosition.enabled)
             transform.position = _globalPosition.value;
@@ -68,7 +68,7 @@ public class RequireGlobalTransform : ScriptableValidationRequirement
         if (!_globalScale.enabled)
             return;
 
-        Transform originalParent = transform.parent;
+        UnityEngine.Transform originalParent = transform.parent;
         transform.SetParent(null);
         transform.localScale = _globalScale.value;
         transform.SetParent(originalParent);

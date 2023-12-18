@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_EDITOR
+using System.Collections.Generic;
 using SerializeReferenceDropdown.Runtime;
 using UnityEngine;
 using ValidationRequirement;
@@ -9,8 +10,13 @@ public class ValidatorSettings : ScriptableObject
     [SerializeReferenceDropdown] [SerializeReference]
     public List <IValidationRequirement> requirements;
 
+    #region Public Methods
+
     public void SetRequirements(List <IValidationRequirement> newRequirements)
     {
         requirements = newRequirements;
     }
+
+    #endregion
 }
+#endif

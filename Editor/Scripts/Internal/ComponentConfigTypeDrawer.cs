@@ -1,18 +1,18 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using ValidationRequirement.Requirements.ComponentOrder;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
-namespace Editor.Scripts
+namespace Editor.Scripts.Internal
 {
 
 [CustomEditor(typeof(ComponentOrderConfig))]
-public class ComponentConfigTypeDrawer : UnityEditor.Editor
+internal class ComponentConfigTypeDrawer : UnityEditor.Editor
 {
     private const string BasePath = "User Interface/ComponentOrder/";
     private const string ConfigPath = BasePath + "Config";
@@ -55,9 +55,7 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
         categoryDropdown.choices.Remove("Fill");
 
         for (var i = 0; i < categoryDropdown.choices.Count; i++)
-        {
             categoryDropdown.choices[i] = TranslateCategoryFunctions(categoryDropdown.choices[i]);
-        }
 
         categoryDropdown.index = 0;
 
@@ -91,10 +89,48 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
 
     #region Private Methods
 
+    private static string CategoryFunctionTooltip(ComponentOrderConfig.CategoryFunction categoryFunction)
+    {
+        return categoryFunction switch
+               {
+                   ComponentOrderConfig.CategoryFunction.AddCategory => "",
+                   ComponentOrderConfig.CategoryFunction.NonUnityComponents =>
+                       "All components that are not in the UnityEngine namespace will be placed here.",
+                   ComponentOrderConfig.CategoryFunction.NamespaceContains =>
+                       "All components that contain the given string in their namespace will be placed here.",
+                   ComponentOrderConfig.CategoryFunction.NamespaceEquals => "All components that are in the specified namespace will be placed here",
+                   var _ => throw new ArgumentOutOfRangeException(nameof(categoryFunction), categoryFunction, null)
+               };
+    }
+
+    private static string TranslateCategoryFunctions(string category)
+    {
+        if (Enum.TryParse(category, out ComponentOrderConfig.CategoryFunction function))
+        {
+            return function switch
+                   {
+                       ComponentOrderConfig.CategoryFunction.AddCategory => AddCategoryNiceName,
+                       ComponentOrderConfig.CategoryFunction.NonUnityComponents => NonUnityComponentsNiceName,
+                       ComponentOrderConfig.CategoryFunction.NamespaceContains => NamespaceContainsNiceName,
+                       ComponentOrderConfig.CategoryFunction.NamespaceEquals => NamespaceEqualsNiceName,
+                       var _ => throw new ArgumentOutOfRangeException()
+                   };
+        }
+
+        return category switch
+               {
+                   AddCategoryNiceName => ComponentOrderConfig.CategoryFunction.AddCategory.ToString(),
+                   NonUnityComponentsNiceName => ComponentOrderConfig.CategoryFunction.NonUnityComponents.ToString(),
+                   NamespaceContainsNiceName => ComponentOrderConfig.CategoryFunction.NamespaceContains.ToString(),
+                   NamespaceEqualsNiceName => ComponentOrderConfig.CategoryFunction.NamespaceEquals.ToString(),
+                   var _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
+               };
+    }
+
     private void AddCategoryListElement(string categoryFunction)
     {
         var function = Enum.Parse <ComponentOrderConfig.CategoryFunction>(TranslateCategoryFunctions(categoryFunction));
-        
+
         _types.Add(
             new ComponentOrderConfig.Type
             {
@@ -103,10 +139,7 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
                 canBeDeleted = true,
                 canBeModified = true,
                 isCategory = true,
-                category =
-                {
-                    function = function
-                }
+                category = {function = function}
             });
 
         _isDirty = true;
@@ -149,40 +182,42 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
 #endif
     }
 
-    private string TranslateCategoryFunctions(string category)
+    private void UpdateCategoryContent(VisualElement element, ComponentOrderConfig.Type entry)
     {
-        if (Enum.TryParse(category, out ComponentOrderConfig.CategoryFunction function))
+        switch (entry.category.function)
         {
-            return function switch
-                   {
-                       ComponentOrderConfig.CategoryFunction.AddCategory => AddCategoryNiceName,
-                       ComponentOrderConfig.CategoryFunction.NonUnityComponents => NonUnityComponentsNiceName,
-                       ComponentOrderConfig.CategoryFunction.NamespaceContains => NamespaceContainsNiceName,
-                       ComponentOrderConfig.CategoryFunction.NamespaceEquals => NamespaceEqualsNiceName,
-                       var _ => throw new ArgumentOutOfRangeException()
-                   };
+            case ComponentOrderConfig.CategoryFunction.AddCategory:
+                break;
+
+            case ComponentOrderConfig.CategoryFunction.Fill:
+                break;
+
+            case ComponentOrderConfig.CategoryFunction.NonUnityComponents:
+                break;
+
+            case ComponentOrderConfig.CategoryFunction.NamespaceContains or
+                ComponentOrderConfig.CategoryFunction.NamespaceEquals:
+
+                var title = entry.category.function == ComponentOrderConfig.CategoryFunction.NamespaceContains
+                    ? "Control String"
+                    : "Namespace";
+
+                var namespaceField = new TextField(title) {value = entry.category.nameSpaceString, style = {flexGrow = 1}};
+
+                element.Add(namespaceField);
+
+                namespaceField.RegisterValueChangedCallback(
+                    evt =>
+                    {
+                        entry.category.nameSpaceString = evt.newValue;
+                        _isDirty = true;
+                    });
+
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException();
         }
-
-        return category switch
-               {
-                   AddCategoryNiceName => ComponentOrderConfig.CategoryFunction.AddCategory.ToString(),
-                   NonUnityComponentsNiceName => ComponentOrderConfig.CategoryFunction.NonUnityComponents.ToString(),
-                   NamespaceContainsNiceName => ComponentOrderConfig.CategoryFunction.NamespaceContains.ToString(),
-                   NamespaceEqualsNiceName => ComponentOrderConfig.CategoryFunction.NamespaceEquals.ToString(),
-                   var _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
-               };
-    }
-
-    private string CategoryFunctionTooltip(ComponentOrderConfig.CategoryFunction categoryFunction)
-    {
-        return categoryFunction switch
-               {
-                   ComponentOrderConfig.CategoryFunction.AddCategory => "",
-                   ComponentOrderConfig.CategoryFunction.NonUnityComponents => "All components that are not in the UnityEngine namespace will be placed here.",
-                   ComponentOrderConfig.CategoryFunction.NamespaceContains => "All components that contain the given string in their namespace will be placed here.",
-                   ComponentOrderConfig.CategoryFunction.NamespaceEquals => "All components that are in the specified namespace will be placed here",
-                   var _ => throw new ArgumentOutOfRangeException(nameof(categoryFunction), categoryFunction, null)
-               };
     }
 
     private void UpdateEntry(VisualElement element, int i)
@@ -197,10 +232,10 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
 
         componentContent.style.display = entry.isCategory ? DisplayStyle.None : DisplayStyle.Flex;
         categoryContent.style.display = entry.isCategory ? DisplayStyle.Flex : DisplayStyle.None;
-        
+
         componentContent.style.opacity = entry.canBeModified ? 1 : .5f;
         categoryContent.style.opacity = entry.canBeModified ? 1 : .5f;
-        
+
         if (entry.isCategory)
         {
             categoryContent.Q <Label>("CategoryTitle").text = entry.componentName;
@@ -208,7 +243,7 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
             var customContent = categoryContent.Q <GroupBox>("CustomContent");
             customContent.Clear();
 
-            UpdateCategoryContent(element, customContent, entry);
+            UpdateCategoryContent(customContent, entry);
         }
         else
         {
@@ -221,50 +256,10 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
                 {
                     if (_types[i].isCategory)
                         return;
-                    
+
                     _types[i].componentName = evt.newValue;
                     _isDirty = true;
-                });   
-        }
-    }
-
-    private void UpdateCategoryContent(VisualElement root, VisualElement element, ComponentOrderConfig.Type entry)
-    {
-        switch (entry.category.function)
-        {
-            case ComponentOrderConfig.CategoryFunction.AddCategory: break;
-            case ComponentOrderConfig.CategoryFunction.Fill: break;
-            case ComponentOrderConfig.CategoryFunction.NonUnityComponents: break;
-            case ComponentOrderConfig.CategoryFunction.NamespaceContains or 
-                ComponentOrderConfig.CategoryFunction.NamespaceEquals:
-
-                var title = entry.category.function == ComponentOrderConfig.CategoryFunction.NamespaceContains
-                    ? "Control String"
-                    : "Namespace";
-
-                var namespaceField = new TextField(title)
-                {
-                    value = entry.category.nameSpaceString,
-                    
-                    style =
-                    {
-                        flexGrow = 1
-                    }
-                };
-
-                element.Add(namespaceField);
-
-                namespaceField.RegisterValueChangedCallback(
-                    evt =>
-                    {
-                        entry.category.nameSpaceString = evt.newValue;
-                        _isDirty = true;
-                    });
-                
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException();
+                });
         }
     }
 
@@ -272,3 +267,5 @@ public class ComponentConfigTypeDrawer : UnityEditor.Editor
 }
 
 }
+
+#endif

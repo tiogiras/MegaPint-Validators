@@ -18,7 +18,6 @@ public class RequireGameObjectActive : ScriptableValidationRequirement
     {
         _targetState = true;
     }
-    
 
     protected override void Validate(UnityEngine.GameObject gameObject)
     {

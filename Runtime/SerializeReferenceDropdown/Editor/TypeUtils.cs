@@ -15,8 +15,8 @@ namespace SerializeReferenceDropdown.Editor
             var splitFieldTypename = typeName.Split(' ');
             var assemblyName = splitFieldTypename[0];
             var subStringTypeName = splitFieldTypename[1];
-            var assembly = Assembly.Load(assemblyName);
-            var targetType = assembly.GetType(subStringTypeName);
+            Assembly assembly = Assembly.Load(assemblyName);
+            Type targetType = assembly.GetType(subStringTypeName);
             return targetType;
         }
 
