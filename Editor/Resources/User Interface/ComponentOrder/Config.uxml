@@ -3,11 +3,11 @@
     <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: space-between; margin-left: 10px; margin-right: 10px;">
         <ui:Label text="0" display-tooltip-when-elided="true" style="-unity-text-align: middle-left; -unity-font-style: bold; font-size: 20px; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;); width: auto;" />
         <ui:GroupBox style="width: auto; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-grow: 1;">
-            <ui:TextField picking-mode="Ignore" label="Component Name" value="filler text" text="Transform / RectTransform" readonly="true" style="opacity: 0.5;" />
+            <ui:TextField picking-mode="Ignore" label="Component Name" value="Transform" text="Transform / RectTransform" readonly="true" style="opacity: 0.5;" />
         </ui:GroupBox>
     </ui:VisualElement>
     <ui:GroupBox>
-        <ui:ListView reorderable="true" show-alternating-row-backgrounds="ContentOnly" show-border="true" reorder-mode="Animated" fixed-item-height="50" />
+        <ui:ListView show-border="true" fixed-item-height="50" virtualization-method="FixedHeight" reorder-mode="Animated" reorderable="true" show-alternating-row-backgrounds="ContentOnly" focusable="false" style="-unity-text-align: upper-left;" />
         <ui:GroupBox style="flex-direction: row-reverse; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;">
             <ui:Button text="-" display-tooltip-when-elided="true" name="BTN_Remove" style="-unity-font-style: bold; font-size: 16px;" />
             <ui:Button text="+" display-tooltip-when-elided="true" name="BTN_Add" style="font-size: 16px; -unity-font-style: bold;" />

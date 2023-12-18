@@ -20,8 +20,29 @@ public static partial class DisplayContent
             "User Interface/Display Content Tabs/Tab0",
             "User Interface/Display Content Tabs/Tab1",
             "User Interface/Display Content Tabs/Tab2");
+
+        s_onSelectedTabChanged += ValidatorsOnTabChanged;
+        s_onSelectedPackageChanged += Unsubscribe;
         
         SwitchTab(tabContentParent, 0);
+    }
+
+    private static void Unsubscribe()
+    {
+        s_onSelectedTabChanged -= ValidatorsOnTabChanged;
+        s_onSelectedPackageChanged -= Unsubscribe;
+    }
+    
+    private static void ValidatorsOnTabChanged(int tab, VisualElement root)
+    {
+        if (tab != 0)
+            return;
+
+        root.Q <Button>("BTN_ValidatorView").clickable = new Clickable(
+            _ =>
+            {
+                ContextMenu.TryOpen<MegaPintValidators>(false);
+            });
     }
 
     #endregion

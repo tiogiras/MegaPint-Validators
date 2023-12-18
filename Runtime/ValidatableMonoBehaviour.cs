@@ -11,13 +11,12 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 {
     public ValidatorSettings _importedSettings;
     
-    [FormerlySerializedAs("_requirementss")]
     [SerializeReferenceDropdown] [SerializeReference]
     public List <IValidationRequirement> _requirements;
 
     private ValidatableMonoBehaviourStatus _status;
 
-    private List <IValidationRequirement> Requiremtents => _importedSettings == null ? _requirements : _importedSettings._requirements;
+    private List <IValidationRequirement> Requiremtents => _importedSettings == null ? _requirements : _importedSettings.requirements;
 
     public bool ValidatesChildren()
     {

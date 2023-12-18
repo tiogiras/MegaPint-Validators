@@ -3,14 +3,14 @@ using SerializeReferenceDropdown.Runtime;
 using UnityEngine;
 using ValidationRequirement;
 
-[CreateAssetMenu(fileName = "Settings", menuName = "MegaPint/ValidatorSettings", order = 1)]
+[CreateAssetMenu(fileName = "Settings", menuName = "MegaPint/Validators/ValidatorSettings", order = 1)]
 public class ValidatorSettings : ScriptableObject
 {
     [SerializeReferenceDropdown] [SerializeReference]
-    public List <IValidationRequirement> _requirements;
+    public List <IValidationRequirement> requirements;
 
-    public void SetRequirements(List <IValidationRequirement> requirements)
+    public void SetRequirements(List <IValidationRequirement> newRequirements)
     {
-        _requirements = requirements;
+        requirements = newRequirements;
     }
 }

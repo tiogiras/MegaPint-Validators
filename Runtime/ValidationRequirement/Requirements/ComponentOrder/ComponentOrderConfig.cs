@@ -5,7 +5,7 @@ using UnityEngine;
 namespace ValidationRequirement.Requirements.ComponentOrder
 {
 
-[CreateAssetMenu(fileName = "Config", menuName = "ScriptableObjects/Component Order Config", order = 1)]
+[CreateAssetMenu(fileName = "Config", menuName = "MegaPint/Validators/Component Order Config", order = 1)]
 public class ComponentOrderConfig : ScriptableObject
 {
     [Serializable]
