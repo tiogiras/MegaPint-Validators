@@ -45,7 +45,7 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
                 ((ValidatableMonoBehaviour)target).SetImportedSettings((ValidatorSettings)EditorGUIUtility.GetObjectPickerObject());
                 ((ValidatableMonoBehaviour)target).OnValidate();
             }
-
+            
             EditorGUILayout.EndHorizontal();
         }
 

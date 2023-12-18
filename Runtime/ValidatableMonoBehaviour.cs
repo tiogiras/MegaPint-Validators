@@ -10,7 +10,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 {
     public bool HasImportedSettings => _importedSettings != null;
 
-    private List <IValidationRequirement> _activeRequirements => _importedSettings == null ? _requirements : _importedSettings.requirements;
+    private List <IValidationRequirement> _activeRequirements => _importedSettings == null ? _requirements : _importedSettings.Requirements();
 
     private ValidatorSettings _importedSettings;
 
