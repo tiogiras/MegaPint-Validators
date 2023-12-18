@@ -196,7 +196,7 @@ internal class MegaPintValidators : MegaPintEditorWindowBase
 
         RegisterCallbacks();
 
-        _validatorsSettings = MegaPintSettings.Instance.GetSetting(MegaPintValidatorsSaveData.SettingsName);
+        _validatorsSettings = MegaPintSettings.instance.GetSetting(MegaPintValidatorsSaveData.SettingsName);
 
         _showChildren.value = _validatorsSettings.GetValue(
             MegaPintValidatorsSaveData.showChildren.key,

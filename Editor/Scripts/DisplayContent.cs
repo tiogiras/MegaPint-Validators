@@ -14,7 +14,8 @@ internal static partial class DisplayContent
         s_onSelectedPackageChanged -= Unsubscribe;
     }
 
-    private static partial void Validators(VisualElement root)
+    // Called by reflection
+    private static void Validators(VisualElement root)
     {
         var tabs = root.Q <GroupBox>("Tabs");
         var tabContentParent = root.Q <GroupBox>("TabContent");
