@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -79,35 +80,42 @@ internal class ValidationDrawer : UnityEditor.Editor
 
             errors.bindItem = (visualElement, j) =>
             {
-                ValidationError error = invalidBehaviour.errors[j];
-
-                var label = visualElement.Q <Label>("Name");
-                label.text = error.errorName;
-                label.tooltip = error.errorText;
-
-                visualElement.Q <Label>("Ok").style.display = error.severity == ValidationState.Ok
-                    ? DisplayStyle.Flex
-                    : DisplayStyle.None;
-
-                visualElement.Q <Label>("Warning").style.display = error.severity == ValidationState.Warning
-                    ? DisplayStyle.Flex
-                    : DisplayStyle.None;
-
-                visualElement.Q <Label>("Error").style.display = error.severity == ValidationState.Error
-                    ? DisplayStyle.Flex
-                    : DisplayStyle.None;
-
-                var button = visualElement.Q <Button>();
-
-                if (error.fixAction == null)
-                    button.style.display = DisplayStyle.None;
-                else
+                try
                 {
-                    button.clicked += () =>
+                    ValidationError error = invalidBehaviour.errors[j];
+
+                    var label = visualElement.Q <Label>("Name");
+                    label.text = error.errorName;
+                    label.tooltip = error.errorText;
+
+                    visualElement.Q <Label>("Ok").style.display = error.severity == ValidationState.Ok
+                        ? DisplayStyle.Flex
+                        : DisplayStyle.None;
+
+                    visualElement.Q <Label>("Warning").style.display = error.severity == ValidationState.Warning
+                        ? DisplayStyle.Flex
+                        : DisplayStyle.None;
+
+                    visualElement.Q <Label>("Error").style.display = error.severity == ValidationState.Error
+                        ? DisplayStyle.Flex
+                        : DisplayStyle.None;
+
+                    var button = visualElement.Q <Button>();
+
+                    if (error.fixAction == null)
+                        button.style.display = DisplayStyle.None;
+                    else
                     {
-                        error.fixAction.Invoke(error.gameObject);
-                        _status.ValidateStatus();
-                    };
+                        button.clicked += () =>
+                        {
+                            error.fixAction.Invoke(error.gameObject);
+                            _status.ValidateStatus();
+                        };
+                    }
+                }
+                catch (Exception)
+                {
+                    // ignored
                 }
             };
 
@@ -129,7 +137,10 @@ internal class ValidationDrawer : UnityEditor.Editor
         foreach (ValidationError error in _status.invalidBehaviours.SelectMany(invalidBehaviour => invalidBehaviour.errors))
         {
             if (error.fixAction == null)
-                Debug.LogWarning($"No FixAction specified for [{error.errorName}], requires manual attention!");
+            {
+                if (!error.errorName.Equals("Invalid monoBehaviours in children"))
+                    Debug.LogWarning($"No FixAction specified for [{error.errorName}], requires manual attention!");
+            }
             else
                 error.fixAction.Invoke(error.gameObject);
         }

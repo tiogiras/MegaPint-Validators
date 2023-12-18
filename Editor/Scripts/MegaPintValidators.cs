@@ -319,8 +319,11 @@ internal class MegaPintValidators : MegaPintEditorWindowBase
         return AssetDatabase.FindAssets("t:prefab", folders.ToArray());
     }
 
-    private void ConvertGUIDsToValidatableMonoBehaviours(IEnumerable <string> guids)
+    private void ConvertGUIDsToValidatableMonoBehaviours(string[] guids)
     {
+        if (guids is not {Length: > 0})
+            return;
+
         foreach (var guid in guids)
         {
             var path = AssetDatabase.GUIDToAssetPath(guid);
@@ -440,6 +443,29 @@ internal class MegaPintValidators : MegaPintEditorWindowBase
         PerformSearch(_currentSearchMode);
     }
 
+    private void PerformSceneSearch()
+    {
+        ValidatableMonoBehaviourStatus[] behaviours = Resources.FindObjectsOfTypeAll <ValidatableMonoBehaviourStatus>();
+        behaviours = behaviours.Where(behaviour => behaviour.gameObject.scene.isLoaded).ToArray();
+
+        if (_validatorsSettings.GetValue(MegaPintValidatorsSaveData.showChildren.key, MegaPintValidatorsSaveData.showChildren.defaultValue))
+        {
+            _validatableMonoBehaviours.AddRange(behaviours);
+            return;
+        }
+        
+        foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
+        {
+            if (behaviour.transform.parent != null)
+            {
+                if (behaviour.transform.parent.GetComponentsInParent<ValidatableMonoBehaviourStatus>().Length > 0)
+                    continue;
+            }
+                
+            _validatableMonoBehaviours.Add(behaviour);
+        }
+    }
+    
     private void PerformProjectSearch()
     {
         string[] prefabs;
@@ -483,7 +509,8 @@ internal class MegaPintValidators : MegaPintEditorWindowBase
                 return;
 
             case SearchMode.Scene:
-                _validatableMonoBehaviours.AddRange(FindObjectsOfType <ValidatableMonoBehaviourStatus>());
+
+                PerformSceneSearch();
 
                 break;
 
