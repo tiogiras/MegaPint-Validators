@@ -12,7 +12,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
     private List <IValidationRequirement> _activeRequirements => _importedSettings == null ? _requirements : _importedSettings.Requirements();
 
-    private ValidatorSettings _importedSettings;
+    [SerializeField] private ValidatorSettings _importedSettings;
 
     [SerializeReferenceDropdown] [SerializeReference]
     private List <IValidationRequirement> _requirements;
