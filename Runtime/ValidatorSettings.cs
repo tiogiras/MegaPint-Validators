@@ -4,7 +4,7 @@ using SerializeReferenceDropdown.Runtime;
 using UnityEngine;
 using ValidationRequirement;
 
-[CreateAssetMenu(fileName = "Settings", menuName = "MegaPint/Validators/ValidatorSettings", order = 1)]
+[CreateAssetMenu(fileName = "Settings", menuName = "MegaPint/Validators/Validator Settings", order = 1)]
 public class ValidatorSettings : ScriptableObject
 {
     [SerializeReferenceDropdown] [SerializeReference]
