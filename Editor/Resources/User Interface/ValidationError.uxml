@@ -9,6 +9,6 @@
             <ui:Label text="ERROR" display-tooltip-when-elided="true" name="Error" style="-unity-font-style: bold; -unity-text-align: upper-center; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;); width: auto; font-size: 12px; white-space: normal; color: rgb(178, 46, 38);" />
             <ui:Label text="]" display-tooltip-when-elided="true" />
         </ui:GroupBox>
-        <ui:Button text="Fix" display-tooltip-when-elided="true" />
+        <ui:Button text="Fix" display-tooltip-when-elided="true" class="megapint-button" />
     </ui:GroupBox>
 </ui:UXML>

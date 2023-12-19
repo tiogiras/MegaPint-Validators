@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
     <Style src="project://database/Packages/com.tiogiras.megapint/Editor/Resources/User%20Interface/MegaPint.uss?fileID=7433441132597879392&amp;guid=2f2b50e0e132e3a4989e6dbb646711fa&amp;type=3#MegaPint" />
-    <ui:TwoPaneSplitView fixed-pane-initial-size="200" fixed-pane-initial-dimension="300" style="height: 5000px;">
+    <ui:TwoPaneSplitView fixed-pane-initial-size="200" fixed-pane-initial-dimension="300" style="height: 5000px; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;);">
         <ui:GroupBox style="background-image: resource(&apos;Images/Background/Background 2&apos;); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; height: auto; min-width: 300px;">
             <ui:GroupBox style="flex-direction: row; margin-left: 3px; margin-right: 3px; margin-top: 3px; margin-bottom: 3px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; align-items: center; justify-content: center;">
                 <ui:Button display-tooltip-when-elided="true" enable-rich-text="false" focusable="false" text="Scene" name="BTN_Scene" class="megapint-button" style="width: 48%; justify-content: center; align-items: center;" />
