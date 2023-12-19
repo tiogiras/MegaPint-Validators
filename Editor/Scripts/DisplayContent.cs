@@ -6,6 +6,8 @@ namespace Editor.Scripts
 
 internal static partial class DisplayContent
 {
+    private const string BasePath = "Validators/User Interface/Display Content Tabs/";
+    
     #region Private Methods
 
     private static void Unsubscribe()
@@ -22,10 +24,7 @@ internal static partial class DisplayContent
 
         RegisterTabCallbacks(tabs, tabContentParent, 3);
 
-        SetTabContentLocations(
-            "User Interface/Display Content Tabs/Tab0",
-            "User Interface/Display Content Tabs/Tab1",
-            "User Interface/Display Content Tabs/Tab2");
+        SetTabContentLocations(BasePath + "Tab0", BasePath + "Tab1", BasePath + "Tab2");
 
         s_onSelectedTabChanged += ValidatorsOnTabChanged;
         s_onSelectedPackageChanged += Unsubscribe;
