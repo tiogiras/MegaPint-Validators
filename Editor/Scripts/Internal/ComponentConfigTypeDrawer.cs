@@ -14,7 +14,7 @@ namespace Editor.Scripts.Internal
 [CustomEditor(typeof(ComponentOrderConfig))]
 internal class ComponentConfigTypeDrawer : UnityEditor.Editor
 {
-    private const string BasePath = "User Interface/ComponentOrder/";
+    private const string BasePath = "Validators/User Interface/ComponentOrder/";
     private const string ConfigPath = BasePath + "Config";
     private const string TypeEntryPath = BasePath + "TypeEntry";
 

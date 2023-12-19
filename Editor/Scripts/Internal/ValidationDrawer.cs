@@ -12,9 +12,10 @@ namespace Editor.Scripts.Internal
 [CustomEditor(typeof(ValidatableMonoBehaviourStatus), true)]
 internal class ValidationDrawer : UnityEditor.Editor
 {
-    private const string Status = "User Interface/Status";
-    private const string BehaviourEntry = "User Interface/ValidatableMonoBehaviour";
-    private const string ErrorEntry = "User Interface/ValidationError";
+    private const string BasePath = "Validators/User Interface/";
+    private const string Status = BasePath + "Status";
+    private const string BehaviourEntry = BasePath + "ValidatableMonoBehaviour";
+    private const string ErrorEntry = BasePath + "ValidationError";
 
     private VisualTreeAsset _behaviourEntry;
     private VisualElement _error;

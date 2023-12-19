@@ -19,10 +19,11 @@ internal class MegaPintValidators : MegaPintEditorWindowBase
         None, Scene, Project
     }
 
-    private const string BehaviourEntry = "User Interface/ValidatableMonoBehaviour";
-    private const string ErrorEntry = "User Interface/ValidationError";
+    private const string BaseResourcePath = "Validators/User Interface/";
+    private const string BehaviourEntry = BaseResourcePath + "ValidatableMonoBehaviour";
+    private const string ErrorEntry = BaseResourcePath + "ValidationError";
 
-    private const string MainListEntryPath = "User Interface/ValidatorView/ValidatorViewElement";
+    private const string MainListEntryPath = BaseResourcePath + "ValidatorView/ValidatorViewElement";
     private readonly List <ValidatableMonoBehaviourStatus> _displayedItems = new();
 
     private readonly List <ValidatableMonoBehaviourStatus> _validatableMonoBehaviours = new();
@@ -75,7 +76,7 @@ internal class MegaPintValidators : MegaPintEditorWindowBase
 
     protected override string BasePath()
     {
-        return "User Interface/ValidatorView/ValidatorView";
+        return BaseResourcePath + "ValidatorView/ValidatorView";
     }
 
     protected override void CreateGUI()
