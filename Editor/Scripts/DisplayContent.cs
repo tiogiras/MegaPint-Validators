@@ -6,14 +6,14 @@ namespace Editor.Scripts
 
 internal static partial class DisplayContent
 {
-    private const string BasePath = "Validators/User Interface/Display Content Tabs/";
+    private const string BasePathValidators = "Validators/User Interface/Display Content Tabs/";
     
     #region Private Methods
 
-    private static void Unsubscribe()
+    private static void UnsubscribeValidators()
     {
-        s_onSelectedTabChanged -= ValidatorsOnTabChanged;
-        s_onSelectedPackageChanged -= Unsubscribe;
+        s_onSelectedTabChanged -= OnTabChangedValidators;
+        s_onSelectedPackageChanged -= UnsubscribeValidators;
     }
 
     // Called by reflection
@@ -24,15 +24,15 @@ internal static partial class DisplayContent
 
         RegisterTabCallbacks(tabs, tabContentParent, 3);
 
-        SetTabContentLocations(BasePath + "Tab0", BasePath + "Tab1", BasePath + "Tab2");
+        SetTabContentLocations(BasePathValidators + "Tab0", BasePathValidators + "Tab1", BasePathValidators + "Tab2");
 
-        s_onSelectedTabChanged += ValidatorsOnTabChanged;
-        s_onSelectedPackageChanged += Unsubscribe;
+        s_onSelectedTabChanged += OnTabChangedValidators;
+        s_onSelectedPackageChanged += UnsubscribeValidators;
 
         SwitchTab(tabContentParent, 0);
     }
 
-    private static void ValidatorsOnTabChanged(int tab, VisualElement root)
+    private static void OnTabChangedValidators(int tab, VisualElement root)
     {
         if (tab != 0)
             return;
