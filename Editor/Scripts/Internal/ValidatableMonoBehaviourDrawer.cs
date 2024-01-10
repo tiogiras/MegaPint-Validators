@@ -36,10 +36,8 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
                 var controlID = GUIUtility.GetControlID(FocusType.Passive);
                 EditorGUIUtility.ShowObjectPicker <ValidatorSettings>(null, false, "", controlID);
             }
-
-            var commandName = Event.current.commandName;
-
-            if (commandName == "ObjectSelectorClosed" && _listening)
+            
+            if (Event.current.commandName == "ObjectSelectorClosed" && _listening)
             {
                 _listening = false;
                 ((ValidatableMonoBehaviour)target).SetImportedSettings((ValidatorSettings)EditorGUIUtility.GetObjectPickerObject());
