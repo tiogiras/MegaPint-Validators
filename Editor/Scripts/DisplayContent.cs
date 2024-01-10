@@ -17,6 +17,7 @@ internal static partial class DisplayContent
     }
 
     // Called by reflection
+    // ReSharper disable once UnusedMember.Local
     private static void Validators(VisualElement root)
     {
         var tabs = root.Q <GroupBox>("Tabs");
