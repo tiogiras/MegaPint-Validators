@@ -135,8 +135,12 @@ internal class ValidationDrawer : UnityEditor.Editor
 
     private void FixAll()
     {
-        foreach (ValidationError error in _status.invalidBehaviours.SelectMany(invalidBehaviour => invalidBehaviour.errors))
+        ValidationError[] errors = _status.invalidBehaviours.SelectMany(invalidBehaviour => invalidBehaviour.errors).ToArray();
+
+        for (var i = errors.Length - 1; i >= 0; i--)
         {
+            ValidationError error = errors[i];
+            
             if (error.fixAction == null)
             {
                 if (!error.errorName.Equals("Invalid monoBehaviours in children"))

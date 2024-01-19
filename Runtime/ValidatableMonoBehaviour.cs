@@ -23,6 +23,8 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
     public void OnValidate()
     {
+        BeforeValidation();
+        
         if (_status == null)
         {
             _status = GetComponent <ValidatableMonoBehaviourStatus>();
@@ -45,6 +47,11 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     public List <IValidationRequirement> Requirements()
     {
         return _requirements;
+    }
+
+    protected void SetRequirements(List <IValidationRequirement> requirements)
+    {
+        _requirements = requirements;
     }
 
     public void SetImportedSettings(ValidatorSettings settings)
@@ -80,4 +87,9 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     }
 
     #endregion
+
+    protected virtual void BeforeValidation()
+    {
+        
+    }
 }

@@ -1,5 +1,5 @@
 {
-    "name": "tiogiras.megapint-validators.Editor.Scripts",
+    "name": "tiogiras.megapint-validators.editor.scripts",
     "rootNamespace": "",
     "references": [
         "GUID:0e40976153628db4fbfccfcc6ab8f1bf"
