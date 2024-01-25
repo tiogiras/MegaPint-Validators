@@ -57,7 +57,7 @@ public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
         Action <int> onSelectedNewType) :
         base(state)
     {
-        _attributes = attributes;
+        _attributes = attributes.Where(attr => attr != null);
         _onSelectedTypeIndex = onSelectedNewType;
 
         minimumSize = new Vector2(minimumSize.x, 300);

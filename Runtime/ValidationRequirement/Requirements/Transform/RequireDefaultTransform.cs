@@ -53,7 +53,7 @@ public class RequireDefaultTransform : ScriptableValidationRequirement
         AddError(
             "Non-Default Transform",
             errorText.ToString(),
-            ValidationState.Warning,
+            ValidationState.Error,
             FixAction);
     }
 
