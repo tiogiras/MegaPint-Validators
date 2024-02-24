@@ -2,8 +2,11 @@
   "name": "com.tiogiras.megapint-validators",
   "displayName": "Megapint - Validators",
   "author": "Tiogiras",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "unity": "2022.3",
   "category": "Tools",
-  "description": "MegaPint package for validation functions"
+  "description": "This package adds an option to use and create own validations for MonoBehaviours. The results of the validations are easily readable in one window and can be automatically fixed.",
+  "repository": {
+    "url": "https://github.com/tiogiras/MegaPint-Validators.git"
+  }
 }
