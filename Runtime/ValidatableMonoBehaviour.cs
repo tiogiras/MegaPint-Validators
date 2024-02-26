@@ -27,7 +27,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         
         if (_status == null)
         {
-            _status = GetComponent <ValidatableMonoBehaviourStatus>();
+            _status = TryGetComponent(out ValidatableMonoBehaviourStatus status) ? status : gameObject.AddComponent <ValidatableMonoBehaviourStatus>();
             _status.AddValidatableMonoBehaviour(this);
         }
 
