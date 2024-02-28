@@ -6,6 +6,7 @@ using UnityEngine;
 
 #if UNITY_EDITOR
 using UnityEditorInternal;
+using UnityEditor;
 #endif
 
 namespace ValidationRequirement.Requirements.ComponentOrder
@@ -181,6 +182,27 @@ public class RequireComponentOrder : ScriptableValidationRequirement
 
     private void FixAction(UnityEngine.GameObject gameObject)
     {
+#if UNITY_EDITOR
+        PrefabInstanceStatus status = PrefabUtility.GetPrefabInstanceStatus(gameObject);
+
+        if (status == PrefabInstanceStatus.Connected)
+        {
+            UnityEngine.GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
+            var assetPath = AssetDatabase.GetAssetPath(prefab);
+            
+            var statusComp = prefab.GetComponent <ValidatableMonoBehaviourStatus>();
+            statusComp.ValidateStatus();
+            
+            statusComp.FixAll();
+
+            PrefabUtility.SaveAsPrefabAsset(prefab, assetPath);
+
+            // TODO prefabUtility is editor only
+            
+            return;
+        }
+#endif
+        
         foreach (Component component in _allCategories.SelectMany(category => category.components))
             MoveToTop(component);
     }
