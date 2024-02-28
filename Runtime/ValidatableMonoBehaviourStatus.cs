@@ -14,6 +14,26 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
 
     #region Public Methods
 
+    public void FixAll()
+    {
+        ValidationError[] errors = invalidBehaviours.SelectMany(invalidBehaviour => invalidBehaviour.errors).ToArray();
+
+        for (var i = errors.Length - 1; i >= 0; i--)
+        {
+            ValidationError error = errors[i];
+            
+            if (error.fixAction == null)
+            {
+                if (!error.errorName.Equals("Invalid monoBehaviours in children"))
+                    Debug.LogWarning($"No FixAction specified for [{error.errorName}], requires manual attention!");
+            }
+            else
+                error.fixAction.Invoke(error.gameObject);
+        }
+
+        ValidateStatus();
+    }
+
     public int CompareTo(ValidatableMonoBehaviourStatus other)
     {
         if ((int)State > (int)other.State)
@@ -104,4 +124,6 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
     }
 
     #endregion
+    
+    
 }
