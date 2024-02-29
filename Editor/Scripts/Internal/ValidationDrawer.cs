@@ -59,7 +59,7 @@ internal class ValidationDrawer : UnityEditor.Editor
         _fixAllButton = root.Q <Button>("BTN_FixAll");
         _fixAllButton.style.display = _status.State == ValidationState.Ok ? DisplayStyle.None : DisplayStyle.Flex;
 
-        _fixAllButton.clicked += FixAll;
+        _fixAllButton.clicked += _status.FixAll;
 
         _behaviourEntry = Resources.Load <VisualTreeAsset>(BehaviourEntry);
         _errorEntry = Resources.Load <VisualTreeAsset>(ErrorEntry);
@@ -132,26 +132,6 @@ internal class ValidationDrawer : UnityEditor.Editor
     #endregion
 
     #region Private Methods
-
-    private void FixAll()
-    {
-        ValidationError[] errors = _status.invalidBehaviours.SelectMany(invalidBehaviour => invalidBehaviour.errors).ToArray();
-
-        for (var i = errors.Length - 1; i >= 0; i--)
-        {
-            ValidationError error = errors[i];
-            
-            if (error.fixAction == null)
-            {
-                if (!error.errorName.Equals("Invalid monoBehaviours in children"))
-                    Debug.LogWarning($"No FixAction specified for [{error.errorName}], requires manual attention!");
-            }
-            else
-                error.fixAction.Invoke(error.gameObject);
-        }
-
-        _status.ValidateStatus();
-    }
 
     private void StatusUpdate(ValidationState state)
     {
