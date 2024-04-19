@@ -1,14 +1,61 @@
 ﻿#if UNITY_EDITOR
+using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
+using GUIUtility = Editor.Scripts.GUI.GUIUtility;
 
 namespace Editor.Scripts
 {
 
 internal static partial class DisplayContent
 {
-    private const string BasePathValidators = "Validators/User Interface/Display Content Tabs/";
     
-    #region Private Methods
+    // Called by reflection
+    // ReSharper disable once UnusedMember.Local
+    private static void Validators(DisplayContentReferences refs)
+    {
+        InitializeDisplayContent(
+            refs,
+            new TabSettings
+            {
+                info = true,
+                guides = true,
+                help = true
+            },
+            new TabActions
+            {
+                info = ValidatorsActivateLinks,
+                guides = ValidatorsActivateLinks,
+                help = ValidatorsActivateLinks
+            });
+    }
+
+    private static void ValidatorsActivateLinks(VisualElement root)
+    {
+        GUIUtility.ActivateLinks(root,
+                                 evt =>
+                                 {
+                                     switch (evt.linkID)
+                                     {
+                                         case "validatorView":
+                                             EditorApplication.ExecuteMenuItem(
+                                                 "MegaPint/Packages/Validator View");
+                                             break;
+                                         
+                                         case "validatorSettings":
+                                             EditorApplication.ExecuteMenuItem(
+                                                 "Assets/Create/MegaPint/Validators/Validator Settings");
+                                             break;
+                                         
+                                         case "componentOrderConfig":
+                                             EditorApplication.ExecuteMenuItem(
+                                                 "Assets/Create/MegaPint/Validators/Component Order Config");
+                                             break;
+                                     }
+                                 });
+    }
+    
+    /*#region Private Methods
 
     private static void UnsubscribeValidators()
     {
@@ -16,8 +63,7 @@ internal static partial class DisplayContent
         s_onSelectedPackageChanged -= UnsubscribeValidators;
     }
 
-    // Called by reflection
-    // ReSharper disable once UnusedMember.Local
+
     private static void Validators(VisualElement root)
     {
         var tabs = root.Q <GroupBox>("Tabs");
@@ -42,7 +88,7 @@ internal static partial class DisplayContent
             _ => {ContextMenu.TryOpen <MegaPintValidators>(false);});
     }
 
-    #endregion
+    #endregion*/
 }
 
 }

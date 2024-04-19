@@ -8,7 +8,7 @@ internal static partial class ContextMenu
 {
     #region Private Methods
 
-    [MenuItem(MenuItemPackages + "/Validators", false, 13)]
+    [MenuItem(MenuItemPackages + "/Validator View", false, 13)]
     private static void OpenValidatorView()
     {
         TryOpen <MegaPintValidators>(false);
