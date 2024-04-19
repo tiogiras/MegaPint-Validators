@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <Style src="project://database/Packages/com.tiogiras.megapint/Editor/Resources/MegaPint/User%20Interface/MegaPint.uss?fileID=7433441132597879392&amp;guid=54dba4b7e58379b46a03a9a47e130e51&amp;type=3#MegaPint" />
+    <ui:GroupBox style="margin-top: 10px; margin-right: 10px; margin-bottom: 10px; margin-left: 10px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
+        <Editor.Scripts.GUI.Factories.TextSecondary tabindex="-1" name="PackageInfo" text="Package Info" style="-unity-font-style: italic; white-space: normal;" />
+        <Editor.Scripts.GUI.Factories.Separator Space="1.5" />
+        <Editor.Scripts.GUI.Factories.Text tabindex="-1" text="For instructions on how to setup your own &lt;link=&quot;info_validators&quot;&gt;Validators&lt;/link&gt; and &lt;link=&quot;info_requirement&quot;&gt;Requirements&lt;/link&gt; see the guides tab." class="mp_link" style="white-space: normal; margin-top: 20px;" />
+        <Editor.Scripts.GUI.Factories.Text tabindex="-1" text="&lt;link=&quot;validatorView&quot;&gt;Validator View&lt;/link&gt;" class="mp_textColor_primary mp_link" style="-unity-font-style: bold; margin-left: 15px; margin-top: 20px; white-space: normal;" />
+        <Editor.Scripts.GUI.Factories.Text tabindex="-1" text="Find and resolve all issues in either the open scene or the project files." style="margin-left: 15px; white-space: normal;" />
+    </ui:GroupBox>
+</ui:UXML>
