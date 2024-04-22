@@ -7,6 +7,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using ValidationRequirement.Requirements.ComponentOrder;
+using GUIUtility = Editor.Scripts.GUI.GUIUtility;
 
 namespace Editor.Scripts.Internal
 {
@@ -14,9 +15,9 @@ namespace Editor.Scripts.Internal
 [CustomEditor(typeof(ComponentOrderConfig))]
 internal class ComponentConfigTypeDrawer : UnityEditor.Editor
 {
-    private const string BasePath = "Validators/User Interface/ComponentOrder/";
+    private const string BasePath = "Validators/User Interface/Component Order/";
     private const string ConfigPath = BasePath + "Config";
-    private const string TypeEntryPath = BasePath + "TypeEntry";
+    private const string TypeEntryPath = BasePath + "Type Entry";
 
     private const string AddCategoryNiceName = "Add Category";
     private const string NonUnityComponentsNiceName = "Non-Unity Components";
@@ -39,8 +40,8 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
         var root = new VisualElement();
 
         _configTemplate = Resources.Load <VisualTreeAsset>(ConfigPath);
-        TemplateContainer configBase = _configTemplate.Instantiate();
-        root.Add(configBase);
+        
+        GUIUtility.Instantiate(_configTemplate, root);
 
         root.RegisterCallback <FocusOutEvent>(Save);
 

@@ -8,6 +8,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using GUIUtility = Editor.Scripts.GUI.GUIUtility;
 
 namespace Editor.Scripts
 {
@@ -19,11 +20,9 @@ internal class MegaPintValidators : MegaPintEditorWindowBase
         None, Scene, Project
     }
 
-    private const string BaseResourcePath = "Validators/User Interface/";
-    private const string BehaviourEntry = BaseResourcePath + "ValidatableMonoBehaviour";
-    private const string ErrorEntry = BaseResourcePath + "ValidationError";
+    private const string BaseResourcePath = "Validators/User Interface/Validator View";
+    private const string BaseResourcePathStatus = "Validators/User Interface/Status";
 
-    private const string MainListEntryPath = BaseResourcePath + "ValidatorView/ValidatorViewElement";
     private readonly List <ValidatableMonoBehaviourStatus> _displayedItems = new();
 
     private readonly List <ValidatableMonoBehaviourStatus> _validatableMonoBehaviours = new();
@@ -76,7 +75,7 @@ internal class MegaPintValidators : MegaPintEditorWindowBase
 
     protected override string BasePath()
     {
-        return BaseResourcePath + "ValidatorView/ValidatorView";
+        return BaseResourcePath;
     }
 
     protected override void CreateGUI()
@@ -85,7 +84,7 @@ internal class MegaPintValidators : MegaPintEditorWindowBase
 
         VisualElement root = rootVisualElement;
 
-        VisualElement content = _baseWindow.Instantiate();
+        VisualElement content = GUIUtility.Instantiate(_baseWindow);
 
         #region References
 
@@ -115,7 +114,7 @@ internal class MegaPintValidators : MegaPintEditorWindowBase
 
         #region MainList
 
-        _mainList.makeItem = () => _mainListEntry.Instantiate();
+        _mainList.makeItem = () => GUIUtility.Instantiate(_mainListEntry);
 
         _mainList.bindItem = (element, i) =>
         {
@@ -137,10 +136,10 @@ internal class MegaPintValidators : MegaPintEditorWindowBase
 
         #region ErrorView
 
-        _behaviourEntry = Resources.Load <VisualTreeAsset>(BehaviourEntry);
-        _errorEntry = Resources.Load <VisualTreeAsset>(ErrorEntry);
+        _behaviourEntry = Resources.Load <VisualTreeAsset>(Path.Combine(BaseResourcePathStatus, "Behaviour"));
+        _errorEntry = Resources.Load <VisualTreeAsset>(Path.Combine(BaseResourcePathStatus, "Error"));
 
-        _errorView.makeItem = () => _behaviourEntry.Instantiate();
+        _errorView.makeItem = () => GUIUtility.Instantiate(_behaviourEntry);
 
         _errorView.bindItem = (element, i) =>
         {
@@ -150,7 +149,7 @@ internal class MegaPintValidators : MegaPintEditorWindowBase
             element.Q <Foldout>().text = invalidBehaviour.behaviourName;
             var errors = element.Q <ListView>("Errors");
 
-            errors.makeItem = () => _errorEntry.Instantiate();
+            errors.makeItem = () => GUIUtility.Instantiate(_errorEntry);
 
             errors.bindItem = (visualElement, j) =>
             {
@@ -219,7 +218,7 @@ internal class MegaPintValidators : MegaPintEditorWindowBase
     protected override bool LoadResources()
     {
         _baseWindow = Resources.Load <VisualTreeAsset>(BasePath());
-        _mainListEntry = Resources.Load <VisualTreeAsset>(MainListEntryPath);
+        _mainListEntry = Resources.Load <VisualTreeAsset>(Path.Combine(BaseResourcePath, "Item"));
 
         return _baseWindow != null && _mainListEntry != null;
     }
