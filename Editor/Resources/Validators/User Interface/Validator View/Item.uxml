@@ -1,9 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
     <Style src="project://database/Packages/com.tiogiras.megapint/Editor/Resources/MegaPint/User%20Interface/MegaPint.uss?fileID=7433441132597879392&amp;guid=54dba4b7e58379b46a03a9a47e130e51&amp;type=3#MegaPint" />
-    <ui:GroupBox style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; flex-direction: row; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;);">
-        <ui:Label text="[OK]" display-tooltip-when-elided="true" name="Ok" style="-unity-font-style: bold; -unity-text-align: upper-center; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;); width: auto; font-size: 12px; white-space: normal; color: rgb(40, 178, 38);" />
-        <ui:Label text="[WARNING]" display-tooltip-when-elided="true" name="Warning" style="-unity-font-style: bold; -unity-text-align: upper-center; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;); width: auto; font-size: 12px; white-space: normal; color: rgb(178, 104, 38);" />
-        <ui:Label text="[ERROR]" display-tooltip-when-elided="true" name="Error" style="-unity-font-style: bold; -unity-text-align: upper-center; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;); width: auto; font-size: 12px; white-space: normal; color: rgb(178, 46, 38);" />
-        <ui:Label text="ObjectName" display-tooltip-when-elided="true" name="ObjectName" style="-unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;); -unity-font-definition: initial;" />
+    <ui:GroupBox style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; flex-direction: row;">
+        <Editor.Scripts.GUI.Factories.Text tabindex="-1" text="[OK]" name="Ok" class="mp_textColor_green" style="-unity-font-style: bold; -unity-text-align: middle-center; white-space: normal;" />
+        <Editor.Scripts.GUI.Factories.Text tabindex="-1" text="[WARNING]" name="Warning" class="mp_textColor_orange" style="-unity-font-style: bold; -unity-text-align: middle-center; white-space: normal;" />
+        <Editor.Scripts.GUI.Factories.Text tabindex="-1" text="[ERROR]" name="Error" class="mp_textColor_red" style="-unity-font-style: bold; -unity-text-align: middle-center; white-space: normal;" />
+        <Editor.Scripts.GUI.Factories.Text tabindex="-1" text="ObjectName" name="ObjectName" />
     </ui:GroupBox>
 </ui:UXML>

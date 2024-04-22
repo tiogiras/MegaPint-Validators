@@ -1,10 +1,12 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using GUIUtility = Editor.Scripts.GUI.GUIUtility;
 
 namespace Editor.Scripts.Internal
 {
@@ -12,10 +14,7 @@ namespace Editor.Scripts.Internal
 [CustomEditor(typeof(ValidatableMonoBehaviourStatus), true)]
 internal class ValidationDrawer : UnityEditor.Editor
 {
-    private const string BasePath = "Validators/User Interface/";
-    private const string Status = BasePath + "Status";
-    private const string BehaviourEntry = BasePath + "ValidatableMonoBehaviour";
-    private const string ErrorEntry = BasePath + "ValidationError";
+    private const string BasePath = "Validators/User Interface/Status";
 
     private VisualTreeAsset _behaviourEntry;
     private VisualElement _error;
@@ -38,9 +37,9 @@ internal class ValidationDrawer : UnityEditor.Editor
     {
         var root = new VisualElement();
 
-        var statusFile = Resources.Load <VisualTreeAsset>(Status);
-        TemplateContainer status = statusFile.Instantiate();
-        root.Add(status);
+        var statusFile = Resources.Load <VisualTreeAsset>(BasePath);
+
+        GUIUtility.Instantiate(statusFile, root);
 
         _ok = root.Q <VisualElement>("Ok");
         _warning = root.Q <VisualElement>("Warning");
@@ -61,14 +60,14 @@ internal class ValidationDrawer : UnityEditor.Editor
 
         _fixAllButton.clicked += _status.FixAll;
 
-        _behaviourEntry = Resources.Load <VisualTreeAsset>(BehaviourEntry);
-        _errorEntry = Resources.Load <VisualTreeAsset>(ErrorEntry);
+        _behaviourEntry = Resources.Load <VisualTreeAsset>(Path.Combine(BasePath, "Behaviour"));
+        _errorEntry = Resources.Load <VisualTreeAsset>(Path.Combine(BasePath, "Error"));
 
         _errorFoldout = root.Q <Foldout>("ErrorFoldout");
 
         _errorView = root.Q <ListView>("ErrorView");
 
-        _errorView.makeItem = () => _behaviourEntry.Instantiate();
+        _errorView.makeItem = () => GUIUtility.Instantiate(_behaviourEntry);
 
         _errorView.bindItem = (element, i) =>
         {
@@ -77,7 +76,7 @@ internal class ValidationDrawer : UnityEditor.Editor
             element.Q <Foldout>().text = invalidBehaviour.behaviourName;
             var errors = element.Q <ListView>("Errors");
 
-            errors.makeItem = () => _errorEntry.Instantiate();
+            errors.makeItem = () => GUIUtility.Instantiate(_errorEntry);
 
             errors.bindItem = (visualElement, j) =>
             {

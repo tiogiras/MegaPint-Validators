@@ -1,19 +1,17 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
     <Style src="project://database/Packages/com.tiogiras.megapint/Editor/Resources/MegaPint/User%20Interface/MegaPint.uss?fileID=7433441132597879392&amp;guid=54dba4b7e58379b46a03a9a47e130e51&amp;type=3#MegaPint" />
-    <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: space-between; margin-left: 10px; margin-right: 10px; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;);">
-        <ui:Label text="0" display-tooltip-when-elided="true" style="-unity-text-align: middle-left; -unity-font-style: bold; font-size: 20px; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;); width: auto;" />
-        <ui:GroupBox style="width: auto; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-grow: 1;">
-            <ui:TextField picking-mode="Ignore" label="Component Name" value="Transform" text="Transform / RectTransform" readonly="true" style="opacity: 0.5;" />
-        </ui:GroupBox>
+    <ui:VisualElement picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; margin-left: 10px; margin-right: 10px;">
+        <Editor.Scripts.GUI.Factories.Text tabindex="-1" text="0" style="-unity-font-style: bold; font-size: 20px; -unity-text-align: middle-left; white-space: normal;" />
+        <ui:TextField picking-mode="Ignore" label="Component Name" value="Transform" text="Transform / RectTransform" readonly="true" focusable="false" class="mp_font mp_textColor_secondary" style="opacity: 0.5; flex-grow: 1; flex-shrink: 1;" />
     </ui:VisualElement>
-    <ui:GroupBox style="-unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;);">
+    <ui:GroupBox>
         <ui:ListView show-border="true" fixed-item-height="50" virtualization-method="FixedHeight" reorder-mode="Animated" reorderable="true" show-alternating-row-backgrounds="ContentOnly" focusable="true" style="-unity-text-align: upper-left;" />
         <ui:GroupBox style="flex-direction: row-reverse; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;">
-            <ui:Button text="-" display-tooltip-when-elided="true" name="BTN_Remove" class="megapint-button" style="-unity-font-style: bold; font-size: 16px;" />
-            <ui:Button text="+" display-tooltip-when-elided="true" name="BTN_Add" class="megapint-button" style="font-size: 16px; -unity-font-style: bold;" />
+            <Editor.Scripts.GUI.Factories.Interactive.Button name="BTN_Remove" text="-" style="font-size: 16px; -unity-font-style: bold;" />
+            <Editor.Scripts.GUI.Factories.Interactive.Button name="BTN_Add" text="+" style="font-size: 16px; -unity-font-style: bold;" />
         </ui:GroupBox>
         <ui:GroupBox style="flex-direction: row-reverse; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-top: 0;">
-            <ui:DropdownField index="0" choices="System.Collections.Generic.List`1[System.String]" name="CategoryDropdown" />
+            <ui:DropdownField index="0" choices="System.Collections.Generic.List`1[System.String]" name="CategoryDropdown" class="mp_font mp_textColor_normal" />
         </ui:GroupBox>
     </ui:GroupBox>
 </ui:UXML>

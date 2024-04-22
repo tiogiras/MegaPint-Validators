@@ -1,19 +1,19 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
     <Style src="project://database/Packages/com.tiogiras.megapint/Editor/Resources/MegaPint/User%20Interface/MegaPint.uss?fileID=7433441132597879392&amp;guid=54dba4b7e58379b46a03a9a47e130e51&amp;type=3#MegaPint" />
-    <ui:GroupBox style="margin-left: 0; margin-right: 0; margin-top: 10px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 5px; flex-direction: column; background-color: rgb(37, 37, 37); -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;);">
+    <ui:GroupBox style="margin-left: 0; margin-right: 0; margin-top: 10px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 5px; flex-direction: column; background-color: rgb(37, 37, 37);">
         <ui:GroupBox style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-direction: row; align-items: center; justify-content: space-between;">
             <ui:GroupBox style="flex-direction: row; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 0; align-items: center;">
-                <ui:Label text="Status:" display-tooltip-when-elided="true" style="-unity-font-style: bold; -unity-text-align: upper-center; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;); padding-top: 5px; padding-bottom: 5px; width: auto; font-size: 12px; white-space: normal; margin-left: 20px;" />
-                <ui:Label text="OK" display-tooltip-when-elided="true" name="Ok" style="-unity-font-style: bold; -unity-text-align: upper-center; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;); padding-top: 5px; padding-bottom: 5px; width: auto; font-size: 12px; white-space: normal; margin-left: 5px; color: rgb(40, 178, 38);" />
-                <ui:Label text="WARNING" display-tooltip-when-elided="true" name="Warning" style="-unity-font-style: bold; -unity-text-align: upper-center; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;); padding-top: 5px; padding-bottom: 5px; width: auto; font-size: 12px; white-space: normal; margin-left: 5px; color: rgb(178, 104, 38);" />
-                <ui:Label text="ERROR" display-tooltip-when-elided="true" name="Error" style="-unity-font-style: bold; -unity-text-align: upper-center; -unity-font-definition: initial; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;); padding-top: 5px; padding-bottom: 5px; width: auto; font-size: 12px; white-space: normal; margin-left: 5px; color: rgb(178, 46, 38);" />
+                <Editor.Scripts.GUI.Factories.Text tabindex="-1" text="Status:" style="-unity-font-style: bold; white-space: normal; padding-top: 5px; padding-bottom: 5px; margin-left: 20px;" />
+                <Editor.Scripts.GUI.Factories.Text tabindex="-1" name="Ok" text="OK" class="mp_textColor_green" style="margin-left: 5px; padding-top: 5px; padding-bottom: 5px; -unity-font-style: bold; white-space: normal; -unity-text-align: upper-center;" />
+                <Editor.Scripts.GUI.Factories.Text tabindex="-1" name="Warning" text="WARNING" class="mp_textColor_orange" style="margin-left: 5px; padding-top: 5px; padding-bottom: 5px; -unity-font-style: bold; white-space: normal; -unity-text-align: upper-center;" />
+                <Editor.Scripts.GUI.Factories.Text tabindex="-1" name="Error" text="ERROR" class="mp_textColor_red" style="margin-left: 5px; padding-top: 5px; padding-bottom: 5px; -unity-font-style: bold; white-space: normal; -unity-text-align: upper-center;" />
             </ui:GroupBox>
             <ui:GroupBox style="margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-direction: row; align-items: center;">
-                <ui:Button text="Fix All" display-tooltip-when-elided="true" name="BTN_FixAll" class="megapint-button" style="margin-left: 0; margin-right: 5px; margin-top: 0; margin-bottom: 0;" />
-                <ui:Button text="Validate" display-tooltip-when-elided="true" name="BTN_Validate" class="megapint-button" style="margin-left: 0; margin-right: 10px; margin-top: 0; margin-bottom: 0;" />
+                <Editor.Scripts.GUI.Factories.Interactive.Button text="Fix All" name="BTN_FixAll" style="margin-top: 0; margin-right: 5px; margin-bottom: 0; margin-left: 0;" />
+                <Editor.Scripts.GUI.Factories.Interactive.Button text="Validate" name="BTN_Validate" style="margin-top: 0; margin-right: 10px; margin-bottom: 0; margin-left: 0;" />
             </ui:GroupBox>
         </ui:GroupBox>
-        <ui:Foldout text="Invalid Behaviours" name="ErrorFoldout" value="false" style="margin-left: 20px; -unity-font: resource(&apos;RobotoMono-VariableFont_wght&apos;); -unity-font-definition: initial; -unity-font-style: bold;">
+        <ui:Foldout text="Invalid Behaviours" name="ErrorFoldout" value="false" class="mp_font mp_textColor_normal" style="margin-left: 20px; -unity-font-style: bold;">
             <ui:ListView name="ErrorView" virtualization-method="DynamicHeight" selection-type="None" />
         </ui:Foldout>
     </ui:GroupBox>
