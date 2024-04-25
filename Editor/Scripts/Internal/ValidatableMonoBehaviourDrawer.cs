@@ -62,6 +62,9 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
         {
             var path = EditorUtility.SaveFilePanelInProject("Export Requirements", "Requirements", "asset", "Hello World");
 
+            if (string.IsNullOrEmpty(path))
+                return;
+            
             var requirements = CreateInstance <ValidatorSettings>();
             requirements.SetRequirements(((ValidatableMonoBehaviour)target).Requirements());
 
