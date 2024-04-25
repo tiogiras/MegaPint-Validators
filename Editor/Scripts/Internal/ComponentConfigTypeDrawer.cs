@@ -26,8 +26,6 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
 
     private VisualTreeAsset _configTemplate;
 
-    private bool _isDirty;
-
     private ListView _listView;
     private VisualTreeAsset _typeEntryTemplate;
 
@@ -43,7 +41,7 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
         
         GUIUtility.Instantiate(_configTemplate, root);
 
-        root.RegisterCallback <FocusOutEvent>(Save);
+        //TODO ??? root.RegisterCallback <FocusOutEvent>(Save);
 
         var addButton = root.Q <Button>("BTN_Add");
         addButton.clicked += AddListElement;
@@ -75,7 +73,7 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
 
         _typeEntryTemplate = Resources.Load <VisualTreeAsset>(TypeEntryPath);
 
-        _listView.makeItem = () => _typeEntryTemplate.Instantiate();
+        _listView.makeItem = () => GUIUtility.Instantiate(_typeEntryTemplate);
 
         _listView.bindItem = UpdateEntry;
 
@@ -143,7 +141,7 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                 category = {function = function}
             });
 
-        _isDirty = true;
+        Save();
 
         _listView.RefreshItems();
     }
@@ -151,36 +149,30 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
     private void AddListElement()
     {
         _types.Add(new ComponentOrderConfig.Type());
-        _isDirty = true;
+        Save();
 
         _listView.RefreshItems();
     }
 
     private void RemoveListElement()
     {
+        Debug.Log(_listView.selectedItem);
+
         var index = _listView.selectedItem == null ? _types.Count - 1 : _listView.selectedIndex;
 
         if (!_types[index].canBeDeleted)
             return;
 
         _types.RemoveAt(index);
-        _isDirty = true;
+        Save();
 
         _listView.RefreshItems();
     }
 
-    private void Save(FocusOutEvent evt)
+    private void Save()
     {
-        if (!_isDirty)
-            return;
-
-        _isDirty = false;
-
         serializedObject.ApplyModifiedProperties();
-#if UNITY_EDITOR
         EditorUtility.SetDirty(serializedObject.targetObject);
-        AssetDatabase.SaveAssetIfDirty(serializedObject.targetObject);
-#endif
     }
 
     private void UpdateCategoryContent(VisualElement element, ComponentOrderConfig.Type entry)
@@ -204,6 +196,9 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                     : "Namespace";
 
                 var namespaceField = new TextField(title) {value = entry.category.nameSpaceString, style = {flexGrow = 1}};
+                namespaceField.AddToClassList("mp_inputField");
+                
+                GUIUtility.ApplyTheme(namespaceField);
 
                 element.Add(namespaceField);
 
@@ -211,7 +206,7 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                     evt =>
                     {
                         entry.category.nameSpaceString = evt.newValue;
-                        _isDirty = true;
+                        Save();
                     });
 
                 break;
@@ -259,7 +254,7 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                         return;
 
                     _types[i].componentName = evt.newValue;
-                    _isDirty = true;
+                    Save();
                 });
         }
     }

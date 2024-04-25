@@ -9,6 +9,6 @@
             <Editor.Scripts.GUI.Factories.Text tabindex="-1" name="Error" text="ERROR" class="mp_textColor_red" style="-unity-font-style: bold; -unity-text-align: upper-center;" />
             <Editor.Scripts.GUI.Factories.Text tabindex="-1" text="]" />
         </ui:GroupBox>
-        <Editor.Scripts.GUI.Factories.Interactive.Button text="Fix" />
+        <Editor.Scripts.GUI.Factories.Interactive.Button text="Fix" display-tooltip-when-elided="true" tooltip="Fix this issue." />
     </ui:GroupBox>
 </ui:UXML>

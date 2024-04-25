@@ -5,13 +5,13 @@
         <ui:TextField picking-mode="Ignore" label="Component Name" value="Transform" text="Transform / RectTransform" readonly="true" focusable="false" class="mp_font mp_textColor_secondary" style="opacity: 0.5; flex-grow: 1; flex-shrink: 1;" />
     </ui:VisualElement>
     <ui:GroupBox>
-        <ui:ListView show-border="true" fixed-item-height="50" virtualization-method="FixedHeight" reorder-mode="Animated" reorderable="true" show-alternating-row-backgrounds="ContentOnly" focusable="true" style="-unity-text-align: upper-left;" />
+        <ui:ListView show-border="true" fixed-item-height="50" virtualization-method="FixedHeight" reorder-mode="Animated" reorderable="true" show-alternating-row-backgrounds="ContentOnly" focusable="true" class="mp_listSelection_primary" style="-unity-text-align: upper-left;" />
         <ui:GroupBox style="flex-direction: row-reverse; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;">
-            <Editor.Scripts.GUI.Factories.Interactive.Button name="BTN_Remove" text="-" style="font-size: 16px; -unity-font-style: bold;" />
-            <Editor.Scripts.GUI.Factories.Interactive.Button name="BTN_Add" text="+" style="font-size: 16px; -unity-font-style: bold;" />
+            <Editor.Scripts.GUI.Factories.Interactive.Button name="BTN_Remove" text="-" display-tooltip-when-elided="true" tooltip="Remove the selected/last element." style="font-size: 16px; -unity-font-style: bold;" />
+            <Editor.Scripts.GUI.Factories.Interactive.Button name="BTN_Add" text="+" tooltip="Add a new element." display-tooltip-when-elided="true" style="font-size: 16px; -unity-font-style: bold;" />
         </ui:GroupBox>
         <ui:GroupBox style="flex-direction: row-reverse; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-top: 0;">
-            <ui:DropdownField index="0" choices="System.Collections.Generic.List`1[System.String]" name="CategoryDropdown" class="mp_font mp_textColor_normal" />
+            <ui:DropdownField index="0" choices="System.Collections.Generic.List`1[System.String]" name="CategoryDropdown" class="mp_font mp_textColor_normal mp_dropdown" />
         </ui:GroupBox>
     </ui:GroupBox>
 </ui:UXML>

@@ -3,15 +3,15 @@
     <ui:TwoPaneSplitView fixed-pane-initial-size="200" fixed-pane-initial-dimension="300" style="height: 5000px;">
         <Editor.Scripts.GUI.Factories.Backgrounds.Background2 style="min-width: 300px; width: 300px; flex-shrink: 0;">
             <ui:GroupBox style="flex-direction: row; margin-left: 3px; margin-right: 3px; margin-top: 3px; margin-bottom: 3px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; align-items: center; justify-content: center;">
-                <Editor.Scripts.GUI.Factories.Interactive.Button text="Scene" name="BTN_Scene" style="width: 48%;" />
-                <Editor.Scripts.GUI.Factories.Interactive.Button text="Project" name="BTN_Project" style="width: 48%;" />
+                <Editor.Scripts.GUI.Factories.Interactive.Button text="Scene" name="BTN_Scene" tooltip="Show all validators in the open scene." display-tooltip-when-elided="true" style="width: 48%;" />
+                <Editor.Scripts.GUI.Factories.Interactive.Button text="Project" name="BTN_Project" tooltip="Show all validators in the project or the selected folder." display-tooltip-when-elided="true" style="width: 48%;" />
             </ui:GroupBox>
             <ui:GroupBox name="Settings" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-                <ui:Toggle label="Show Children" name="ShowChildren" tooltip="Show Child GameObjects even if the parent contains a ChildValidation requirement." class="mp_font mp_textColor_normal" />
-                <ui:DropdownField label="Search Mode" index="0" choices="In Project,Single Folder, Including Subfolders" name="ProjectSearchMode" class="mp_font mp_textColor_normal" />
-                <ui:Toggle label="Show Children" name="ShowChildren_Project" tooltip="Show Child GameObjects even if the parent contains a ChildValidation requirement." class="mp_font mp_textColor_normal" />
+                <ui:Toggle label="Show Children" name="ShowChildren" tooltip="Show Child GameObjects even if the parent contains a ChildValidation requirement." class="mp_font mp_textColor_normal mp_toggle" />
+                <ui:DropdownField label="Search Mode" index="0" choices="In Project,Single Folder, Including Subfolders" name="ProjectSearchMode" tooltip="Choose how the project should be searched." class="mp_font mp_textColor_normal mp_dropdown" />
+                <ui:Toggle label="Show Children" name="ShowChildren_Project" tooltip="Show Child GameObjects even if the parent contains a ChildValidation requirement." class="mp_font mp_textColor_normal mp_toggle" />
                 <ui:GroupBox name="ChangeButtonParent" style="flex-direction: row; margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-                    <Editor.Scripts.GUI.Factories.Interactive.Button name="BTN_Change" text="Choose Folder in Project" />
+                    <Editor.Scripts.GUI.Factories.Interactive.Button name="BTN_Change" text="Choose Folder in Project" tooltip="Choose a folder for the folder search mode." display-tooltip-when-elided="true" />
                 </ui:GroupBox>
                 <ui:TextField picking-mode="Ignore" label="Folder Path" text="..." readonly="true" tooltip="Path to the folder the search should be performed in" name="FolderPath" focusable="false" class="mp_font mp_textColor_secondary" style="opacity: 0.5;" />
             </ui:GroupBox>
@@ -28,7 +28,7 @@
                 <ui:IMGUIContainer style="background-image: none; height: 2px; margin-left: 4px; margin-right: 4px; margin-top: 4px; margin-bottom: 4px; border-top-left-radius: 1px; border-bottom-left-radius: 1px; border-top-right-radius: 1px; border-bottom-right-radius: 1px; background-color: rgb(88, 88, 88);" />
                 <ui:GroupBox name="ErrorPanel" style="margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
                     <ui:GroupBox style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-direction: row;">
-                        <Editor.Scripts.GUI.Factories.Interactive.Button text="Fix All" name="BTN_FixAll" style="height: 15px;" />
+                        <Editor.Scripts.GUI.Factories.Interactive.Button text="Fix All" name="BTN_FixAll" tooltip="Fix all issues." display-tooltip-when-elided="true" style="height: 15px;" />
                     </ui:GroupBox>
                     <ui:ListView name="ErrorView" virtualization-method="DynamicHeight" selection-type="None" style="margin-top: 5px;" />
                 </ui:GroupBox>

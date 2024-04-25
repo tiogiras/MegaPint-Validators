@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
     <Style src="project://database/Packages/com.tiogiras.megapint/Editor/Resources/MegaPint/User%20Interface/MegaPint.uss?fileID=7433441132597879392&amp;guid=54dba4b7e58379b46a03a9a47e130e51&amp;type=3#MegaPint" />
-    <ui:VisualElement style="flex-grow: 1; margin-left: 20px; margin-top: 10px; margin-right: 10px; margin-bottom: 10px; overflow: hidden;">
+    <ui:VisualElement class="mp_foldout" style="flex-grow: 1; margin-left: 20px; margin-top: 10px; margin-right: 10px; margin-bottom: 10px; overflow: hidden;">
         <ui:Foldout text="Cannot select reference in dropdown" value="false" class="mp_textColor_normal mp_font mp_link" style="-unity-font-style: bold;">
             <ui:VisualElement style="flex-grow: 1; margin-top: 5px; margin-bottom: 20px;">
                 <Editor.Scripts.GUI.Factories.TextSecondary tabindex="-1" text="NullReferenceException: Object reference not set to an instance of an object&#10;SerializeReferenceDropdown.Editor.SerializeReferenceDropdownAdvancedDropdown.BuildRoot ()" style="white-space: normal; -unity-font-style: bold-and-italic; font-size: 10px;" />

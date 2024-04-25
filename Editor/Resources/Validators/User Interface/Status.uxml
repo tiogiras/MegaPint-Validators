@@ -9,11 +9,11 @@
                 <Editor.Scripts.GUI.Factories.Text tabindex="-1" name="Error" text="ERROR" class="mp_textColor_red" style="margin-left: 5px; padding-top: 5px; padding-bottom: 5px; -unity-font-style: bold; white-space: normal; -unity-text-align: upper-center;" />
             </ui:GroupBox>
             <ui:GroupBox style="margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-direction: row; align-items: center;">
-                <Editor.Scripts.GUI.Factories.Interactive.Button text="Fix All" name="BTN_FixAll" style="margin-top: 0; margin-right: 5px; margin-bottom: 0; margin-left: 0;" />
-                <Editor.Scripts.GUI.Factories.Interactive.Button text="Validate" name="BTN_Validate" style="margin-top: 0; margin-right: 10px; margin-bottom: 0; margin-left: 0;" />
+                <Editor.Scripts.GUI.Factories.Interactive.Button text="Fix All" name="BTN_FixAll" display-tooltip-when-elided="true" tooltip="Try to fix all issues." style="margin-top: 0; margin-right: 5px; margin-bottom: 0; margin-left: 0;" />
+                <Editor.Scripts.GUI.Factories.Interactive.Button text="Validate" name="BTN_Validate" tooltip="Validate the GameObject." display-tooltip-when-elided="true" style="margin-top: 0; margin-right: 10px; margin-bottom: 0; margin-left: 0;" />
             </ui:GroupBox>
         </ui:GroupBox>
-        <ui:Foldout text="Invalid Behaviours" name="ErrorFoldout" value="false" class="mp_font mp_textColor_normal" style="margin-left: 20px; -unity-font-style: bold;">
+        <ui:Foldout text="Invalid Behaviours" name="ErrorFoldout" value="false" class="mp_font mp_textColor_normal mp_foldout" style="margin-left: 20px; -unity-font-style: bold;">
             <ui:ListView name="ErrorView" virtualization-method="DynamicHeight" selection-type="None" />
         </ui:Foldout>
     </ui:GroupBox>
