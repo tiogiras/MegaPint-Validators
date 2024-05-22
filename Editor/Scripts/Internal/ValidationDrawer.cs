@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Editor.Scripts.GUI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -35,11 +36,11 @@ internal class ValidationDrawer : UnityEditor.Editor
 
     public override VisualElement CreateInspectorGUI()
     {
-        var root = new VisualElement();
-
         var statusFile = Resources.Load <VisualTreeAsset>(BasePath);
 
-        GUIUtility.Instantiate(statusFile, root);
+        VisualElement root = GUIUtility.Instantiate(statusFile);
+        root.style.flexGrow = 1f;
+        root.style.flexShrink = 1f;
 
         _ok = root.Q <VisualElement>("Ok");
         _warning = root.Q <VisualElement>("Warning");
@@ -125,6 +126,16 @@ internal class ValidationDrawer : UnityEditor.Editor
 
         _status.ValidateStatus();
 
+        root.schedule.Execute(
+            () =>
+            {
+                root.parent.styleSheets.Add(Resources.Load <StyleSheet>(StyleSheetClasses.BaseStyleSheetPath));
+                root.parent.styleSheets.Add(Resources.Load <StyleSheet>(StyleSheetClasses.AttributeStyleSheetPath));
+
+                GUIUtility.ApplyRootElementTheme(root.parent);
+                root.parent.AddToClassList(StyleSheetClasses.Background.Color.Secondary);
+            });
+        
         return root;
     }
 
