@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Editor.Scripts.GUI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -35,13 +36,10 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
 
     public override VisualElement CreateInspectorGUI()
     {
-        var root = new VisualElement();
-
         _configTemplate = Resources.Load <VisualTreeAsset>(ConfigPath);
         
-        GUIUtility.Instantiate(_configTemplate, root);
-
-        //TODO ??? root.RegisterCallback <FocusOutEvent>(Save);
+        VisualElement root = GUIUtility.Instantiate(_configTemplate);
+        root.style.flexGrow = 1f;
 
         var addButton = root.Q <Button>("BTN_Add");
         addButton.clicked += AddListElement;
@@ -81,6 +79,19 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
         _listView.itemsSource = _types;
         _listView.RefreshItems();
 
+        root.schedule.Execute(
+            () =>
+            {
+                root.parent.styleSheets.Add(Resources.Load<StyleSheet>(StyleSheetClasses.BaseStyleSheetPath));
+                root.parent.styleSheets.Add(Resources.Load<StyleSheet>(StyleSheetClasses.AttributeStyleSheetPath));
+
+                VisualElement upperParent = GUIUtility.SetParentFlexGrowRecursive(root, 4, true);
+                upperParent.Q <VisualElement>("unity-content-container").style.flexGrow = 1f;
+
+                GUIUtility.ApplyRootElementTheme(root.parent);
+                root.parent.AddToClassList(StyleSheetClasses.Background.Color.Tertiary);
+            });
+        
         return root;
     }
 
@@ -156,8 +167,6 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
 
     private void RemoveListElement()
     {
-        Debug.Log(_listView.selectedItem);
-
         var index = _listView.selectedItem == null ? _types.Count - 1 : _listView.selectedIndex;
 
         if (!_types[index].canBeDeleted)
@@ -196,10 +205,6 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                     : "Namespace";
 
                 var namespaceField = new TextField(title) {value = entry.category.nameSpaceString, style = {flexGrow = 1}};
-                namespaceField.AddToClassList("mp_inputField");
-                
-                GUIUtility.ApplyTheme(namespaceField);
-
                 element.Add(namespaceField);
 
                 namespaceField.RegisterValueChangedCallback(
@@ -245,6 +250,9 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
         {
             var componentName = componentContent.Q <TextField>();
             componentName.isReadOnly = !entry.canBeModified;
+            componentName.pickingMode = entry.canBeModified ? PickingMode.Position : PickingMode.Ignore;
+            componentName.focusable = entry.canBeModified;
+            
             componentName.value = entry.componentName;
 
             componentName.RegisterValueChangedCallback(
