@@ -129,8 +129,8 @@ internal class ValidationDrawer : UnityEditor.Editor
         root.schedule.Execute(
             () =>
             {
-                root.parent.styleSheets.Add(Resources.Load <StyleSheet>(StyleSheetClasses.BaseStyleSheetPath));
-                root.parent.styleSheets.Add(Resources.Load <StyleSheet>(StyleSheetClasses.AttributeStyleSheetPath));
+                root.parent.styleSheets.Add(StyleSheetValues.BaseStyleSheet);
+                root.parent.styleSheets.Add(StyleSheetValues.AttributesStyleSheet);
 
                 GUIUtility.ApplyRootElementTheme(root.parent);
                 root.parent.AddToClassList(StyleSheetClasses.Background.Color.Secondary);

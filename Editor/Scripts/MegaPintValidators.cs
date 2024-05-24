@@ -9,6 +9,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using GUIUtility = Editor.Scripts.GUI.GUIUtility;
+using Toggle = UnityEngine.UIElements.Toggle;
 
 namespace Editor.Scripts
 {
