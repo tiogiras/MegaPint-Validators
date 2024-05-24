@@ -82,8 +82,8 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
         root.schedule.Execute(
             () =>
             {
-                root.parent.styleSheets.Add(Resources.Load<StyleSheet>(StyleSheetClasses.BaseStyleSheetPath));
-                root.parent.styleSheets.Add(Resources.Load<StyleSheet>(StyleSheetClasses.AttributeStyleSheetPath));
+                root.parent.styleSheets.Add(StyleSheetValues.BaseStyleSheet);
+                root.parent.styleSheets.Add(StyleSheetValues.AttributesStyleSheet);
 
                 VisualElement upperParent = GUIUtility.SetParentFlexGrowRecursive(root, 4, true);
                 upperParent.Q <VisualElement>("unity-content-container").style.flexGrow = 1f;
