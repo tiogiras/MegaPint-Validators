@@ -1,21 +1,20 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Editor.Scripts.GUI;
+using MegaPint.Editor.Scripts.GUI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using GUIUtility = Editor.Scripts.GUI.GUIUtility;
+using GUIUtility = MegaPint.Editor.Scripts.GUI.Utility.GUIUtility;
 
-namespace Editor.Scripts.Internal
+namespace MegaPint.Editor.Scripts.Internal
 {
 
+/// <summary> Drawer class for the <see cref="ValidatableMonoBehaviourStatus" /> class </summary>
 [CustomEditor(typeof(ValidatableMonoBehaviourStatus), true)]
 internal class ValidationDrawer : UnityEditor.Editor
 {
-    private const string BasePath = "Validators/User Interface/Status";
+    private static readonly string s_basePath = Constants.Validators.UserInterface.Status;
 
     private VisualTreeAsset _behaviourEntry;
     private VisualElement _error;
@@ -36,7 +35,7 @@ internal class ValidationDrawer : UnityEditor.Editor
 
     public override VisualElement CreateInspectorGUI()
     {
-        var statusFile = Resources.Load <VisualTreeAsset>(BasePath);
+        var statusFile = Resources.Load <VisualTreeAsset>(s_basePath);
 
         VisualElement root = GUIUtility.Instantiate(statusFile);
         root.style.flexGrow = 1f;
@@ -61,8 +60,8 @@ internal class ValidationDrawer : UnityEditor.Editor
 
         _fixAllButton.clicked += _status.FixAll;
 
-        _behaviourEntry = Resources.Load <VisualTreeAsset>(Path.Combine(BasePath, "Behaviour"));
-        _errorEntry = Resources.Load <VisualTreeAsset>(Path.Combine(BasePath, "Error"));
+        _behaviourEntry = Resources.Load <VisualTreeAsset>(Constants.Validators.UserInterface.StatusBehaviour);
+        _errorEntry = Resources.Load <VisualTreeAsset>(Constants.Validators.UserInterface.StatusError);
 
         _errorFoldout = root.Q <Foldout>("ErrorFoldout");
 
@@ -135,7 +134,7 @@ internal class ValidationDrawer : UnityEditor.Editor
                 GUIUtility.ApplyRootElementTheme(root.parent);
                 root.parent.AddToClassList(StyleSheetClasses.Background.Color.Secondary);
             });
-        
+
         return root;
     }
 
@@ -143,6 +142,8 @@ internal class ValidationDrawer : UnityEditor.Editor
 
     #region Private Methods
 
+    /// <summary> Update the displayed status </summary>
+    /// <param name="state"> New status to display </param>
     private void StatusUpdate(ValidationState state)
     {
         _ok.style.display = state == ValidationState.Ok ? DisplayStyle.Flex : DisplayStyle.None;
