@@ -87,14 +87,6 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
         if (type == null)
             return new SerializeReferenceDropdownNameAttribute(NullName, -30);
 
-        /*var typesWithNames = TypeCache.GetTypesWithAttribute(typeof(SerializeReferenceDropdownNameAttribute));
-        
-        if (!typesWithNames.Contains(type)) 
-            return new SerializeReferenceDropdownAdvancedDropdown.Type
-            {
-                name = ObjectNames.NicifyVariableName(type.Name)
-            };*/
-
         return type.GetCustomAttribute <SerializeReferenceDropdownNameAttribute>();
     }
 
