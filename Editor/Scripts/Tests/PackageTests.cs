@@ -6,6 +6,7 @@ using MegaPint.Editor.Scripts.PackageManager.Packages;
 using MegaPint.Editor.Scripts.Tests.Utility;
 using NUnit.Framework;
 using UnityEngine.TestTools;
+using UnityEngine.UIElements;
 
 namespace MegaPint.Editor.Scripts.Tests
 {
@@ -14,11 +15,14 @@ namespace MegaPint.Editor.Scripts.Tests
 internal class PackageTests
 {
     private static bool s_initialized;
-    
+
+    #region Tests
+
     [UnityTest] [Order(0)]
     public IEnumerator InitializePackageCache()
     {
         Task <bool> task = TestsUtility.CheckCacheInitialization();
+
         yield return task.AsIEnumeratorReturnNull();
 
         s_initialized = task.Result;
@@ -30,11 +34,42 @@ internal class PackageTests
     {
         if (!s_initialized)
             Assert.Fail("FAILED ===> Missing packageCache initialization!");
-        
+
         TestsUtility.CheckStructure(PackageKey.Validators);
     }
-    
+
+    [Test] [Order(1)]
+    public void Resources()
+    {
+        var isValid = true;
+
+        TestsUtility.ValidateResource <VisualTreeAsset>(
+            ref isValid,
+            Constants.Validators.UserInterface.ComponentOrderConfig);
+
+        TestsUtility.ValidateResource <VisualTreeAsset>(
+            ref isValid,
+            Constants.Validators.UserInterface.ComponentOrderTypeEntry);
+
+        TestsUtility.ValidateResource <VisualTreeAsset>(ref isValid, Constants.Validators.UserInterface.Status);
+
+        TestsUtility.ValidateResource <VisualTreeAsset>(
+            ref isValid,
+            Constants.Validators.UserInterface.StatusBehaviour);
+
+        TestsUtility.ValidateResource <VisualTreeAsset>(ref isValid, Constants.Validators.UserInterface.StatusError);
+        TestsUtility.ValidateResource <VisualTreeAsset>(ref isValid, Constants.Validators.UserInterface.ValidatorView);
+
+        TestsUtility.ValidateResource <VisualTreeAsset>(
+            ref isValid,
+            Constants.Validators.UserInterface.ValidatorViewItem);
+
+        Assert.IsTrue(isValid);
+    }
+
+    #endregion
 }
+
 }
 #endif
 #endif
