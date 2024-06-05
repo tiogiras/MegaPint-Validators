@@ -31,7 +31,7 @@ internal class PackageTests
         if (!s_initialized)
             Assert.Fail("FAILED ===> Missing packageCache initialization!");
         
-        TestsUtility.CheckStructure(PackageKey.AlphaButton);
+        TestsUtility.CheckStructure(PackageKey.Validators);
     }
     
 }
