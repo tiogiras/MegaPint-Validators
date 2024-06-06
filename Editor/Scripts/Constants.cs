@@ -11,9 +11,12 @@ internal static partial class Constants
     {
         public static class Links
         {
-            public const string ValidatorView = "MegaPint/Packages/Validator View";
-            public const string CreateValidatorSettings = "Assets/Create/MegaPint/Validators/Validator Settings";
-            public const string CreateComponentOrderConfig = "Assets/Create/MegaPint/Validators/Component Order Config";
+            public const string CreateValidatorSettings = "Assets/Create/MegaPint/Validators/";
+            public const string CreateComponentOrderConfig = "Assets/Create/MegaPint/Validators/";
+
+            public static readonly string ValidatorView = Utility.CombineMenuItemPath(
+                ContextMenu.MenuItemPackages,
+                "Validator View");
         }
 
         public static class UserInterface
