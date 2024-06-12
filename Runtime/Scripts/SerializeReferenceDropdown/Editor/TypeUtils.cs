@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System;
 using System.Reflection;
 
 namespace MegaPint.SerializeReferenceDropdown.Editor
@@ -31,3 +32,4 @@ public static class TypeUtils
 }
 
 }
+#endif
