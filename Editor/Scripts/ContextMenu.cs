@@ -13,7 +13,7 @@ internal static partial class ContextMenu
     [MenuItem(MenuItemPackages + "/Validator View", false, 13)]
     private static void OpenValidatorView()
     {
-        TryOpen <Validators>(false);
+        TryOpen <ValidatorView>(false);
     }
 
     #endregion

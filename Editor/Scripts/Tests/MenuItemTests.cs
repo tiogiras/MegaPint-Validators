@@ -15,7 +15,7 @@ internal class MenuItemTests
     [Test]
     public void ValidatorView()
     {
-        TestsUtility.ValidateMenuItemLink(Constants.Validators.Links.ValidatorView, typeof(Validators));
+        TestsUtility.ValidateMenuItemLink(Constants.Validators.Links.ValidatorView, typeof(ValidatorView));
     }
 
     #endregion
