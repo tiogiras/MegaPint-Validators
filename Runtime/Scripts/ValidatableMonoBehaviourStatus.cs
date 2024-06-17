@@ -14,8 +14,54 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
     public readonly List <InvalidBehaviour> invalidBehaviours = new();
 
     public Action <ValidationState> onStatusUpdate;
+    public Action <ValidatableMonoBehaviourStatus> onStatusChanged;
+
     private List <ValidatableMonoBehaviour> _behaviours = new();
 
+    private void OnValidate()
+    {
+        if (ValidatesChildren())
+            ListenToChildValidations();
+        else 
+            StopListenToChildValidations();
+    }
+
+    private void ListenToChildValidations()
+    {
+        ValidatableMonoBehaviourStatus[] children =
+            gameObject.GetComponentsInChildren <ValidatableMonoBehaviourStatus>(true);
+
+        if (children.Length == 0)
+            return;
+        
+        foreach (ValidatableMonoBehaviourStatus status in children)
+        {
+            Debug.Log($"Subscribed to {status.gameObject.name}");
+            status.onStatusChanged += OnChildStatusChanged;
+        }
+    }
+
+    private void StopListenToChildValidations()
+    {
+        ValidatableMonoBehaviourStatus[] children =
+            gameObject.GetComponentsInChildren <ValidatableMonoBehaviourStatus>(true);
+
+        if (children.Length == 0)
+            return;
+        
+        foreach (ValidatableMonoBehaviourStatus status in children)
+        {
+            Debug.Log($"UnSubscribed from {status.gameObject.name}");
+            status.onStatusChanged -= OnChildStatusChanged;
+        }
+    }
+
+    private void OnChildStatusChanged(ValidatableMonoBehaviourStatus _)
+    {
+        Debug.Log("Validating due to child status change");
+        ValidateStatus();
+    }
+    
     #region Public Methods
 
     /// <summary> Compare against other status </summary>
@@ -50,14 +96,7 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
         for (var i = errors.Length - 1; i >= 0; i--)
         {
             ValidationError error = errors[i];
-
-            if (error.fixAction == null)
-            {
-                if (!error.errorName.Equals("Invalid monoBehaviours in children"))
-                    Debug.LogWarning($"No FixAction specified for [{error.errorName}], requires manual attention!");
-            }
-            else
-                error.fixAction.Invoke(error.gameObject);
+            error.fixAction?.Invoke(error.gameObject);
         }
 
         ValidateStatus();
@@ -73,6 +112,8 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
     /// <summary> Validate the current status </summary>
     public void ValidateStatus()
     {
+        ValidationState previousState = State;
+        
         State = ValidationState.Ok;
         invalidBehaviours.Clear();
 
@@ -82,6 +123,9 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
         if (_behaviours.Count == 0)
         {
             onStatusUpdate?.Invoke(State);
+            
+            if (previousState != State)
+                onStatusChanged?.Invoke(this);
 
             return;
         }
@@ -115,6 +159,9 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
         }
 
         onStatusUpdate?.Invoke(State);
+        
+        if (previousState != State)
+            onStatusChanged?.Invoke(this);
     }
 
     #endregion

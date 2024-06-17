@@ -94,15 +94,7 @@ internal static class RightPane
     /// <summary> Fix all issues </summary>
     private static void FixAll()
     {
-        foreach (ValidationError error in s_invalidBehaviours.SelectMany(invalidBehaviour => invalidBehaviour.errors))
-        {
-            if (error.fixAction == null)
-                Debug.LogWarning($"No FixAction specified for [{error.errorName}], requires manual attention!");
-            else
-                error.fixAction.Invoke(error.gameObject);
-        }
-
-        s_status.ValidateStatus();
+        s_status.FixAll();
         ValidatorView.UpdateBehaviourBasedOnState(s_status);
 
         Refresh();
