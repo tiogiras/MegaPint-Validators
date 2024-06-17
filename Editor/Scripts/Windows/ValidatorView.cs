@@ -5,8 +5,10 @@ using System.Linq;
 using MegaPint.Editor.Scripts.GUI.Utility;
 using MegaPint.Editor.Scripts.Windows.ValidatorViewContent;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using GUIUtility = MegaPint.Editor.Scripts.GUI.Utility.GUIUtility;
 
@@ -212,6 +214,14 @@ internal class ValidatorView : EditorWindowBase
             var noFixAction = element.Q <VisualElement>("NoFixAction");
             noFixAction.style.display = isMissingFixAction ? DisplayStyle.Flex : DisplayStyle.None;
         };
+
+        EditorSceneManager.sceneOpened += OnSceneLoaded;
+    }
+
+    private static void OnSceneLoaded(Scene scene, OpenSceneMode mode)
+    {
+        if (s_isSceneMode)
+            UpdateLeftPane();
     }
 
     protected override void UnRegisterCallbacks()
@@ -231,6 +241,8 @@ internal class ValidatorView : EditorWindowBase
 
         s_gameObjectsView.itemsChosen -= OnGameObjectSelectionConfirmed;
         s_gameObjectsView.selectedIndicesChanged -= OnGameObjectSelected;
+
+        EditorSceneManager.sceneOpened -= OnSceneLoaded;
     }
 
     #endregion
