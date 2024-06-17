@@ -7,6 +7,7 @@ using UnityEngine.UIElements;
 namespace MegaPint.Editor.Scripts.Windows.ValidatorViewContent
 {
 
+// TODO commenting
 internal static class LeftPaneSceneMode
 {
     private static LeftPaneReferences s_refs;
@@ -16,13 +17,16 @@ internal static class LeftPaneSceneMode
         ValidatableMonoBehaviourStatus[] behaviours = Resources.FindObjectsOfTypeAll <ValidatableMonoBehaviourStatus>();
         behaviours = behaviours.Where(behaviour => behaviour.gameObject.scene.isLoaded).ToArray();
         
+        if (!SaveValues.Validators.ShowChildren)
+            behaviours = behaviours.Where(behaviour => !IsChildValidation(behaviour.transform)).ToArray();
+        
         errors = new List<ValidatableMonoBehaviourStatus>();
         warnings = new List <ValidatableMonoBehaviourStatus>();
         ok = new List <ValidatableMonoBehaviourStatus>();
 
         if (behaviours.Length == 0)
             return false;
-        
+
         foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
         {
             switch (behaviour.State)
@@ -47,6 +51,17 @@ internal static class LeftPaneSceneMode
         }
 
         return true;
+    }
+
+    private static bool IsChildValidation(Transform transform)
+    {
+        if (transform.parent == null)
+            return false;
+
+        ValidatableMonoBehaviourStatus[] behaviours =
+            transform.parent.GetComponentsInParent <ValidatableMonoBehaviourStatus>();
+
+        return behaviours.Length != 0 && behaviours.Any(behaviour => behaviour.ValidatesChildren());
     }
 
     public static void SetReferences(LeftPaneReferences refs)

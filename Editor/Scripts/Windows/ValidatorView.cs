@@ -40,6 +40,8 @@ internal class ValidatorView : EditorWindowBase
 
     private static bool _isSceneMode;
 
+    private static VisualElement s_root;
+
     #region Public Methods
 
     public override EditorWindowBase ShowWindow()
@@ -64,7 +66,7 @@ internal class ValidatorView : EditorWindowBase
     {
         base.CreateGUI();
 
-        VisualElement root = rootVisualElement;
+        s_root = rootVisualElement;
 
         VisualElement content = GUIUtility.Instantiate(_baseWindow);
 
@@ -108,13 +110,13 @@ internal class ValidatorView : EditorWindowBase
         
         RegisterCallbacks();
 
-        root.schedule.Execute(
+        s_root.schedule.Execute(
             () =>
             {
                 ChangeMode(_isSceneMode);
             });
 
-        root.Add(content);
+        s_root.Add(content);
     }
 
     protected override bool LoadResources()
@@ -129,6 +131,8 @@ internal class ValidatorView : EditorWindowBase
 
     protected override void RegisterCallbacks()
     {
+        onRefresh += UpdateLeftPane;
+        
         _btnSceneMode.clickable = new Clickable(() => {ChangeMode(true);});
         _btnProjectMode.clickable = new Clickable(() => {ChangeMode(false);});
 
@@ -151,6 +155,8 @@ internal class ValidatorView : EditorWindowBase
 
     protected override void UnRegisterCallbacks()
     {
+        onRefresh -= UpdateLeftPane;
+        
         _btnSceneMode.clickable = null;
         _btnProjectMode.clickable = null;
         
@@ -167,7 +173,8 @@ internal class ValidatorView : EditorWindowBase
         
         var status = (ValidatableMonoBehaviourStatus)s_gameObjectsView.selectedItem;
 
-        var path = _isSceneMode ? GetParentPath(status.transform) : AssetDatabase.GetAssetPath(status);
+        var parentPath = GetParentPath(status.transform);
+        var path = _isSceneMode ? parentPath : $"{AssetDatabase.GetAssetPath(status)} => {parentPath}";
 
         RightPane.Display(status, path);
     }
@@ -383,6 +390,15 @@ internal class ValidatorView : EditorWindowBase
     }
 
     #endregion
+
+    public static void ScheduleRefreshCall()
+    {
+        s_root.schedule.Execute(
+            () =>
+            {
+                onRefresh?.Invoke();
+            });
+    }
 }
 
 }

@@ -9,19 +9,27 @@ using UnityEngine.UIElements;
 namespace MegaPint.Editor.Scripts.Windows.ValidatorViewContent
 {
 
+// TODO commenting
 internal static class LeftPaneProjectMode
 {
     private static LeftPaneReferences s_refs;
 
+    private static bool s_canBeChanged;
+
     public static bool CollectInvalidObjects(out List<ValidatableMonoBehaviourStatus> errors, out List<ValidatableMonoBehaviourStatus> warnings, out List <ValidatableMonoBehaviourStatus> ok)
     {
+        Debug.Log($"Collecting in folder: {SaveValues.Validators.SearchFolder}");
+        
         ValidatableMonoBehaviourStatus[] behaviours = CollectBehaviours();
 
         errors = new List<ValidatableMonoBehaviourStatus>();
         warnings = new List <ValidatableMonoBehaviourStatus>();
         ok = new List <ValidatableMonoBehaviourStatus>();
 
-        if (behaviours.Length == 0)
+        Debug.Log("Set to true");
+        s_canBeChanged = true;
+        
+        if (behaviours is not {Length: > 0})
             return false;
         
         foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
@@ -69,7 +77,24 @@ internal static class LeftPaneProjectMode
                 return null;
         }
 
-        return ConvertGUIDsToValidatableMonoBehaviours(guids);
+        if (guids is not {Length: > 0})
+            return null;
+        
+        IEnumerable <ValidatableMonoBehaviourStatus> behaviours = ConvertGUIDsToValidatableMonoBehaviours(guids).
+            Where(behaviour => !IsChildValidation(behaviour.transform));
+
+        return behaviours.ToArray();
+    }
+
+    private static bool IsChildValidation(Transform transform)
+    {
+        if (transform.parent == null)
+            return false;
+
+        ValidatableMonoBehaviourStatus[] behaviours =
+            transform.parent.GetComponentsInParent <ValidatableMonoBehaviourStatus>();
+
+        return behaviours.Length != 0 && behaviours.Any(behaviour => behaviour.ValidatesChildren());
     }
     
     /// <summary> Collect all guids in the selected folder </summary>
@@ -205,6 +230,11 @@ internal static class LeftPaneProjectMode
 
     private static void OnChangeButton()
     {
+        Debug.Log(s_canBeChanged);
+        
+        if (!s_canBeChanged)
+            return;
+        
         var path = EditorUtility.OpenFolderPanel("Select a target folder", SaveValues.Validators.SearchFolder, "");
 
         if (!path.IsPathInProject(out var relativePath))
@@ -215,7 +245,10 @@ internal static class LeftPaneProjectMode
         
         UpdateFolderPath(relativePath);
         SaveValues.Validators.SearchFolder = relativePath;
-        ValidatorView.onRefresh?.Invoke();
+        s_canBeChanged = false;
+        Debug.Log("Set to false");
+
+        ValidatorView.ScheduleRefreshCall();
     }
 
     private static void OnShowChildrenChanged(ChangeEvent <bool> evt)
