@@ -105,6 +105,7 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
                     new InvalidBehaviour
                     {
                         behaviourName = $"{GetFullBehaviourName(behaviour)} : {behaviour.GetType()}",
+                        shortBehaviourName = behaviour.GetType().Name,
                         errors = errors
                     });
             }

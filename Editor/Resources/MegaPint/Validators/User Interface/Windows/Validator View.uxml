@@ -4,40 +4,45 @@
     <Style src="project://database/Packages/com.tiogiras.megapint/Editor/Resources/MegaPint/User%20Interface/MegaPintAttributes.uss?fileID=7433441132597879392&amp;guid=db4b42bc58d645b8ab6f8c0e914c2a0c&amp;type=3#MegaPintAttributes" />
     <MegaPint.Editor.Scripts.GUI.Factories.RootElement style="flex-grow: 1;">
         <ui:TwoPaneSplitView fixed-pane-initial-size="200" fixed-pane-initial-dimension="300" style="height: 5000px;">
-            <MegaPint.Editor.Scripts.GUI.Factories.Backgrounds.BackgroundSecondary style="flex-shrink: 0; width: 300px; min-width: 300px;">
-                <ui:GroupBox style="flex-direction: row; margin-left: 3px; margin-right: 3px; margin-top: 3px; margin-bottom: 3px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; align-items: center; justify-content: center;">
-                    <ui:VisualElement style="flex-grow: 1; width: 50%;">
-                        <ui:Button text="Scene" parse-escape-sequences="true" display-tooltip-when-elided="true" tooltip="Show all validators in the open scene." name="BTN_Scene" style="flex-grow: 1;" />
-                    </ui:VisualElement>
-                    <ui:VisualElement style="flex-grow: 1; width: 50%; min-width: auto; min-height: auto;">
-                        <ui:Button text="Project" parse-escape-sequences="true" display-tooltip-when-elided="true" tooltip="Show all validators in the project or the selected folder." name="BTN_Project" style="flex-grow: 1;" />
-                    </ui:VisualElement>
-                </ui:GroupBox>
+            <MegaPint.Editor.Scripts.GUI.Factories.Backgrounds.BackgroundSecondary name="LeftPane" style="flex-shrink: 0; width: 300px; min-width: 300px; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px;">
+                <ui:VisualElement style="flex-direction: row;">
+                    <ui:Button text="Scene" parse-escape-sequences="true" display-tooltip-when-elided="true" tooltip="Show all validators in the open scene." name="BTN_Scene" style="flex-grow: 1; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+                    <ui:Button text="Project" parse-escape-sequences="true" display-tooltip-when-elided="true" tooltip="Show all validators in the project or the selected folder." name="BTN_Project" style="flex-grow: 1; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+                </ui:VisualElement>
                 <ui:GroupBox name="Settings" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
                     <ui:Toggle label="Show Children" name="ShowChildren" tooltip="Show Child GameObjects even if the parent contains a ChildValidation requirement." />
                     <ui:DropdownField label="Search Mode" index="0" choices="In Project,Single Folder, Including Subfolders" name="ProjectSearchMode" tooltip="Choose how the project should be searched." />
-                    <ui:Toggle label="Show Children" name="ShowChildren_Project" tooltip="Show Child GameObjects even if the parent contains a ChildValidation requirement." />
-                    <ui:GroupBox name="ChangeButtonParent" style="flex-direction: row; margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-                        <ui:Button text="Choose Folder in Project" parse-escape-sequences="true" display-tooltip-when-elided="true" tooltip="Choose a folder for the folder search mode." name="BTN_Change" />
+                    <ui:GroupBox name="ChangeButtonParent" style="flex-direction: column; margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
+                        <ui:VisualElement style="flex-direction: row;">
+                            <ui:Button text="Choose Target Folder" parse-escape-sequences="true" display-tooltip-when-elided="true" tooltip="Choose a folder for the folder search mode." name="BTN_Change" />
+                        </ui:VisualElement>
+                        <MegaPint.Editor.Scripts.GUI.Factories.TextElements.TextSecondary tabindex="-1" name="FolderPath" text="FolderPath/..." style="padding-left: 20px; text-overflow: ellipsis; overflow: hidden;" />
                     </ui:GroupBox>
-                    <ui:TextField picking-mode="Ignore" label="Folder Path" text="..." readonly="true" tooltip="Path to the folder the search should be performed in" name="FolderPath" focusable="false" style="opacity: 0.5;" />
                 </ui:GroupBox>
                 <MegaPint.Editor.Scripts.GUI.Factories.Structure.Separator />
                 <uie:Toolbar style="background-color: rgba(60, 60, 60, 0); padding-left: 5px; padding-right: 2px; border-bottom-width: 0;">
                     <uie:ToolbarSearchField focusable="true" name="SearchField" style="width: 100%; margin-left: 0;" />
                 </uie:Toolbar>
-                <ui:ListView name="MainList" style="flex-grow: 1;" />
+                <ui:VisualElement style="flex-direction: row; margin-top: 5px; margin-bottom: 5px;">
+                    <ui:Button text="[ERROR] (xxx)" parse-escape-sequences="true" display-tooltip-when-elided="true" name="BTN_Errors" class="mp_text-color--red" style="flex-grow: 1; flex-shrink: 1; white-space: nowrap; font-size: 10px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; -unity-font-style: bold;" />
+                    <ui:Button text="[WARNING] (xxx)" parse-escape-sequences="true" display-tooltip-when-elided="true" name="BTN_Warnings" class="mp_text-color--orange" style="flex-grow: 1; flex-shrink: 1; font-size: 10px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; -unity-font-style: bold;" />
+                    <ui:Button text="[OK] (xxx)" parse-escape-sequences="true" display-tooltip-when-elided="true" name="BTN_Ok" class="mp_text-color--green" style="flex-grow: 1; flex-shrink: 1; font-size: 10px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; -unity-font-style: bold;" />
+                </ui:VisualElement>
+                <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="Select a tab to view it&apos;s content." name="NoSelection" style="flex-shrink: 1; -unity-text-align: upper-center; opacity: 0.34; white-space: normal;" />
+                <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="No ValidatableMonoBehaviours found!" name="NoBehaviours" style="flex-shrink: 1; -unity-text-align: middle-center; height: 100px;" />
+                <ui:ListView focusable="true" name="GameObjects" virtualization-method="DynamicHeight" style="flex-grow: 1;" />
             </MegaPint.Editor.Scripts.GUI.Factories.Backgrounds.BackgroundSecondary>
-            <MegaPint.Editor.Scripts.GUI.Factories.Backgrounds.BackgroundTertiary style="flex-shrink: 0; flex-grow: 1; min-width: 40%;">
-                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="RightPane" style="width: 100%; height: 100%; display: flex; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
-                    <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="GameObject" name="GameObjectName" style="font-size: 15px; white-space: normal;" />
-                    <MegaPint.Editor.Scripts.GUI.Factories.TextElements.TextSecondary tabindex="-1" text="Scene: Parent/GameObject || Path: Parent/GameObject" name="Path" style="white-space: normal; font-size: 10px;" />
+            <MegaPint.Editor.Scripts.GUI.Factories.Backgrounds.BackgroundTertiary name="RightPane" style="flex-shrink: 0; flex-grow: 1; min-width: 40%;">
+                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="RightPaneContent" style="width: 100%; height: 100%; display: flex; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
+                    <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="GameObject" name="GameObjectName" style="font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" />
+                    <MegaPint.Editor.Scripts.GUI.Factories.TextElements.TextSecondary tabindex="-1" text="Scene: Parent/GameObject || Path: Parent/GameObject" name="Path" style="white-space: nowrap; font-size: 10px; text-overflow: ellipsis; overflow: hidden;" />
                     <MegaPint.Editor.Scripts.GUI.Factories.Structure.Separator />
-                    <ui:GroupBox name="ErrorPanel" style="margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
-                        <ui:GroupBox style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-direction: row;">
+                    <ui:GroupBox name="ErrorPanel" style="margin-left: 0; margin-right: 0; margin-top: 10px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
+                        <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: space-between;">
+                            <MegaPint.Editor.Scripts.GUI.Factories.Headings.HeadingSecondary tabindex="-1" text="Invalid MonoBehaviours" style="flex-grow: 1;" />
                             <ui:Button text="Fix All" parse-escape-sequences="true" display-tooltip-when-elided="true" name="BTN_FixAll" tooltip="Fix all issues." style="height: 15px;" />
-                        </ui:GroupBox>
-                        <ui:ListView name="ErrorView" virtualization-method="DynamicHeight" selection-type="None" style="margin-top: 5px;" />
+                        </ui:VisualElement>
+                        <ui:ListView name="InvalidBehaviours" virtualization-method="DynamicHeight" selection-type="None" style="margin-top: 5px;" />
                     </ui:GroupBox>
                     <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="No issues found!" name="NoIssue" class="mp_text-color--green" style="margin-top: 20px; margin-bottom: 20px; white-space: normal; -unity-text-align: middle-center;" />
                 </ui:ScrollView>
