@@ -90,7 +90,7 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
     public void FixAll()
     {
         ValidationError[] errors = invalidBehaviours.SelectMany(invalidBehaviour => invalidBehaviour.errors).ToArray();
-
+        
         for (var i = errors.Length - 1; i >= 0; i--)
         {
             ValidationError error = errors[i];

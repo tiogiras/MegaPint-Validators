@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MegaPint.Editor.Scripts.PackageManager.Packages;
 using MegaPint.Editor.Scripts.Tests.Utility;
 using NUnit.Framework;
+using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.UIElements;
 
@@ -63,6 +64,12 @@ internal class PackageTests
         TestsUtility.ValidateResource <VisualTreeAsset>(
             ref isValid,
             Constants.Validators.UserInterface.ValidatorViewItem);
+
+        TestsUtility.ValidateResource <Texture2D>(ref isValid, Constants.Validators.Images.ManualIssue);
+
+        TestsUtility.ValidateResource <ValidatorSettings>(
+            ref isValid,
+            Constants.Validators.Tests.RequireGameObjectActive);
 
         Assert.IsTrue(isValid);
     }

@@ -9,6 +9,12 @@ internal static partial class Constants
 {
     public static class Validators
     {
+        public static class Images
+        {
+            private static readonly string s_images = Path.Combine(s_base, "Images");
+            public static readonly string ManualIssue = Path.Combine(s_images, "Manual Issue");
+        }
+
         public static class Links
         {
             public const string CreateValidatorSettings = "Assets/Create/MegaPint/Validators/";
@@ -17,6 +23,12 @@ internal static partial class Constants
             public static readonly string ValidatorView = Utility.CombineMenuItemPath(
                 ContextMenu.MenuItemPackages,
                 "Validator View");
+        }
+
+        public static class Tests
+        {
+            private static readonly string s_tests = Path.Combine(s_base, "Tests");
+            public static readonly string RequireGameObjectActive = Path.Combine(s_tests, "GameObject", "[Test] Require Game Object Active");
         }
 
         public static class UserInterface
