@@ -10,7 +10,10 @@
                 <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" name="Error" text="[ERROR]" class="mp_text-color--red" style="white-space: normal; -unity-text-align: upper-center; -unity-font-style: bold;" />
                 <ui:Button text="Name" parse-escape-sequences="true" display-tooltip-when-elided="true" name="Name" style="display: flex; background-color: rgba(89, 89, 89, 0); border-left-color: rgba(255, 255, 255, 0); border-right-color: rgba(255, 255, 255, 0); border-top-color: rgba(255, 255, 255, 0); border-bottom-color: rgba(255, 255, 255, 0); -unity-text-align: middle-left; flex-grow: 1; margin-top: 0; margin-right: 0; margin-bottom: 0; padding-right: 3px; padding-left: 3px; text-overflow: ellipsis; margin-left: 0; flex-shrink: 1;" />
             </ui:VisualElement>
-            <ui:Button text="Fix" parse-escape-sequences="true" display-tooltip-when-elided="true" tooltip="Fix this issue." name="BTN_Fix" />
+            <ui:VisualElement style="flex-direction: row-reverse; align-items: center;">
+                <ui:Button text="Fix" parse-escape-sequences="true" display-tooltip-when-elided="true" tooltip="Fix this issue." name="BTN_Fix" />
+                <ui:Button parse-escape-sequences="true" display-tooltip-when-elided="true" tooltip="No existing fix action" name="NoFixAction" style="background-color: rgba(255, 255, 255, 0); border-left-color: rgba(255, 255, 255, 0); border-right-color: rgba(255, 255, 255, 0); border-top-color: rgba(255, 255, 255, 0); border-bottom-color: rgba(255, 255, 255, 0); border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; background-image: resource(&apos;MegaPint/Validators/Images/Manual Issue&apos;); height: 18px; width: 18px; opacity: 0.75;" />
+            </ui:VisualElement>
         </ui:VisualElement>
     </MegaPint.Editor.Scripts.GUI.Factories.RootElement>
 </ui:UXML>

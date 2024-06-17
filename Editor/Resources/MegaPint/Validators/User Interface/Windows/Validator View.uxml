@@ -11,8 +11,8 @@
                 </ui:VisualElement>
                 <ui:GroupBox name="Settings" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
                     <ui:Toggle label="Show Children" name="ShowChildren" tooltip="Show Child GameObjects even if the parent contains a ChildValidation requirement." />
-                    <ui:DropdownField label="Search Mode" index="0" choices="In Project,Single Folder, Including Subfolders" name="ProjectSearchMode" tooltip="Choose how the project should be searched." />
-                    <ui:GroupBox name="ChangeButtonParent" style="flex-direction: column; margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
+                    <ui:DropdownField label="Search Mode" index="0" choices="In Project,Single Folder, Including Subfolders" name="ProjectSearchMode" tooltip="Choose how the project should be searched." style="display: none;" />
+                    <ui:GroupBox name="ChangeButtonParent" style="flex-direction: column; margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; display: none;">
                         <ui:VisualElement style="flex-direction: row;">
                             <ui:Button text="Choose Target Folder" parse-escape-sequences="true" display-tooltip-when-elided="true" tooltip="Choose a folder for the folder search mode." name="BTN_Change" />
                         </ui:VisualElement>
@@ -24,16 +24,21 @@
                     <uie:ToolbarSearchField focusable="true" name="SearchField" style="width: 100%; margin-left: 0;" />
                 </uie:Toolbar>
                 <ui:VisualElement style="flex-direction: row; margin-top: 5px; margin-bottom: 5px;">
-                    <ui:Button text="[ERROR] (xxx)" parse-escape-sequences="true" display-tooltip-when-elided="true" name="BTN_Errors" class="mp_text-color--red" style="flex-grow: 1; flex-shrink: 1; white-space: nowrap; font-size: 10px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; -unity-font-style: bold;" />
-                    <ui:Button text="[WARNING] (xxx)" parse-escape-sequences="true" display-tooltip-when-elided="true" name="BTN_Warnings" class="mp_text-color--orange" style="flex-grow: 1; flex-shrink: 1; font-size: 10px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; -unity-font-style: bold;" />
-                    <ui:Button text="[OK] (xxx)" parse-escape-sequences="true" display-tooltip-when-elided="true" name="BTN_Ok" class="mp_text-color--green" style="flex-grow: 1; flex-shrink: 1; font-size: 10px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; -unity-font-style: bold;" />
+                    <ui:Button text="[ERROR] (xxx)" parse-escape-sequences="true" display-tooltip-when-elided="true" name="BTN_Errors" class="mp_text-color--red" style="flex-grow: 1; flex-shrink: 1; white-space: nowrap; font-size: 10px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; -unity-font-style: bold; display: none;" />
+                    <ui:Button text="[WARNING] (xxx)" parse-escape-sequences="true" display-tooltip-when-elided="true" name="BTN_Warnings" class="mp_text-color--orange" style="flex-grow: 1; flex-shrink: 1; font-size: 10px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; -unity-font-style: bold; display: none;" />
+                    <ui:Button text="[OK] (xxx)" parse-escape-sequences="true" display-tooltip-when-elided="true" name="BTN_Ok" class="mp_text-color--green" style="flex-grow: 1; flex-shrink: 1; font-size: 10px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; -unity-font-style: bold; display: none;" />
                 </ui:VisualElement>
-                <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="Select a tab to view it&apos;s content." name="NoSelection" style="flex-shrink: 1; -unity-text-align: upper-center; opacity: 0.34; white-space: normal;" />
-                <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="No ValidatableMonoBehaviours found!" name="NoBehaviours" style="flex-shrink: 1; -unity-text-align: middle-center; height: 100px;" />
-                <ui:ListView focusable="true" name="GameObjects" virtualization-method="DynamicHeight" style="flex-grow: 1;" />
+                <ui:VisualElement style="flex-grow: 1;">
+                    <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="Select a tab to view it&apos;s content." name="NoSelection" style="flex-shrink: 1; -unity-text-align: upper-center; opacity: 0.34; white-space: normal; display: none;" />
+                    <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="No ValidatableMonoBehaviours found!" name="NoBehaviours" style="flex-shrink: 1; -unity-text-align: middle-center; height: 100px; display: none;" />
+                    <ui:ListView focusable="true" name="GameObjects" virtualization-method="DynamicHeight" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row-reverse;">
+                    <ui:Button text="Fix All" parse-escape-sequences="true" display-tooltip-when-elided="true" name="BTN_FixAll" tooltip="Call all automatic fix actions on the listed gameObjects." style="height: 20px; display: none;" />
+                </ui:VisualElement>
             </MegaPint.Editor.Scripts.GUI.Factories.Backgrounds.BackgroundSecondary>
             <MegaPint.Editor.Scripts.GUI.Factories.Backgrounds.BackgroundTertiary name="RightPane" style="flex-shrink: 0; flex-grow: 1; min-width: 40%;">
-                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="RightPaneContent" style="width: 100%; height: 100%; display: flex; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
+                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="RightPaneContent" style="width: 100%; height: 100%; display: none; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
                     <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="GameObject" name="GameObjectName" style="font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" />
                     <MegaPint.Editor.Scripts.GUI.Factories.TextElements.TextSecondary tabindex="-1" text="Scene: Parent/GameObject || Path: Parent/GameObject" name="Path" style="white-space: nowrap; font-size: 10px; text-overflow: ellipsis; overflow: hidden;" />
                     <MegaPint.Editor.Scripts.GUI.Factories.Structure.Separator />

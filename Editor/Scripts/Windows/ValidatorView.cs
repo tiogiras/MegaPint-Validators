@@ -25,6 +25,7 @@ internal class ValidatorView : EditorWindowBase
     private static Button s_btnErrors;
     private static Button s_btnWarnings;
     private static Button s_btnOk;
+    private static Button s_btnFixAll;
 
     private static VisualElement s_noBehaviours;
     private static VisualElement s_noSelection;
@@ -90,24 +91,16 @@ internal class ValidatorView : EditorWindowBase
 
         s_btnSceneMode = leftPane.Q <Button>("BTN_Scene");
         s_btnProjectMode = leftPane.Q <Button>("BTN_Project");
+        s_btnFixAll = leftPane.Q <Button>("BTN_FixAll");
 
         s_btnErrors = leftPane.Q <Button>("BTN_Errors");
-        s_btnErrors.style.display = DisplayStyle.None;
-
         s_btnWarnings = leftPane.Q <Button>("BTN_Warnings");
-        s_btnWarnings.style.display = DisplayStyle.None;
-
         s_btnOk = leftPane.Q <Button>("BTN_Ok");
-        s_btnOk.style.display = DisplayStyle.None;
 
         s_noBehaviours = leftPane.Q <VisualElement>("NoBehaviours");
-        s_noBehaviours.style.display = DisplayStyle.None;
-
         s_noSelection = leftPane.Q <VisualElement>("NoSelection");
-        s_noSelection.style.display = DisplayStyle.None;
 
         s_gameObjectsView = leftPane.Q <ListView>("GameObjects");
-
         s_searchField = leftPane.Q <ToolbarSearchField>("SearchField");
 
         var refs = new LeftPaneReferences
@@ -149,6 +142,8 @@ internal class ValidatorView : EditorWindowBase
         s_btnSceneMode.clickable = new Clickable(() => {ChangeMode(true);});
         s_btnProjectMode.clickable = new Clickable(() => {ChangeMode(false);});
 
+        s_btnFixAll.clicked += FixAll;
+
         s_btnErrors.clicked += OnErrorButton;
         s_btnWarnings.clicked += OnWarningButton;
         s_btnOk.clicked += OnOkButton;
@@ -167,6 +162,12 @@ internal class ValidatorView : EditorWindowBase
 
             label.text = status.gameObject.name;
             label.tooltip = GetParentPath(status.transform);
+
+            var isMissingFixAction = status.invalidBehaviours.Any(
+                behaviour => behaviour.errors.Any(error => error.fixAction == null));
+            
+            var noFixAction = element.Q <VisualElement>("NoFixAction");
+            noFixAction.style.display = isMissingFixAction ? DisplayStyle.Flex : DisplayStyle.None;
         };
     }
 
@@ -177,6 +178,8 @@ internal class ValidatorView : EditorWindowBase
         s_btnSceneMode.clickable = null;
         s_btnProjectMode.clickable = null;
         
+        s_btnFixAll.clicked -= FixAll;
+        
         s_btnErrors.clicked -= OnErrorButton;
         s_btnWarnings.clicked -= OnWarningButton;
         s_btnOk.clicked -= OnOkButton;
@@ -185,6 +188,49 @@ internal class ValidatorView : EditorWindowBase
 
         s_gameObjectsView.itemsChosen -= OnGameObjectSelectionConfirmed;
         s_gameObjectsView.selectedIndicesChanged -= OnGameObjectSelected;
+    }
+
+    private void FixAll()
+    {
+        ValidatableMonoBehaviourStatus[] behaviours = GetFixableBehaviours();
+
+        foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
+        {
+            foreach (InvalidBehaviour invalidBehaviour in behaviour.invalidBehaviours)
+            {
+                foreach (ValidationError error in invalidBehaviour.errors)
+                {
+                    error.fixAction?.Invoke(error.gameObject);
+                }
+            }
+            
+            behaviour.ValidateStatus();
+        }
+        
+        RightPane.Clear();
+        UpdateBehavioursBasedOnState(behaviours);
+    }
+
+    private static ValidatableMonoBehaviourStatus[] GetFixableBehaviours()
+    {
+        return s_displayedItems.Where(
+                                    gameObject =>
+                                        gameObject.invalidBehaviours.Any(
+                                            behaviour => behaviour.errors.Any(error => error.fixAction != null))).
+                                ToArray();
+    }
+
+    private static void UpdateFixAllButton()
+    {
+        if (s_displayedListIndex == -1 || s_displayedItems.Count == 2)
+        {
+            s_btnFixAll.style.display = DisplayStyle.None;
+            return;
+        }
+
+        var hasFixAction = GetFixableBehaviours().Length > 0;
+
+        s_btnFixAll.style.display = hasFixAction ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     #endregion
@@ -213,8 +259,18 @@ internal class ValidatorView : EditorWindowBase
                 s_displayedListIndex = -1;
         }
     }
+
+    private static void UpdateBehavioursBasedOnState(ValidatableMonoBehaviourStatus[] behaviours)
+    {
+        foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
+        {
+            UpdateBehaviourBasedOnState(behaviour, true);
+        }
+        
+        UpdateLeftPaneGUI();
+    }
     
-    public static void UpdateBehaviourBasedOnState(ValidatableMonoBehaviourStatus behaviour)
+    public static void UpdateBehaviourBasedOnState(ValidatableMonoBehaviourStatus behaviour, bool suppressGUIRefresh = false)
     {
         RemoveFromOldList(behaviour);
 
@@ -238,7 +294,8 @@ internal class ValidatorView : EditorWindowBase
                 throw new ArgumentOutOfRangeException();
         }
         
-        UpdateLeftPaneGUI();
+        if (!suppressGUIRefresh)
+            UpdateLeftPaneGUI();
     }
     
     #region Private Methods
@@ -315,6 +372,7 @@ internal class ValidatorView : EditorWindowBase
         s_gameObjectsView.itemsSource = s_displayedItems;
 
         UpdateGameObjectsListViewVisibility();
+        UpdateFixAllButton();
         s_gameObjectsView.ClearSelection();
     }
 
