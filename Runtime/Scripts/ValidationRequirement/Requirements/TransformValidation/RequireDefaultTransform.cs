@@ -49,12 +49,12 @@ public class RequireDefaultTransform : ScriptableValidationRequirement
             errorText.AppendLine("Rotation should be (0,0,0)");
 
         if (!validScale)
-            errorText.AppendLine("Scale should be (1,1,1)");
+            errorText.Append("Scale should be (1,1,1)");
 
         AddError(
             "Non-Default Transform",
             errorText.ToString(),
-            ValidationState.Error,
+            ValidationState.Warning,
             FixAction);
     }
 

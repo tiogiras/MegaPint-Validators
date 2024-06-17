@@ -67,9 +67,29 @@ internal class PackageTests
 
         TestsUtility.ValidateResource <Texture2D>(ref isValid, Constants.Validators.Images.ManualIssue);
 
-        TestsUtility.ValidateResource <ValidatorSettings>(
-            ref isValid,
-            Constants.Validators.Tests.RequireGameObjectActive);
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireGameObjectActive);
+        
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireComponentOrder);
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireComponentOrder1);
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireComponentOrder2);
+        
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireDefaultTransform);
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireDefaultTransform1);
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireDefaultTransform2);
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireDefaultTransform3);
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireDefaultTransform4);
+        
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireGlobalTransform);
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireGlobalTransform1);
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireGlobalTransform2);
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireGlobalTransform3);
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireGlobalTransform4);
+        
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireLocalTransform);
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireLocalTransform1);
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireLocalTransform2);
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireLocalTransform3);
+        TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireLocalTransform4);
 
         Assert.IsTrue(isValid);
     }

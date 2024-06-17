@@ -36,15 +36,12 @@ internal static class RequirementTests
         validatableMonoBehaviour.SetImportedSettings(settings);
         
         // Invoke the setup... used to set the specific values of the object so the next validation returns false
-        setup.Invoke(testObject);
+        setup?.Invoke(testObject);
         
         // Second validation of the object should return the expected state
         state = validatableMonoBehaviour.Validate(out List <ValidationError> errors);
 
-        Assert.AreEqual(
-            expectedStateAfterValidation,
-            state,
-            $"Validation did not return the expected state! Is: {state}, Expected: {expectedStateAfterValidation}");
+        Assert.AreEqual(expectedStateAfterValidation, state, "Validation did not return the expected state!");
 
         if (!canBeFixed)
             Assert.Pass();
