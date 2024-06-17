@@ -18,15 +18,12 @@ internal static class LeftPaneProjectMode
 
     public static bool CollectInvalidObjects(out List<ValidatableMonoBehaviourStatus> errors, out List<ValidatableMonoBehaviourStatus> warnings, out List <ValidatableMonoBehaviourStatus> ok)
     {
-        Debug.Log($"Collecting in folder: {SaveValues.Validators.SearchFolder}");
-        
         ValidatableMonoBehaviourStatus[] behaviours = CollectBehaviours();
 
         errors = new List<ValidatableMonoBehaviourStatus>();
         warnings = new List <ValidatableMonoBehaviourStatus>();
         ok = new List <ValidatableMonoBehaviourStatus>();
-
-        Debug.Log("Set to true");
+        
         s_canBeChanged = true;
         
         if (behaviours is not {Length: > 0})
@@ -230,8 +227,6 @@ internal static class LeftPaneProjectMode
 
     private static void OnChangeButton()
     {
-        Debug.Log(s_canBeChanged);
-        
         if (!s_canBeChanged)
             return;
         
@@ -246,7 +241,6 @@ internal static class LeftPaneProjectMode
         UpdateFolderPath(relativePath);
         SaveValues.Validators.SearchFolder = relativePath;
         s_canBeChanged = false;
-        Debug.Log("Set to false");
 
         ValidatorView.ScheduleRefreshCall();
     }

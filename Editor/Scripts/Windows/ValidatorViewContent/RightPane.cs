@@ -101,6 +101,7 @@ internal static class RightPane
         }
 
         s_status.ValidateStatus();
+        ValidatorView.UpdateBehaviourBasedOnState(s_status);
 
         Refresh();
     }
@@ -213,8 +214,14 @@ internal static class RightPane
             fixButton.clickable = new Clickable(
                 () =>
                 {
+                    ValidationState status = s_status.State;
+                    
                     error.fixAction.Invoke(error.gameObject);
                     s_status.ValidateStatus();
+                    
+                    if (status != s_status.State)
+                        ValidatorView.UpdateBehaviourBasedOnState(s_status);
+                    
                     Refresh();
                 });
         };
