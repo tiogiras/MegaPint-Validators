@@ -216,6 +216,13 @@ internal class ValidatorView : EditorWindowBase
         };
 
         EditorSceneManager.sceneOpened += OnSceneLoaded;
+        EditorSceneManager.sceneClosed += OnSceneClosed;
+    }
+
+    private static void OnSceneClosed(Scene scene)
+    {
+        if (s_isSceneMode)
+            UpdateLeftPane();
     }
 
     private static void OnSceneLoaded(Scene scene, OpenSceneMode mode)
@@ -243,6 +250,7 @@ internal class ValidatorView : EditorWindowBase
         s_gameObjectsView.selectedIndicesChanged -= OnGameObjectSelected;
 
         EditorSceneManager.sceneOpened -= OnSceneLoaded;
+        EditorSceneManager.sceneClosed -= OnSceneClosed;
     }
 
     #endregion
