@@ -47,7 +47,7 @@ public class RequireGlobalTransform : ScriptableValidationRequirement
             errorText.AppendLine($"Rotation should be {_globalRotation}");
 
         if (!validScale)
-            errorText.AppendLine($"Scale should be {_globalScale}");
+            errorText.Append($"Scale should be {_globalScale}");
 
         AddError("Transform differs from specifications", errorText.ToString(), ValidationState.Warning, FixAction);
     }

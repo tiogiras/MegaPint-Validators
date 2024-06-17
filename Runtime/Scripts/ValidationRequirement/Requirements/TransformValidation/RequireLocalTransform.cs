@@ -47,7 +47,7 @@ public class RequireLocalTransform : ScriptableValidationRequirement
             errorText.AppendLine($"Rotation should be {_localRotation.value}");
 
         if (!validScale)
-            errorText.AppendLine($"Scale should be {_localScale.value}");
+            errorText.Append($"Scale should be {_localScale.value}");
 
         AddError("Transform differs from specifications", errorText.ToString(), ValidationState.Warning, FixAction);
     }

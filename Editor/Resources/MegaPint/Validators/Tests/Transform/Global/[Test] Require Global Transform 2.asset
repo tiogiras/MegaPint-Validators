@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74d3942af42a4cdf99dcbb5260b15292, type: 3}
+  m_Name: '[Test] Require Global Transform 2'
+  m_EditorClassIdentifier: 
+  _requirements:
+  - rid: 2612410337079328776
+  references:
+    version: 2
+    RefIds:
+    - rid: 2612410337079328776
+      type: {class: RequireGlobalTransform, ns: MegaPint.ValidationRequirement.Requirements.TransformValidation, asm: tiogiras.megapint.validators.runtime}
+      data:
+        _globalPosition:
+          enabled: 0
+          value: {x: 0, y: 0, z: 0}
+        _globalRotation:
+          enabled: 1
+          value: {x: 45, y: 90, z: 3}
+        _globalScale:
+          enabled: 0
+          value: {x: 0, y: 0, z: 0}

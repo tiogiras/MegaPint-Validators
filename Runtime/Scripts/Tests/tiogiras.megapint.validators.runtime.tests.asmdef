@@ -1,0 +1,16 @@
+{
+    "name": "tiogiras.megapint.validators.runtime.tests",
+    "rootNamespace": "MegaPint",
+    "references": [
+        "GUID:0e40976153628db4fbfccfcc6ab8f1bf"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

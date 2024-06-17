@@ -9,6 +9,12 @@ internal static partial class Constants
 {
     public static class Validators
     {
+        public static class Images
+        {
+            private static readonly string s_images = Path.Combine(s_base, "Images");
+            public static readonly string ManualIssue = Path.Combine(s_images, "Manual Issue");
+        }
+
         public static class Links
         {
             public const string CreateValidatorSettings = "Assets/Create/MegaPint/Validators/";
@@ -17,6 +23,97 @@ internal static partial class Constants
             public static readonly string ValidatorView = Utility.CombineMenuItemPath(
                 ContextMenu.MenuItemPackages,
                 "Validator View");
+        }
+
+        public static class Tests
+        {
+            private static readonly string s_tests = Path.Combine(s_base, "Tests");
+
+            public static readonly string RequireGameObjectActive = Path.Combine(
+                s_tests,
+                "GameObject",
+                "[Test] Require Game Object Active");
+            
+            public static readonly string RequireChildrenValidation = Path.Combine(s_tests, "[Test] Require Children Validation");
+
+            private static readonly string s_componentOrder = Path.Combine(s_tests, "Component Order");
+            
+            public static readonly string RequireComponentOrder = Path.Combine(s_componentOrder, "[Test] Require Component Order");
+            public static readonly string RequireComponentOrder1 = Path.Combine(s_componentOrder, "[Test] Require Component Order 1");
+            public static readonly string RequireComponentOrder2 = Path.Combine(s_componentOrder, "[Test] Require Component Order 2");
+            
+            private static readonly string s_customNaming = Path.Combine(s_tests, "Custom Naming");
+            
+            public static readonly string RequireCustomNaming = Path.Combine(s_customNaming, "[Test] Require Custom Naming");
+            public static readonly string RequireCustomNaming1 = Path.Combine(s_customNaming, "[Test] Require Custom Naming 1");
+            public static readonly string RequireCustomNaming2 = Path.Combine(s_customNaming, "[Test] Require Custom Naming 2");
+
+            private static readonly string s_transform = Path.Combine(s_tests, "Transform");
+            private static readonly string s_defaultTransform = Path.Combine(s_transform, "Default");
+
+            public static readonly string RequireDefaultTransform = Path.Combine(
+                s_defaultTransform,
+                "[Test] Require Default Transform");
+
+            public static readonly string RequireDefaultTransform1 = Path.Combine(
+                s_defaultTransform,
+                "[Test] Require Default Transform 1");
+
+            public static readonly string RequireDefaultTransform2 = Path.Combine(
+                s_defaultTransform,
+                "[Test] Require Default Transform 2");
+
+            public static readonly string RequireDefaultTransform3 = Path.Combine(
+                s_defaultTransform,
+                "[Test] Require Default Transform 3");
+
+            public static readonly string RequireDefaultTransform4 = Path.Combine(
+                s_defaultTransform,
+                "[Test] Require Default Transform 4");
+
+            private static readonly string s_globalTransform = Path.Combine(s_transform, "Global");
+
+            public static readonly string RequireGlobalTransform = Path.Combine(
+                s_globalTransform,
+                "[Test] Require Global Transform");
+
+            public static readonly string RequireGlobalTransform1 = Path.Combine(
+                s_globalTransform,
+                "[Test] Require Global Transform 1");
+
+            public static readonly string RequireGlobalTransform2 = Path.Combine(
+                s_globalTransform,
+                "[Test] Require Global Transform 2");
+
+            public static readonly string RequireGlobalTransform3 = Path.Combine(
+                s_globalTransform,
+                "[Test] Require Global Transform 3");
+
+            public static readonly string RequireGlobalTransform4 = Path.Combine(
+                s_globalTransform,
+                "[Test] Require Global Transform 4");
+
+            private static readonly string s_localTransform = Path.Combine(s_transform, "Local");
+
+            public static readonly string RequireLocalTransform = Path.Combine(
+                s_localTransform,
+                "[Test] Require Global Transform");
+
+            public static readonly string RequireLocalTransform1 = Path.Combine(
+                s_localTransform,
+                "[Test] Require Global Transform 1");
+
+            public static readonly string RequireLocalTransform2 = Path.Combine(
+                s_localTransform,
+                "[Test] Require Global Transform 2");
+
+            public static readonly string RequireLocalTransform3 = Path.Combine(
+                s_localTransform,
+                "[Test] Require Global Transform 3");
+
+            public static readonly string RequireLocalTransform4 = Path.Combine(
+                s_localTransform,
+                "[Test] Require Global Transform 4");
         }
 
         public static class UserInterface
