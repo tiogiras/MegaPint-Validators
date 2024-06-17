@@ -6,6 +6,7 @@ using UnityEngine;
 namespace MegaPint
 {
 
+// TODO commenting & cleanup
 /// <summary> Behaviour to display the status of a gameObject with <see cref="ValidatableMonoBehaviour" /> </summary>
 public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <ValidatableMonoBehaviourStatus>
 {
@@ -36,7 +37,6 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
         
         foreach (ValidatableMonoBehaviourStatus status in children)
         {
-            Debug.Log($"Subscribed to {status.gameObject.name}");
             status.onStatusChanged += OnChildStatusChanged;
         }
     }
@@ -51,14 +51,12 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
         
         foreach (ValidatableMonoBehaviourStatus status in children)
         {
-            Debug.Log($"UnSubscribed from {status.gameObject.name}");
             status.onStatusChanged -= OnChildStatusChanged;
         }
     }
 
     private void OnChildStatusChanged(ValidatableMonoBehaviourStatus _)
     {
-        Debug.Log("Validating due to child status change");
         ValidateStatus();
     }
     
