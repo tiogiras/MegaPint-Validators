@@ -2,10 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MegaPint.Editor.Scripts.GUI.Utility;
 using MegaPint.Editor.Scripts.Windows.ValidatorViewContent;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using GUIUtility = MegaPint.Editor.Scripts.GUI.Utility.GUIUtility;
 
@@ -61,11 +64,53 @@ internal class ValidatorView : EditorWindowBase
             () => {onRefresh?.Invoke();});
     }
 
+    public static void UpdateBehaviourBasedOnState(
+        ValidatableMonoBehaviourStatus behaviour,
+        bool suppressGUIRefresh = false)
+    {
+        RemoveFromOldList(behaviour);
+
+        switch (behaviour.State)
+        {
+            case ValidationState.Unknown:
+                break;
+
+            case ValidationState.Ok:
+                s_okGameObjects.Add(behaviour);
+
+                break;
+
+            case ValidationState.Warning:
+                s_warningGameObjects.Add(behaviour);
+
+                break;
+
+            case ValidationState.Error:
+                s_errorGameObjects.Add(behaviour);
+
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        if (!suppressGUIRefresh)
+            UpdateLeftPaneGUI();
+    }
+
     public override EditorWindowBase ShowWindow()
     {
         titleContent.text = "Validator View";
 
+        minSize = new Vector2(700, 350);
+
         s_isSceneMode = true;
+
+        if (!SaveValues.Validators.ApplyPSValidatorView)
+            return this;
+
+        this.CenterOnMainWin(800, 450);
+        SaveValues.Validators.ApplyPSValidatorView = false;
 
         return this;
     }
@@ -165,10 +210,25 @@ internal class ValidatorView : EditorWindowBase
 
             var isMissingFixAction = status.invalidBehaviours.Any(
                 behaviour => behaviour.errors.Any(error => error.fixAction == null));
-            
+
             var noFixAction = element.Q <VisualElement>("NoFixAction");
             noFixAction.style.display = isMissingFixAction ? DisplayStyle.Flex : DisplayStyle.None;
         };
+
+        EditorSceneManager.sceneOpened += OnSceneLoaded;
+        EditorSceneManager.sceneClosed += OnSceneClosed;
+    }
+
+    private static void OnSceneClosed(Scene scene)
+    {
+        if (s_isSceneMode)
+            UpdateLeftPane();
+    }
+
+    private static void OnSceneLoaded(Scene scene, OpenSceneMode mode)
+    {
+        if (s_isSceneMode)
+            UpdateLeftPane();
     }
 
     protected override void UnRegisterCallbacks()
@@ -177,9 +237,9 @@ internal class ValidatorView : EditorWindowBase
 
         s_btnSceneMode.clickable = null;
         s_btnProjectMode.clickable = null;
-        
+
         s_btnFixAll.clicked -= FixAll;
-        
+
         s_btnErrors.clicked -= OnErrorButton;
         s_btnWarnings.clicked -= OnWarningButton;
         s_btnOk.clicked -= OnOkButton;
@@ -188,147 +248,14 @@ internal class ValidatorView : EditorWindowBase
 
         s_gameObjectsView.itemsChosen -= OnGameObjectSelectionConfirmed;
         s_gameObjectsView.selectedIndicesChanged -= OnGameObjectSelected;
-    }
 
-    private void FixAll()
-    {
-        ValidatableMonoBehaviourStatus[] behaviours = GetFixableBehaviours();
-
-        foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
-        {
-            foreach (InvalidBehaviour invalidBehaviour in behaviour.invalidBehaviours)
-            {
-                foreach (ValidationError error in invalidBehaviour.errors)
-                {
-                    error.fixAction?.Invoke(error.gameObject);
-                }
-            }
-            
-            behaviour.ValidateStatus();
-        }
-        
-        RightPane.Clear();
-        UpdateBehavioursBasedOnState(behaviours);
-    }
-
-    private static ValidatableMonoBehaviourStatus[] GetFixableBehaviours()
-    {
-        return s_displayedItems.Where(
-                                    gameObject =>
-                                        gameObject.invalidBehaviours.Any(
-                                            behaviour => behaviour.errors.Any(error => error.fixAction != null))).
-                                ToArray();
-    }
-
-    private static void UpdateFixAllButton()
-    {
-        if (s_displayedListIndex == -1 || s_displayedItems.Count == 2)
-        {
-            s_btnFixAll.style.display = DisplayStyle.None;
-            return;
-        }
-
-        var hasFixAction = GetFixableBehaviours().Length > 0;
-
-        s_btnFixAll.style.display = hasFixAction ? DisplayStyle.Flex : DisplayStyle.None;
+        EditorSceneManager.sceneOpened -= OnSceneLoaded;
+        EditorSceneManager.sceneClosed -= OnSceneClosed;
     }
 
     #endregion
 
-    private static void RemoveFromOldList(ValidatableMonoBehaviourStatus behaviour)
-    {
-        if (s_errorGameObjects.Contains(behaviour))
-        {
-            s_errorGameObjects.Remove(behaviour);
-            
-            if (s_errorGameObjects.Count == 0)
-                s_displayedListIndex = -1;
-        }
-        else if (s_warningGameObjects.Contains(behaviour))
-        {
-            s_warningGameObjects.Remove(behaviour);
-            
-            if (s_warningGameObjects.Count == 0)
-                s_displayedListIndex = -1;
-        }
-        else if (s_okGameObjects.Contains(behaviour))
-        {
-            s_okGameObjects.Remove(behaviour);
-            
-            if (s_okGameObjects.Count == 0)
-                s_displayedListIndex = -1;
-        }
-    }
-
-    private static void UpdateBehavioursBasedOnState(ValidatableMonoBehaviourStatus[] behaviours)
-    {
-        foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
-        {
-            UpdateBehaviourBasedOnState(behaviour, true);
-        }
-        
-        UpdateLeftPaneGUI();
-    }
-    
-    public static void UpdateBehaviourBasedOnState(ValidatableMonoBehaviourStatus behaviour, bool suppressGUIRefresh = false)
-    {
-        RemoveFromOldList(behaviour);
-
-        switch (behaviour.State)
-        {
-            case ValidationState.Unknown: break;
-
-            case ValidationState.Ok:
-                s_okGameObjects.Add(behaviour);
-                break;
-
-            case ValidationState.Warning:
-                s_warningGameObjects.Add(behaviour);
-                break;
-
-            case ValidationState.Error:
-                s_errorGameObjects.Add(behaviour);
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-        
-        if (!suppressGUIRefresh)
-            UpdateLeftPaneGUI();
-    }
-    
     #region Private Methods
-
-    private static void OnErrorButton()
-    {
-        s_gameObjectsItems = s_errorGameObjects;
-        s_displayedListIndex = 0;
-        
-        DisplayBySearchField();
-        UpdateBehaviourButtons();
-        RightPane.Clear();
-    }
-
-    private static void OnWarningButton()
-    {
-        s_gameObjectsItems = s_warningGameObjects;
-        s_displayedListIndex = 1;
-        
-        DisplayBySearchField();
-        UpdateBehaviourButtons();
-        RightPane.Clear();
-    }
-
-    private static void OnOkButton()
-    {
-        s_gameObjectsItems = s_okGameObjects;
-        s_displayedListIndex = 2;
-        
-        DisplayBySearchField();
-        UpdateBehaviourButtons();
-        RightPane.Clear();
-    }
 
     private static bool CollectInvalidGameObjects(
         out List <ValidatableMonoBehaviourStatus> errors,
@@ -376,6 +303,15 @@ internal class ValidatorView : EditorWindowBase
         s_gameObjectsView.ClearSelection();
     }
 
+    private static ValidatableMonoBehaviourStatus[] GetFixableBehaviours()
+    {
+        return s_displayedItems.Where(
+                                    gameObject =>
+                                        gameObject.invalidBehaviours.Any(
+                                            behaviour => behaviour.errors.Any(error => error.fixAction != null))).
+                                ToArray();
+    }
+
     /// <summary> Get path of the transform in their parent hierarchy </summary>
     /// <param name="startTransform"> Transform the path starts at </param>
     /// <returns> Path in the local hierarchy of the given transform </returns>
@@ -396,6 +332,61 @@ internal class ValidatorView : EditorWindowBase
         return path;
     }
 
+    private static void OnErrorButton()
+    {
+        s_gameObjectsItems = s_errorGameObjects;
+        s_displayedListIndex = 0;
+
+        DisplayBySearchField();
+        UpdateBehaviourButtons();
+        RightPane.Clear();
+    }
+
+    private static void OnOkButton()
+    {
+        s_gameObjectsItems = s_okGameObjects;
+        s_displayedListIndex = 2;
+
+        DisplayBySearchField();
+        UpdateBehaviourButtons();
+        RightPane.Clear();
+    }
+
+    private static void OnWarningButton()
+    {
+        s_gameObjectsItems = s_warningGameObjects;
+        s_displayedListIndex = 1;
+
+        DisplayBySearchField();
+        UpdateBehaviourButtons();
+        RightPane.Clear();
+    }
+
+    private static void RemoveFromOldList(ValidatableMonoBehaviourStatus behaviour)
+    {
+        if (s_errorGameObjects.Contains(behaviour))
+        {
+            s_errorGameObjects.Remove(behaviour);
+
+            if (s_errorGameObjects.Count == 0)
+                s_displayedListIndex = -1;
+        }
+        else if (s_warningGameObjects.Contains(behaviour))
+        {
+            s_warningGameObjects.Remove(behaviour);
+
+            if (s_warningGameObjects.Count == 0)
+                s_displayedListIndex = -1;
+        }
+        else if (s_okGameObjects.Contains(behaviour))
+        {
+            s_okGameObjects.Remove(behaviour);
+
+            if (s_okGameObjects.Count == 0)
+                s_displayedListIndex = -1;
+        }
+    }
+
     private static void ResetDisplayedItems()
     {
         s_gameObjectsItems = null;
@@ -406,6 +397,28 @@ internal class ValidatorView : EditorWindowBase
     {
         GUIUtility.ToggleActiveButtonInGroup(s_displayedListIndex, s_btnErrors, s_btnWarnings, s_btnOk);
         UpdateNoSelectionVisibility();
+    }
+
+    private static void UpdateBehavioursBasedOnState(ValidatableMonoBehaviourStatus[] behaviours)
+    {
+        foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
+            UpdateBehaviourBasedOnState(behaviour, true);
+
+        UpdateLeftPaneGUI();
+    }
+
+    private static void UpdateFixAllButton()
+    {
+        if (s_displayedListIndex == -1 || s_displayedItems.Count == 2)
+        {
+            s_btnFixAll.style.display = DisplayStyle.None;
+
+            return;
+        }
+
+        var hasFixAction = GetFixableBehaviours().Length > 0;
+
+        s_btnFixAll.style.display = hasFixAction ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     private static void UpdateGameObjectsListViewVisibility()
@@ -449,14 +462,14 @@ internal class ValidatorView : EditorWindowBase
 
             return;
         }
-        
+
         UpdateLeftPaneGUI();
     }
 
     private static void UpdateLeftPaneGUI()
     {
         ResetDisplayedItems();
-        
+
         s_btnErrors.style.display = s_errorGameObjects.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
         s_btnWarnings.style.display = s_warningGameObjects.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
         s_btnOk.style.display = s_okGameObjects.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
@@ -466,7 +479,7 @@ internal class ValidatorView : EditorWindowBase
         s_btnErrors.text = $"Errors ({s_errorGameObjects.Count})";
         s_btnWarnings.text = $"Warnings ({s_warningGameObjects.Count})";
         s_btnOk.text = $"Ok ({s_okGameObjects.Count})";
-        
+
         if (s_displayedListIndex < 0)
             return;
 
@@ -492,6 +505,25 @@ internal class ValidatorView : EditorWindowBase
         UpdateLeftPane();
 
         RightPane.Clear();
+    }
+
+    private void FixAll()
+    {
+        ValidatableMonoBehaviourStatus[] behaviours = GetFixableBehaviours();
+
+        foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
+        {
+            foreach (InvalidBehaviour invalidBehaviour in behaviour.invalidBehaviours)
+            {
+                foreach (ValidationError error in invalidBehaviour.errors)
+                    error.fixAction?.Invoke(error.gameObject);
+            }
+
+            behaviour.ValidateStatus();
+        }
+
+        RightPane.Clear();
+        UpdateBehavioursBasedOnState(behaviours);
     }
 
     private void OnGameObjectSelected(IEnumerable <int> _)

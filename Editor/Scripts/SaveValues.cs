@@ -13,6 +13,7 @@ internal static partial class SaveValues
         private static CacheValue <bool> s_showChildrenProject = new() {defaultValue = false};
         private static CacheValue <int> s_searchMode = new() {defaultValue = 0};
         private static CacheValue <string> s_searchFolder = new() {defaultValue = ""};
+        private static CacheValue <bool> s_applyPSValidatorView = new() {defaultValue = true};
 
         private static SettingsBase s_settings;
 
@@ -40,12 +41,18 @@ internal static partial class SaveValues
             set => ValueProperty.Set("searchFolder", value, ref s_searchFolder, _Settings);
         }
 
+        public static bool ApplyPSValidatorView
+        {
+            get => ValueProperty.Get("ApplyPS_ValidatorView", ref s_applyPSValidatorView, _Settings);
+            set => ValueProperty.Set("ApplyPS_ValidatorView", value, ref s_applyPSValidatorView, _Settings);
+        }
+
         private static SettingsBase _Settings
         {
             get
             {
                 if (MegaPintSettings.Exists())
-                    return s_generalSettings ??= MegaPintSettings.instance.GetSetting("Validators");
+                    return s_settings ??= MegaPintSettings.instance.GetSetting("Validators");
 
                 return null;
             }
