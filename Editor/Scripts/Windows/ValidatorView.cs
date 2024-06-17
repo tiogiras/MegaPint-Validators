@@ -264,12 +264,12 @@ internal class ValidatorView : EditorWindowBase
     {
         if (s_isSceneMode)
         {
-            if (!LeftPaneSceneMode.CollectInvalidObjects(out errors, out warnings, out ok))
+            if (!LeftPaneSceneMode.CollectValidatableObjects(out errors, out warnings, out ok))
                 return false;
         }
         else
         {
-            if (!LeftPaneProjectMode.CollectInvalidObjects(out errors, out warnings, out ok))
+            if (!LeftPaneProjectMode.CollectValidatableObjects(out errors, out warnings, out ok))
                 return false;
         }
 
@@ -279,6 +279,8 @@ internal class ValidatorView : EditorWindowBase
     /// <summary> Filter the displayed behaviours based on the content of the search field </summary>
     private static void DisplayBySearchField()
     {
+        StopListeningToValidationEvents();
+        
         if (s_gameObjectsItems is not {Count: > 0})
             s_displayedItems = new List <ValidatableMonoBehaviourStatus>();
         else
@@ -296,6 +298,8 @@ internal class ValidatorView : EditorWindowBase
         }
 
         s_displayedItems.Sort();
+        ListenToValidationEvents();
+        
         s_gameObjectsView.itemsSource = s_displayedItems;
 
         UpdateGameObjectsListViewVisibility();
@@ -303,6 +307,34 @@ internal class ValidatorView : EditorWindowBase
         s_gameObjectsView.ClearSelection();
     }
 
+    private static void StopListeningToValidationEvents()
+    {
+        if (s_displayedItems.Count == 0)
+            return;
+        
+        foreach (ValidatableMonoBehaviourStatus item in s_displayedItems)
+        {
+            item.onStatusChanged -= OnStatusChanged;
+        }
+    }
+    
+    private static void ListenToValidationEvents()
+    {
+        if (s_displayedItems.Count == 0)
+            return;
+        
+        foreach (ValidatableMonoBehaviourStatus item in s_displayedItems)
+        {
+            item.onStatusChanged += OnStatusChanged;
+        }
+    }
+
+    private static void OnStatusChanged(ValidatableMonoBehaviourStatus behaviour)
+    {
+        UpdateBehaviourBasedOnState(behaviour);
+    }
+
+    // TODO comments
     private static ValidatableMonoBehaviourStatus[] GetFixableBehaviours()
     {
         return s_displayedItems.Where(
@@ -513,13 +545,7 @@ internal class ValidatorView : EditorWindowBase
 
         foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
         {
-            foreach (InvalidBehaviour invalidBehaviour in behaviour.invalidBehaviours)
-            {
-                foreach (ValidationError error in invalidBehaviour.errors)
-                    error.fixAction?.Invoke(error.gameObject);
-            }
-
-            behaviour.ValidateStatus();
+            behaviour.FixAll();
         }
 
         RightPane.Clear();

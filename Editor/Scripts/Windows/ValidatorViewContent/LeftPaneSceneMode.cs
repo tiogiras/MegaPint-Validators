@@ -12,7 +12,7 @@ internal static class LeftPaneSceneMode
 {
     private static LeftPaneReferences s_refs;
 
-    public static bool CollectInvalidObjects(out List<ValidatableMonoBehaviourStatus> errors, out List<ValidatableMonoBehaviourStatus> warnings, out List <ValidatableMonoBehaviourStatus> ok)
+    public static bool CollectValidatableObjects(out List<ValidatableMonoBehaviourStatus> errors, out List<ValidatableMonoBehaviourStatus> warnings, out List <ValidatableMonoBehaviourStatus> ok)
     {
         ValidatableMonoBehaviourStatus[] behaviours = Resources.FindObjectsOfTypeAll <ValidatableMonoBehaviourStatus>();
         behaviours = behaviours.Where(behaviour => behaviour.gameObject.scene.isLoaded).ToArray();
@@ -29,6 +29,8 @@ internal static class LeftPaneSceneMode
 
         foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
         {
+            behaviour.ValidateStatus();
+            
             switch (behaviour.State)
             {
                 case ValidationState.Unknown: break;

@@ -12,6 +12,7 @@
                     <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" name="Error" text="[ERROR]" class="mp_text-color--red" style="white-space: normal; -unity-text-align: upper-center; -unity-font-style: bold;" />
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; align-items: center;">
+                    <ui:Button parse-escape-sequences="true" display-tooltip-when-elided="true" tooltip="Missing at least one fix action." name="NoFixAction" style="background-color: rgba(255, 255, 255, 0); border-left-color: rgba(255, 255, 255, 0); border-right-color: rgba(255, 255, 255, 0); border-top-color: rgba(255, 255, 255, 0); border-bottom-color: rgba(255, 255, 255, 0); border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; background-image: resource(&apos;MegaPint/Validators/Images/Manual Issue&apos;); height: 18px; width: 18px; opacity: 0.75;" />
                     <ui:Button text="Fix All" parse-escape-sequences="true" display-tooltip-when-elided="true" name="BTN_FixAll" tooltip="Try to fix all issues." style="margin-top: 0; margin-right: 5px; margin-bottom: 0; margin-left: 0;" />
                     <ui:Button text="Validate" parse-escape-sequences="true" display-tooltip-when-elided="true" name="BTN_Validate" tooltip="Validate the GameObject." style="margin-top: 0; margin-right: 10px; margin-bottom: 0; margin-left: 0;" />
                 </ui:VisualElement>

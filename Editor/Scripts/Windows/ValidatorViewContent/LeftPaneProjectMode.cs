@@ -16,7 +16,7 @@ internal static class LeftPaneProjectMode
 
     private static bool s_canBeChanged;
 
-    public static bool CollectInvalidObjects(out List<ValidatableMonoBehaviourStatus> errors, out List<ValidatableMonoBehaviourStatus> warnings, out List <ValidatableMonoBehaviourStatus> ok)
+    public static bool CollectValidatableObjects(out List<ValidatableMonoBehaviourStatus> errors, out List<ValidatableMonoBehaviourStatus> warnings, out List <ValidatableMonoBehaviourStatus> ok)
     {
         ValidatableMonoBehaviourStatus[] behaviours = CollectBehaviours();
 
@@ -31,6 +31,8 @@ internal static class LeftPaneProjectMode
         
         foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
         {
+            behaviour.ValidateStatus();
+            
             switch (behaviour.State)
             {
                 case ValidationState.Unknown: break;
