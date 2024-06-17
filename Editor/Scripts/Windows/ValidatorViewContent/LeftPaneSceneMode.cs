@@ -80,7 +80,7 @@ internal static class LeftPaneSceneMode
             return;
         
         SaveValues.Validators.ShowChildren = evt.newValue;
-        ValidatorView.onSettingsChanged?.Invoke();
+        ValidatorView.onRefresh?.Invoke();
     }
 }
 

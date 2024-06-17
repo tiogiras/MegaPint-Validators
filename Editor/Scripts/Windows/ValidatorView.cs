@@ -20,10 +20,12 @@ namespace MegaPint.Editor.Scripts.Windows
 /// </summary>
 internal class ValidatorView : EditorWindowBase
 {
-    public static Action onSettingsChanged;
+    public static Action onRefresh; // TODO reload with new search on this event
     
     private VisualTreeAsset _baseWindow;
     private VisualTreeAsset _gameObjectItem;
+    private VisualTreeAsset _invalidBehaviourItem;
+    private VisualTreeAsset _errorItem;
 
     private static Button _btnSceneMode;
     private static Button _btnProjectMode;
@@ -72,12 +74,20 @@ internal class ValidatorView : EditorWindowBase
         _btnProjectMode = leftPane.Q <Button>("BTN_Project");
 
         s_btnErrors = leftPane.Q <Button>("BTN_Errors");
+        s_btnErrors.style.display = DisplayStyle.None;
+        
         s_btnWarnings = leftPane.Q <Button>("BTN_Warnings");
+        s_btnWarnings.style.display = DisplayStyle.None;
+        
         s_btnOk = leftPane.Q <Button>("BTN_Ok");
+        s_btnOk.style.display = DisplayStyle.None;
 
         s_noBehaviours = leftPane.Q <VisualElement>("NoBehaviours");
+        s_noBehaviours.style.display = DisplayStyle.None;
+        
         s_noSelection = leftPane.Q <VisualElement>("NoSelection");
-
+        s_noSelection.style.display = DisplayStyle.None;
+        
         s_gameObjectsView = leftPane.Q <ListView>("GameObjects");
 
         s_searchField = leftPane.Q <ToolbarSearchField>("SearchField");
@@ -93,6 +103,8 @@ internal class ValidatorView : EditorWindowBase
         
         LeftPaneSceneMode.SetReferences(refs);
         LeftPaneProjectMode.SetReferences(refs);
+
+        RightPane.CreateGUI(content.Q <VisualElement>("RightPane"), _invalidBehaviourItem, _errorItem);
         
         RegisterCallbacks();
 
@@ -109,6 +121,8 @@ internal class ValidatorView : EditorWindowBase
     {
         _baseWindow = Resources.Load <VisualTreeAsset>(BasePath());
         _gameObjectItem = Resources.Load <VisualTreeAsset>(Constants.Validators.UserInterface.ValidatorViewItem);
+        _invalidBehaviourItem = Resources.Load <VisualTreeAsset>(Constants.Validators.UserInterface.StatusBehaviour);
+        _errorItem = Resources.Load <VisualTreeAsset>(Constants.Validators.UserInterface.StatusError);
 
         return _baseWindow != null && _gameObjectItem != null;
     }
@@ -118,10 +132,13 @@ internal class ValidatorView : EditorWindowBase
         _btnSceneMode.clickable = new Clickable(() => {ChangeMode(true);});
         _btnProjectMode.clickable = new Clickable(() => {ChangeMode(false);});
 
-        s_gameObjectsView.makeItem = () => GUIUtility.Instantiate(_gameObjectItem);
-        
         s_searchField.RegisterValueChangedCallback(OnSearchFieldChanged);
+
+        s_gameObjectsView.itemsChosen += OnGameObjectSelectionConfirmed;
+        s_gameObjectsView.selectedIndicesChanged += OnGameObjectSelected;
         
+        s_gameObjectsView.makeItem = () => GUIUtility.Instantiate(_gameObjectItem);
+
         s_gameObjectsView.bindItem = (element, i) =>
         {
             var status = (ValidatableMonoBehaviourStatus) s_gameObjectsView.itemsSource[i];
@@ -138,6 +155,28 @@ internal class ValidatorView : EditorWindowBase
         _btnProjectMode.clickable = null;
         
         s_searchField.UnregisterValueChangedCallback(OnSearchFieldChanged);
+        
+        s_gameObjectsView.itemsChosen -= OnGameObjectSelectionConfirmed;
+        s_gameObjectsView.selectedIndicesChanged -= OnGameObjectSelected;
+    }
+
+    private void OnGameObjectSelected(IEnumerable <int> _)
+    {
+        if (s_gameObjectsView.selectedItem == null)
+            return;
+        
+        var status = (ValidatableMonoBehaviourStatus)s_gameObjectsView.selectedItem;
+
+        var path = _isSceneMode ? GetParentPath(status.transform) : AssetDatabase.GetAssetPath(status);
+
+        RightPane.Display(status, path);
+    }
+
+    private void OnGameObjectSelectionConfirmed(IEnumerable <object> _)
+    {
+        var status = (ValidatableMonoBehaviourStatus)s_gameObjectsView.selectedItem;
+        
+        Selection.activeObject = status;
     }
 
     private void OnSearchFieldChanged(ChangeEvent <string> _)
@@ -149,6 +188,8 @@ internal class ValidatorView : EditorWindowBase
     {
         _isSceneMode = isSceneMode;
         UpdateLeftPane();
+        
+        RightPane.Clear();
     }
 
     private static void UpdateLeftPane()
@@ -307,79 +348,9 @@ internal class ValidatorView : EditorWindowBase
         return path;
     }
 
-    /// <summary> Get all sub folders in the given folder </summary>
-    /// <param name="folderPath"> Path to the targeted folder </param>
-    /// <returns> List of all found sub folders of the targeted folder </returns>
-    private static IEnumerable <string> GetSubFolders(string folderPath)
-    {
-        List <string> subFolders = new();
 
-        subFolders.AddRange(AssetDatabase.GetSubFolders(folderPath).ToList());
 
-        if (subFolders.Count == 0)
-            return subFolders;
 
-        for (var i = 0; i < subFolders.Count; i++)
-        {
-            var subFolder = subFolders[i];
-            subFolders.AddRange(GetSubFolders(subFolder));
-        }
-
-        return subFolders;
-    }
-
-    /// <summary> Collect all guids in the selected folder </summary>
-    /// <returns> List of found guids </returns>
-    /*private string[] CollectGUIDsInFolder()
-    {
-        /*var searchFolder = SaveValues.Validators.SearchFolder;
-
-        if (string.IsNullOrEmpty(searchFolder))
-            return null;
-
-        if (_projectSearchMode.index == 1)
-        {
-            var path = Path.Combine(Application.dataPath, searchFolder[(searchFolder.Length > 6 ? 7 : 6)..]);
-            var files = Directory.GetFiles(path, "*.prefab");
-
-            return files.Select(file => AssetDatabase.AssetPathToGUID(file.Replace(Application.dataPath, "Assets"))).
-                         ToArray();
-        }
-
-        List <string> folders = new() {searchFolder};
-
-        folders.AddRange(GetSubFolders(searchFolder));
-
-        return AssetDatabase.FindAssets("t:prefab", folders.ToArray());#1#
-    }*/
-
-    /// <summary> Filter and collect all <see cref="ValidatableMonoBehaviour" /> of the guids </summary>
-    /// <param name="guids"> Guids to filter </param>
-    private void ConvertGUIDsToValidatableMonoBehaviours(string[] guids)
-    {
-        /*if (guids is not {Length: > 0})
-            return;
-
-        foreach (var guid in guids)
-        {
-            var path = AssetDatabase.GUIDToAssetPath(guid);
-            var asset = AssetDatabase.LoadAssetAtPath <GameObject>(path);
-
-            if (_showChildrenProject.value)
-            {
-                ValidatableMonoBehaviourStatus[] validators =
-                    asset.GetComponentsInChildren <ValidatableMonoBehaviourStatus>();
-
-                if (validators is {Length: > 0})
-                    _validatableMonoBehaviours.AddRange(validators);
-
-                continue;
-            }
-
-            if (asset.TryGetComponent(out ValidatableMonoBehaviourStatus validator))
-                _validatableMonoBehaviours.Add(validator);
-        }*/
-    }
 
     private static List <ValidatableMonoBehaviourStatus> s_displayedItems = new();
 
@@ -409,140 +380,6 @@ internal class ValidatorView : EditorWindowBase
 
         UpdateGameObjectsListViewVisibility();
         s_gameObjectsView.ClearSelection();
-    }
-
-    /// <summary> Fix all issues </summary>
-    private void FixAll()
-    {
-        /*ValidatableMonoBehaviourStatus status = _displayedItems[_mainList.selectedIndex];
-
-        foreach (ValidationError error in status.invalidBehaviours.SelectMany(
-                     invalidBehaviour => invalidBehaviour.errors))
-        {
-            if (error.fixAction == null)
-                Debug.LogWarning($"No FixAction specified for [{error.errorName}], requires manual attention!");
-            else
-                error.fixAction.Invoke(error.gameObject);
-        }
-
-        status.ValidateStatus();*/
-    }
-
-    /// <summary> Find all <see cref="ValidatableMonoBehaviour" /> in the project based on the given settings </summary>
-    private void PerformProjectSearch()
-    {
-        /*string[] prefabs;
-
-        switch (_projectSearchMode.index)
-        {
-            case 0:
-                prefabs = AssetDatabase.FindAssets("t:prefab");
-
-                break;
-
-            case 1 or 2:
-
-                prefabs = CollectGUIDsInFolder();
-
-                break;
-
-            default:
-                return;
-        }
-
-        ConvertGUIDsToValidatableMonoBehaviours(prefabs);*/
-    }
-
-    /// <summary> Find all <see cref="ValidatableMonoBehaviour" /> in the active scene based on the given settings </summary>
-    private void PerformSceneSearch()
-    {
-        /*ValidatableMonoBehaviourStatus[] behaviours = Resources.FindObjectsOfTypeAll <ValidatableMonoBehaviourStatus>();
-        behaviours = behaviours.Where(behaviour => behaviour.gameObject.scene.isLoaded).ToArray();
-
-        if (SaveValues.Validators.ShowChildren)
-        {
-            _validatableMonoBehaviours.AddRange(behaviours);
-
-            return;
-        }
-
-        foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
-        {
-            if (behaviour.transform.parent != null)
-            {
-                if (behaviour.transform.parent.GetComponentsInParent <ValidatableMonoBehaviourStatus>().Length > 0)
-                    continue;
-            }
-
-            _validatableMonoBehaviours.Add(behaviour);
-        }*/
-    }
-
-    /// <summary> Find the all <see cref="ValidatableMonoBehaviour" /> based on the current settings </summary>
-    /// <param name="mode"> Scene or Project </param>
-    private void PerformSearch()
-    {
-        /*UpdateCurrentSearchMode(mode);
-
-        _rightPane.style.display = DisplayStyle.None;
-        _mainList.ClearSelection();
-
-        _validatableMonoBehaviours.Clear();
-        _mainList.Clear();
-
-        _mainList.style.display = DisplayStyle.None;
-        _searchField.style.display = DisplayStyle.None;
-
-        switch (mode)
-        {
-            case SearchMode.None:
-                return;
-
-            case SearchMode.Scene:
-
-                PerformSceneSearch();
-
-                break;
-
-            case SearchMode.Project:
-
-                PerformProjectSearch();
-
-                break;
-
-            default:
-                return;
-        }
-
-        if (_validatableMonoBehaviours.Count == 0)
-            return;
-
-        for (var i = _validatableMonoBehaviours.Count - 1; i >= 0; i--)
-        {
-            ValidatableMonoBehaviourStatus validatableMonoBehaviourStatus = _validatableMonoBehaviours[i];
-
-            if (!_showChildren.value)
-            {
-                List <ValidatableMonoBehaviourStatus> parentStates =
-                    validatableMonoBehaviourStatus.GetComponentsInParent <ValidatableMonoBehaviourStatus>().ToList();
-
-                parentStates.Remove(validatableMonoBehaviourStatus);
-
-                if (parentStates.Any(state => state.ValidatesChildren()))
-                {
-                    _validatableMonoBehaviours.RemoveAt(i);
-
-                    continue;
-                }
-            }
-
-            validatableMonoBehaviourStatus.ValidateStatus();
-        }
-
-        DisplayBySearchField();
-
-        _mainList.style.display = DisplayStyle.Flex;
-        _searchField.style.display = DisplayStyle.Flex;*/
     }
 
     #endregion

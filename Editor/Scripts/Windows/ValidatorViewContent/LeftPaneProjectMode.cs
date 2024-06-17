@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace MegaPint.Editor.Scripts.Windows.ValidatorViewContent
@@ -12,13 +15,11 @@ internal static class LeftPaneProjectMode
 
     public static bool CollectInvalidObjects(out List<ValidatableMonoBehaviourStatus> errors, out List<ValidatableMonoBehaviourStatus> warnings, out List <ValidatableMonoBehaviourStatus> ok)
     {
-        ValidatableMonoBehaviourStatus[] behaviours = null; // TODO get stuff
+        ValidatableMonoBehaviourStatus[] behaviours = CollectBehaviours();
 
         errors = new List<ValidatableMonoBehaviourStatus>();
         warnings = new List <ValidatableMonoBehaviourStatus>();
         ok = new List <ValidatableMonoBehaviourStatus>();
-        
-        return false; // TODO remove
 
         if (behaviours.Length == 0)
             return false;
@@ -47,6 +48,106 @@ internal static class LeftPaneProjectMode
         }
 
         return true;
+    }
+
+    private static ValidatableMonoBehaviourStatus[] CollectBehaviours()
+    {
+        string[] guids;
+        
+        switch (SaveValues.Validators.SearchMode)
+        {
+            case 0:
+                guids = AssetDatabase.FindAssets("t:prefab");
+                break;
+            case 1 or 2:
+
+                guids = CollectGUIDsInFolder();
+
+                break;
+            
+            default:
+                return null;
+        }
+
+        return ConvertGUIDsToValidatableMonoBehaviours(guids);
+    }
+    
+    /// <summary> Collect all guids in the selected folder </summary>
+    /// <returns> List of found guids </returns>
+    private static string[] CollectGUIDsInFolder()
+    {
+        var searchFolder = SaveValues.Validators.SearchFolder;
+
+        if (string.IsNullOrEmpty(searchFolder))
+            return null;
+
+        if (SaveValues.Validators.SearchMode == 1)
+        {
+            var path = Path.Combine(Application.dataPath, searchFolder[(searchFolder.Length > 6 ? 7 : 6)..]);
+            var files = Directory.GetFiles(path, "*.prefab");
+
+            return files.Select(file => AssetDatabase.AssetPathToGUID(file.Replace(Application.dataPath, "Assets"))).
+                         ToArray();
+        }
+
+        List <string> folders = new() {searchFolder};
+
+        folders.AddRange(GetSubFolders(searchFolder));
+
+        return AssetDatabase.FindAssets("t:prefab", folders.ToArray());
+    }
+    
+    /// <summary> Get all sub folders in the given folder </summary>
+    /// <param name="folderPath"> Path to the targeted folder </param>
+    /// <returns> List of all found sub folders of the targeted folder </returns>
+    private static IEnumerable <string> GetSubFolders(string folderPath)
+    {
+        List <string> subFolders = new();
+
+        subFolders.AddRange(AssetDatabase.GetSubFolders(folderPath).ToList());
+
+        if (subFolders.Count == 0)
+            return subFolders;
+
+        for (var i = 0; i < subFolders.Count; i++)
+        {
+            var subFolder = subFolders[i];
+            subFolders.AddRange(GetSubFolders(subFolder));
+        }
+
+        return subFolders;
+    }
+
+    /// <summary> Filter and collect all <see cref="ValidatableMonoBehaviour" /> of the guids </summary>
+    /// <param name="guids"> Guids to filter </param>
+    private static ValidatableMonoBehaviourStatus[] ConvertGUIDsToValidatableMonoBehaviours(string[] guids)
+    {
+        if (guids is not {Length: > 0})
+            return null;
+        
+        List <ValidatableMonoBehaviourStatus> validatableMonoBehaviours = new();
+
+        foreach (var guid in guids)
+        {
+            var path = AssetDatabase.GUIDToAssetPath(guid);
+            var asset = AssetDatabase.LoadAssetAtPath <GameObject>(path);
+
+            if (SaveValues.Validators.ShowChildrenProject)
+            {
+                ValidatableMonoBehaviourStatus[] validators =
+                    asset.GetComponentsInChildren <ValidatableMonoBehaviourStatus>();
+
+                if (validators is {Length: > 0})
+                    validatableMonoBehaviours.AddRange(validators);
+
+                continue;
+            }
+
+            if (asset.TryGetComponent(out ValidatableMonoBehaviourStatus validator))
+                validatableMonoBehaviours.Add(validator);
+        }
+
+        return validatableMonoBehaviours.ToArray();
     }
     
     public static void SetReferences(LeftPaneReferences refs)
@@ -114,7 +215,7 @@ internal static class LeftPaneProjectMode
         
         UpdateFolderPath(relativePath);
         SaveValues.Validators.SearchFolder = relativePath;
-        ValidatorView.onSettingsChanged?.Invoke();
+        ValidatorView.onRefresh?.Invoke();
     }
 
     private static void OnShowChildrenChanged(ChangeEvent <bool> evt)
@@ -123,7 +224,7 @@ internal static class LeftPaneProjectMode
             return;
         
         SaveValues.Validators.ShowChildrenProject = evt.newValue;
-        ValidatorView.onSettingsChanged?.Invoke();
+        ValidatorView.onRefresh?.Invoke();
     }
     
     private static void OnSearchModeChanged(ChangeEvent<string> evt)
@@ -135,7 +236,7 @@ internal static class LeftPaneProjectMode
         
         UpdateChangeButtonParent(newValue);
         SaveValues.Validators.SearchMode = newValue;
-        ValidatorView.onSettingsChanged?.Invoke();
+        ValidatorView.onRefresh?.Invoke();
     }
 
     private static int TranslateSearchMode(string mode)

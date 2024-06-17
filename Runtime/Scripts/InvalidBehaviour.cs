@@ -8,6 +8,7 @@ namespace MegaPint
 public struct InvalidBehaviour : IComparable <InvalidBehaviour>
 {
     public string behaviourName;
+    public string shortBehaviourName;
     public List <ValidationError> errors;
 
     /// <summary> Compare method </summary>
