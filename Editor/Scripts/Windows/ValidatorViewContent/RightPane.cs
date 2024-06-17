@@ -82,7 +82,9 @@ internal static class RightPane
 
         s_content.style.display = DisplayStyle.Flex;
 
-        Refresh();
+        s_content.schedule.Execute(Refresh);
+        
+        //Refresh();
     }
 
     #endregion
@@ -134,7 +136,6 @@ internal static class RightPane
             {
                 // For some odd reason the list view updates but doesn't show the items in some cases
                 // By setting the display to none and then back to flex it forces the list view to update
-
                 s_ignoreUnbindEvent = true;
                 s_invalidBehavioursView.style.display = DisplayStyle.Flex;
                 s_invalidBehavioursView.RefreshItems();
@@ -207,9 +208,13 @@ internal static class RightPane
                 error.severity == ValidationState.Ok ? DisplayStyle.Flex : DisplayStyle.None;
 
             Action <GameObject> fixAction = error.fixAction;
+            var hasFixAction = fixAction != null;
 
+            var noFixAction = element.Q <VisualElement>("NoFixAction");
+            noFixAction.style.display = !hasFixAction ? DisplayStyle.Flex : DisplayStyle.None;
+            
             var fixButton = element.Q <Button>("BTN_Fix");
-            fixButton.style.display = fixAction != null ? DisplayStyle.Flex : DisplayStyle.None;
+            fixButton.style.display = hasFixAction ? DisplayStyle.Flex : DisplayStyle.None;
 
             fixButton.clickable = new Clickable(
                 () =>
