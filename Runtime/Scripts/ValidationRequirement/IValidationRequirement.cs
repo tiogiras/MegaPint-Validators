@@ -12,7 +12,7 @@ public interface IValidationRequirement
     #region Unity Event Functions
 
     /// <summary> Called when the <see cref="ValidatableMonoBehaviour" /> is validated by unity  </summary>
-    public void OnValidate();
+    public void OnValidate(ValidatableMonoBehaviour behaviour);
 
     #endregion
 

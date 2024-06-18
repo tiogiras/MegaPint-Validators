@@ -22,8 +22,28 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     [SerializeReferenceDropdown] [SerializeReference]
     private List <IValidationRequirement> _requirements;
 
+    //[HideInInspector] // TODO reenable
+    public List <string> initializedRequirements;
+
     private ValidatableMonoBehaviourStatus _status;
 
+    // TODO commenting
+    public bool IsInitialized(IValidationRequirement requirement)
+    {
+        initializedRequirements ??= new List <string>();
+
+        return initializedRequirements.Contains(requirement.GetType().ToString());
+    }
+
+    // TODO commenting
+    public void OnRequirementInitialization(IValidationRequirement requirement)
+    {
+        initializedRequirements ??= new List <string>();
+        
+        if (!initializedRequirements.Contains(requirement.GetType().ToString()))
+            initializedRequirements.Add(requirement.GetType().ToString());
+    }
+    
     #region Unity Event Functions
 
     public void OnValidate()
@@ -43,7 +63,19 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
             return;
 
         foreach (IValidationRequirement requirement in _activeRequirements)
-            requirement?.OnValidate();
+        {
+            requirement?.OnValidate(this);
+        }
+
+        List <string> cleanedInitializedRequirements = (from requirement in _requirements
+                                                        where requirement != null
+                                                        select requirement.GetType().ToString()
+                                                        into typeName
+                                                        where initializedRequirements.Contains(typeName)
+                                                        select initializedRequirements[
+                                                            initializedRequirements.IndexOf(typeName)]).ToList();
+
+        initializedRequirements = cleanedInitializedRequirements;
 
         _status.ValidateStatus();
     }
@@ -97,7 +129,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     /// <returns> If the requirement is set on this gameObject </returns>
     public bool ValidatesChildren()
     {
-        return _activeRequirements.Any(requirement => requirement.GetType() == typeof(RequireChildrenValidation));
+        return _activeRequirements.Any(requirement => requirement?.GetType() == typeof(RequireChildrenValidation));
     }
 
     #endregion
