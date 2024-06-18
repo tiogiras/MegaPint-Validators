@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace MegaPint.ValidationRequirement
@@ -64,13 +65,22 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
     /// <param name="fixAction"> Action that is called when attempting to fix the error </param>
     protected void AddError(string errorName, string errorText, ValidationState severity, Action <GameObject> fixAction)
     {
+        Action <GameObject> finalFixAction = fixAction == null
+            ? null
+            : o =>
+            {
+                Undo.RegisterCompleteObjectUndo(o, errorName);
+                fixAction.Invoke(o);
+                EditorUtility.SetDirty(o);
+            };
+
         _errors.Add(
             new ValidationError
             {
                 errorName = errorName,
                 errorText = errorText,
                 gameObject = _gameObject,
-                fixAction = fixAction,
+                fixAction = finalFixAction,
                 severity = severity
             });
     }
