@@ -24,9 +24,21 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
     private VisualTreeAsset _configTemplate;
 
     private ListView _listView;
+
+    private VisualElement _root;
     private VisualTreeAsset _typeEntryTemplate;
 
     private List <ComponentOrderConfig.Type> _types;
+
+    #region Unity Event Functions
+
+    private void OnDestroy()
+    {
+        VisualElement upperParent = GUIUtility.SetParentFlexGrowRecursive(_root, 3, false);
+        upperParent.Q <VisualElement>("unity-content-container").style.flexGrow = 0f;
+    }
+
+    #endregion
 
     #region Public Methods
 
@@ -34,16 +46,16 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
     {
         _configTemplate = Resources.Load <VisualTreeAsset>(Constants.Validators.UserInterface.ComponentOrderConfig);
 
-        VisualElement root = GUIUtility.Instantiate(_configTemplate);
-        root.style.flexGrow = 1f;
+        _root = GUIUtility.Instantiate(_configTemplate);
+        _root.style.flexGrow = 1f;
 
-        var addButton = root.Q <Button>("BTN_Add");
+        var addButton = _root.Q <Button>("BTN_Add");
         addButton.clicked += AddListElement;
 
-        var removeButton = root.Q <Button>("BTN_Remove");
+        var removeButton = _root.Q <Button>("BTN_Remove");
         removeButton.clicked += RemoveListElement;
 
-        var categoryDropdown = root.Q <DropdownField>("CategoryDropdown");
+        var categoryDropdown = _root.Q <DropdownField>("CategoryDropdown");
         categoryDropdown.choices = Enum.GetNames(typeof(ComponentOrderConfig.CategoryFunction)).ToList();
         categoryDropdown.choices.Remove("Fill");
 
@@ -63,7 +75,7 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                 categoryDropdown.index = 0;
             });
 
-        _listView = root.Q <ListView>();
+        _listView = _root.Q <ListView>();
 
         _typeEntryTemplate =
             Resources.Load <VisualTreeAsset>(Constants.Validators.UserInterface.ComponentOrderTypeEntry);
@@ -76,20 +88,20 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
         _listView.itemsSource = _types;
         _listView.RefreshItems();
 
-        root.schedule.Execute(
+        _root.schedule.Execute(
             () =>
             {
-                root.parent.styleSheets.Add(StyleSheetValues.BaseStyleSheet);
-                root.parent.styleSheets.Add(StyleSheetValues.AttributesStyleSheet);
+                _root.parent.styleSheets.Add(StyleSheetValues.BaseStyleSheet);
+                _root.parent.styleSheets.Add(StyleSheetValues.AttributesStyleSheet);
 
-                VisualElement upperParent = GUIUtility.SetParentFlexGrowRecursive(root, 4, true);
+                VisualElement upperParent = GUIUtility.SetParentFlexGrowRecursive(_root, 3, true);
                 upperParent.Q <VisualElement>("unity-content-container").style.flexGrow = 1f;
 
-                GUIUtility.ApplyRootElementTheme(root.parent);
-                root.parent.AddToClassList(StyleSheetClasses.Background.Color.Tertiary);
+                GUIUtility.ApplyRootElementTheme(_root.parent);
+                _root.parent.AddToClassList(StyleSheetClasses.Background.Color.Tertiary);
             });
 
-        return root;
+        return _root;
     }
 
     #endregion
