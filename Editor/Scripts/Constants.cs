@@ -13,12 +13,13 @@ internal static partial class Constants
         {
             private static readonly string s_images = Path.Combine(s_base, "Images");
             public static readonly string ManualIssue = Path.Combine(s_images, "Manual Issue");
+            public static readonly string Refresh = Path.Combine(s_images, "Refresh");
         }
 
         public static class Links
         {
-            public const string CreateValidatorSettings = "Assets/Create/MegaPint/Validators/";
-            public const string CreateComponentOrderConfig = "Assets/Create/MegaPint/Validators/";
+            public const string CreateValidatorSettings = "Assets/Create/MegaPint/Validators/Validator Settings";
+            public const string CreateComponentOrderConfig = "Assets/Create/MegaPint/Validators/Component Order Config";
 
             public static readonly string ValidatorView = Utility.CombineMenuItemPath(
                 ContextMenu.MenuItemPackages,
