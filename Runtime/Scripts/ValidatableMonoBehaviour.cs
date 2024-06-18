@@ -3,6 +3,7 @@ using System.Linq;
 using MegaPint.SerializeReferenceDropdown.Runtime;
 using MegaPint.ValidationRequirement;
 using MegaPint.ValidationRequirement.Requirements;
+using UnityEditor;
 using UnityEngine;
 
 namespace MegaPint
@@ -43,7 +44,13 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
             return;
 
         foreach (IValidationRequirement requirement in _activeRequirements)
-            requirement?.OnValidate();
+        {
+            if (requirement == null)
+                continue;
+            
+            if (requirement.OnValidate())
+                EditorUtility.SetDirty(gameObject);
+        }
 
         _status.ValidateStatus();
     }
@@ -97,7 +104,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     /// <returns> If the requirement is set on this gameObject </returns>
     public bool ValidatesChildren()
     {
-        return _activeRequirements.Any(requirement => requirement.GetType() == typeof(RequireChildrenValidation));
+        return _activeRequirements.Any(requirement => requirement?.GetType() == typeof(RequireChildrenValidation));
     }
 
     #endregion

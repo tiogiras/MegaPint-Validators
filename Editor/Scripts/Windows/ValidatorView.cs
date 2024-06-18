@@ -29,6 +29,7 @@ internal class ValidatorView : EditorWindowBase
     private static Button s_btnWarnings;
     private static Button s_btnOk;
     private static Button s_btnFixAll;
+    private static Button s_btnRefresh;
 
     private static VisualElement s_noBehaviours;
     private static VisualElement s_noSelection;
@@ -137,6 +138,7 @@ internal class ValidatorView : EditorWindowBase
         s_btnSceneMode = leftPane.Q <Button>("BTN_Scene");
         s_btnProjectMode = leftPane.Q <Button>("BTN_Project");
         s_btnFixAll = leftPane.Q <Button>("BTN_FixAll");
+        s_btnRefresh = leftPane.Q <Button>("BTN_Refresh");
 
         s_btnErrors = leftPane.Q <Button>("BTN_Errors");
         s_btnWarnings = leftPane.Q <Button>("BTN_Warnings");
@@ -188,6 +190,7 @@ internal class ValidatorView : EditorWindowBase
         s_btnProjectMode.clickable = new Clickable(() => {ChangeMode(false);});
 
         s_btnFixAll.clicked += FixAll;
+        s_btnRefresh.clicked += UpdateLeftPane;
 
         s_btnErrors.clicked += OnErrorButton;
         s_btnWarnings.clicked += OnWarningButton;
@@ -239,6 +242,7 @@ internal class ValidatorView : EditorWindowBase
         s_btnProjectMode.clickable = null;
 
         s_btnFixAll.clicked -= FixAll;
+        s_btnRefresh.clicked -= UpdateLeftPane;
 
         s_btnErrors.clicked -= OnErrorButton;
         s_btnWarnings.clicked -= OnWarningButton;
@@ -257,6 +261,7 @@ internal class ValidatorView : EditorWindowBase
 
     #region Private Methods
 
+    // TODO comments
     private static bool CollectInvalidGameObjects(
         out List <ValidatableMonoBehaviourStatus> errors,
         out List <ValidatableMonoBehaviourStatus> warnings,
@@ -307,6 +312,7 @@ internal class ValidatorView : EditorWindowBase
         s_gameObjectsView.ClearSelection();
     }
 
+    // TODO comments
     private static void StopListeningToValidationEvents()
     {
         if (s_displayedItems.Count == 0)
@@ -318,6 +324,7 @@ internal class ValidatorView : EditorWindowBase
         }
     }
     
+    // TODO comments
     private static void ListenToValidationEvents()
     {
         if (s_displayedItems.Count == 0)
@@ -329,6 +336,7 @@ internal class ValidatorView : EditorWindowBase
         }
     }
 
+    // TODO comments
     private static void OnStatusChanged(ValidatableMonoBehaviourStatus behaviour)
     {
         UpdateBehaviourBasedOnState(behaviour);
@@ -441,7 +449,7 @@ internal class ValidatorView : EditorWindowBase
 
     private static void UpdateFixAllButton()
     {
-        if (s_displayedListIndex == -1 || s_displayedItems.Count == 2)
+        if (s_displayedListIndex is -1 or 2)
         {
             s_btnFixAll.style.display = DisplayStyle.None;
 

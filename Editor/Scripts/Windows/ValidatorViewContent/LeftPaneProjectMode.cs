@@ -159,7 +159,7 @@ internal static class LeftPaneProjectMode
             if (SaveValues.Validators.ShowChildrenProject)
             {
                 ValidatableMonoBehaviourStatus[] validators =
-                    asset.GetComponentsInChildren <ValidatableMonoBehaviourStatus>();
+                    asset.GetComponentsInChildren <ValidatableMonoBehaviourStatus>(true);
 
                 if (validators is {Length: > 0})
                     validatableMonoBehaviours.AddRange(validators);

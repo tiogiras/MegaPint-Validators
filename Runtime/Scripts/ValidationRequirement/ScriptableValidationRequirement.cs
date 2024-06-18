@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace MegaPint.ValidationRequirement
 {
@@ -17,9 +19,9 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
     #region Unity Event Functions
 
     /// <summary> Called when the <see cref="ValidatableMonoBehaviour" /> is validated by unity </summary>
-    public virtual void OnValidate()
+    public virtual bool OnValidate()
     {
-        TryInitialize();
+        return TryInitialize();
     }
 
     #endregion
@@ -69,9 +71,14 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
             ? null
             : o =>
             {
-                Undo.RegisterCompleteObjectUndo(o, errorName);
-                fixAction.Invoke(o);
-                EditorUtility.SetDirty(o);
+                if (o.scene.name == null && o.transform.parent != null)
+                    ExecuteFixActionForChildInPrefab(o, fixAction);
+                else
+                {
+                    Undo.RegisterCompleteObjectUndo(o, errorName);
+                    fixAction.Invoke(o);
+                    EditorUtility.SetDirty(o);
+                }
             };
 
         _errors.Add(
@@ -83,6 +90,68 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
                 fixAction = finalFixAction,
                 severity = severity
             });
+    }
+
+    // TODO commenting
+    private void ExecuteFixActionForChildInPrefab(GameObject o, Action <GameObject> fixAction)
+    {
+        var prefabPath = AssetDatabase.GetAssetPath(o);
+        var prefab = AssetDatabase.LoadAssetAtPath <GameObject>(prefabPath);
+
+        var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                    
+        GameObject gameObject = GetObjectPyParentPath(GetPathToRoot(o.transform), instance.transform);
+                    
+        if (gameObject == null)
+            return;
+                    
+        fixAction.Invoke(gameObject);
+                    
+        PrefabUtility.ApplyPrefabInstance(instance, InteractionMode.AutomatedAction);
+        Object.DestroyImmediate(instance);
+        
+        EditorUtility.SetDirty(prefab);
+    }
+
+    // TODO commenting
+    private string GetPathToRoot(Transform transform)
+    {
+        List <Transform> path = new();
+
+        while (transform != null)
+        {
+            path.Add(transform);
+            transform = transform.parent;
+        }
+        
+        path.Reverse();
+
+        return string.Join("/", path.Select(p => p.name));
+    }
+    
+    // TODO commenting
+    private GameObject GetObjectPyParentPath(string path, Transform root)
+    {
+        if (path.Equals(root.name))
+            return root.gameObject;
+        
+        if (!path.StartsWith($"{root.name}/"))
+        {
+            Debug.LogError("Could not find root transform of the prefab hierarchy!");
+
+            return null;
+        }
+
+        path = path[(root.name.Length + 1)..];
+
+        Transform gameObject = root.Find(path);
+
+        if (gameObject != null)
+            return gameObject.gameObject;
+
+        Debug.LogError("Could not find the targeted object inside the prefab hierarchy!");
+
+        return null;
     }
 
     /// <summary> Validates the gameObject </summary>

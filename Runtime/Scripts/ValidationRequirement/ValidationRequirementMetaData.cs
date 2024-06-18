@@ -1,4 +1,7 @@
-﻿namespace MegaPint.ValidationRequirement
+﻿using UnityEditor;
+using UnityEngine;
+
+namespace MegaPint.ValidationRequirement
 {
 
 /// <summary>
@@ -21,13 +24,16 @@ public abstract class ValidationRequirementMetaData
     ///     Calls <see cref="OnInitialization" /> when the <see cref="ScriptableValidationRequirement" /> has not been
     ///     initialized
     /// </summary>
-    protected void TryInitialize()
+    protected bool TryInitialize()
     {
         if (_initialized)
-            return;
+            return false;
 
+        Debug.Log("Initializing with default values"); // TODO remove
         OnInitialization();
         _initialized = true;
+
+        return true;
     }
 
     #endregion
