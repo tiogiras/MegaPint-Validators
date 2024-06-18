@@ -19,9 +19,9 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
     #region Unity Event Functions
 
     /// <summary> Called when the <see cref="ValidatableMonoBehaviour" /> is validated by unity </summary>
-    public virtual bool OnValidate()
+    public virtual void OnValidate(ValidatableMonoBehaviour behaviour)
     {
-        return TryInitialize();
+        TryInitialize(behaviour, this);
     }
 
     #endregion

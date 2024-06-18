@@ -3,7 +3,6 @@ using System.Linq;
 using MegaPint.SerializeReferenceDropdown.Runtime;
 using MegaPint.ValidationRequirement;
 using MegaPint.ValidationRequirement.Requirements;
-using UnityEditor;
 using UnityEngine;
 
 namespace MegaPint
@@ -23,8 +22,28 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     [SerializeReferenceDropdown] [SerializeReference]
     private List <IValidationRequirement> _requirements;
 
+    //[HideInInspector] // TODO reenable
+    public List <string> initializedRequirements;
+
     private ValidatableMonoBehaviourStatus _status;
 
+    // TODO commenting
+    public bool IsInitialized(IValidationRequirement requirement)
+    {
+        initializedRequirements ??= new List <string>();
+
+        return initializedRequirements.Contains(requirement.GetType().ToString());
+    }
+
+    // TODO commenting
+    public void OnRequirementInitialization(IValidationRequirement requirement)
+    {
+        initializedRequirements ??= new List <string>();
+        
+        if (!initializedRequirements.Contains(requirement.GetType().ToString()))
+            initializedRequirements.Add(requirement.GetType().ToString());
+    }
+    
     #region Unity Event Functions
 
     public void OnValidate()
@@ -45,12 +64,18 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
         foreach (IValidationRequirement requirement in _activeRequirements)
         {
-            if (requirement == null)
-                continue;
-            
-            if (requirement.OnValidate())
-                EditorUtility.SetDirty(gameObject);
+            requirement?.OnValidate(this);
         }
+
+        List <string> cleanedInitializedRequirements = (from requirement in _requirements
+                                                        where requirement != null
+                                                        select requirement.GetType().ToString()
+                                                        into typeName
+                                                        where initializedRequirements.Contains(typeName)
+                                                        select initializedRequirements[
+                                                            initializedRequirements.IndexOf(typeName)]).ToList();
+
+        initializedRequirements = cleanedInitializedRequirements;
 
         _status.ValidateStatus();
     }

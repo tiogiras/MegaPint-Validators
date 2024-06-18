@@ -1,7 +1,4 @@
-﻿using UnityEditor;
-using UnityEngine;
-
-namespace MegaPint.ValidationRequirement
+﻿namespace MegaPint.ValidationRequirement
 {
 
 /// <summary>
@@ -10,8 +7,6 @@ namespace MegaPint.ValidationRequirement
 /// </summary>
 public abstract class ValidationRequirementMetaData
 {
-    private bool _initialized;
-
     #region Protected Methods
 
     /// <summary>
@@ -20,20 +15,19 @@ public abstract class ValidationRequirementMetaData
     /// </summary>
     protected abstract void OnInitialization();
 
+    // TODO commenting
     /// <summary>
     ///     Calls <see cref="OnInitialization" /> when the <see cref="ScriptableValidationRequirement" /> has not been
     ///     initialized
     /// </summary>
-    protected bool TryInitialize()
+    protected void TryInitialize(ValidatableMonoBehaviour behaviour, IValidationRequirement requirement)
     {
-        if (_initialized)
-            return false;
-
-        Debug.Log("Initializing with default values"); // TODO remove
+        if (behaviour.IsInitialized(requirement))
+            return;
+        
         OnInitialization();
-        _initialized = true;
-
-        return true;
+        
+        behaviour.OnRequirementInitialization(requirement);
     }
 
     #endregion
