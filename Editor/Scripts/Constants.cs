@@ -97,23 +97,23 @@ internal static partial class Constants
 
             public static readonly string RequireLocalTransform = Path.Combine(
                 s_localTransform,
-                "[Test] Require Global Transform");
+                "[Test] Require Local Transform");
 
             public static readonly string RequireLocalTransform1 = Path.Combine(
                 s_localTransform,
-                "[Test] Require Global Transform 1");
+                "[Test] Require Local Transform 1");
 
             public static readonly string RequireLocalTransform2 = Path.Combine(
                 s_localTransform,
-                "[Test] Require Global Transform 2");
+                "[Test] Require Local Transform 2");
 
             public static readonly string RequireLocalTransform3 = Path.Combine(
                 s_localTransform,
-                "[Test] Require Global Transform 3");
+                "[Test] Require Local Transform 3");
 
             public static readonly string RequireLocalTransform4 = Path.Combine(
                 s_localTransform,
-                "[Test] Require Global Transform 4");
+                "[Test] Require Local Transform 4");
         }
 
         public static class UserInterface
