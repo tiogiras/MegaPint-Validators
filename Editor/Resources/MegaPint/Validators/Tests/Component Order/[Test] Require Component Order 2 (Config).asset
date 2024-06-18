@@ -10,13 +10,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 70e8b0bd73e74b63b2b7cc6111c1563c, type: 3}
-  m_Name: '[Test] Require Custom Naming 1 (Config)'
+  m_Name: '[Test] Require Component Order 2 (Config)'
   m_EditorClassIdentifier: 
   types:
   - canBeModified: 0
     canBeDeleted: 0
     componentName: ValidatableMonoBehaviourStatus
     tooltip: Component to display the validation status of this gameObject
+    isCategory: 0
+    category:
+      function: 0
+      nameSpaceString: 
+  - canBeModified: 1
+    canBeDeleted: 1
+    componentName: Non-Unity Components
+    tooltip: All components that are not in the UnityEngine namespace will be placed
+      here.
+    isCategory: 1
+    category:
+      function: 1
+      nameSpaceString: 
+  - canBeModified: 1
+    canBeDeleted: 1
+    componentName: Rigidbody
+    tooltip: 
     isCategory: 0
     category:
       function: 0

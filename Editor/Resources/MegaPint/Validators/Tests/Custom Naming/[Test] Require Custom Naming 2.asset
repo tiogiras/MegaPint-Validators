@@ -21,4 +21,4 @@ MonoBehaviour:
       type: {class: RequireCustomName, ns: MegaPint.ValidationRequirement.Requirements, asm: tiogiras.megapint.validators.runtime}
       data:
         name: 
-        _regexPattern: 
+        _regexPattern: ^((?!_).)*$

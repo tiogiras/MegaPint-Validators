@@ -1,7 +1,9 @@
 ﻿#if UNITY_EDITOR
 #if UNITY_INCLUDE_TESTS
 using System.Collections;
+using MegaPint.Tests;
 using NUnit.Framework;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -20,24 +22,21 @@ internal class RequireComponentOrder
 
         yield return RequirementTests.TestRequirement(
             settings,
-            o =>
-            {
-                // TODO
-            },
-            ValidationState.Warning,
-            true);
+            null,
+            ValidationState.Ok,
+            false);
     }
     
     [UnityTest] [Order(1)]
     public IEnumerator Test1()
     {
-        var settings = Resources.Load <ValidatorSettings>(Constants.Validators.Tests.RequireComponentOrder1);
+        var settings = Resources.Load <ValidatorSettings>(Constants.Validators.Tests.RequireComponentOrder);
 
         yield return RequirementTests.TestRequirement(
             settings,
             o =>
             {
-                // TODO
+                ComponentUtility.MoveComponentUp(o.GetComponent <TestBehaviour>());
             },
             ValidationState.Warning,
             true);
@@ -46,13 +45,29 @@ internal class RequireComponentOrder
     [UnityTest] [Order(2)]
     public IEnumerator Test2()
     {
+        var settings = Resources.Load <ValidatorSettings>(Constants.Validators.Tests.RequireComponentOrder1);
+
+        yield return RequirementTests.TestRequirement(
+            settings,
+            o =>
+            {
+                ComponentUtility.MoveComponentUp(o.AddComponent <Rigidbody>());
+            },
+            ValidationState.Warning,
+            true);
+    }
+    
+    [UnityTest] [Order(3)]
+    public IEnumerator Test3()
+    {
         var settings = Resources.Load <ValidatorSettings>(Constants.Validators.Tests.RequireComponentOrder2);
 
         yield return RequirementTests.TestRequirement(
             settings,
             o =>
             {
-                // TODO
+                o.AddComponent <BoxCollider>();
+                o.AddComponent <Rigidbody>();
             },
             ValidationState.Warning,
             true);

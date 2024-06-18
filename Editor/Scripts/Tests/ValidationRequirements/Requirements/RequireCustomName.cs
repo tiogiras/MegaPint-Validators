@@ -20,14 +20,11 @@ internal class RequireCustomName
 
         yield return RequirementTests.TestRequirement(
             settings,
-            o =>
-            {
-                // TODO
-            },
-            ValidationState.Warning,
-            true);
+            null,
+            ValidationState.Ok,
+            false);
     }
-    
+
     [UnityTest] [Order(1)]
     public IEnumerator Test1()
     {
@@ -35,27 +32,45 @@ internal class RequireCustomName
 
         yield return RequirementTests.TestRequirement(
             settings,
-            o =>
-            {
-                // TODO
-            },
+            o => {o.gameObject.name = "Custom Name";},
             ValidationState.Warning,
-            true);
+            false);
     }
     
     [UnityTest] [Order(2)]
     public IEnumerator Test2()
     {
+        var settings = Resources.Load <ValidatorSettings>(Constants.Validators.Tests.RequireCustomNaming1);
+
+        yield return RequirementTests.TestRequirement(
+            settings,
+            o => {o.gameObject.name = "[Test] Custom Name";},
+            ValidationState.Ok,
+            false);
+    }
+
+    [UnityTest] [Order(3)]
+    public IEnumerator Test3()
+    {
         var settings = Resources.Load <ValidatorSettings>(Constants.Validators.Tests.RequireCustomNaming2);
 
         yield return RequirementTests.TestRequirement(
             settings,
-            o =>
-            {
-                // TODO
-            },
+            o => {o.gameObject.name = "Custom_Name";},
             ValidationState.Warning,
-            true);
+            false);
+    }
+    
+    [UnityTest] [Order(4)]
+    public IEnumerator Test4()
+    {
+        var settings = Resources.Load <ValidatorSettings>(Constants.Validators.Tests.RequireCustomNaming2);
+
+        yield return RequirementTests.TestRequirement(
+            settings,
+            o => {o.gameObject.name = "Custom Name";},
+            ValidationState.Ok,
+            false);
     }
 
     #endregion

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 70e8b0bd73e74b63b2b7cc6111c1563c, type: 3}
-  m_Name: '[Test] Require Custom Naming 2 (Config)'
+  m_Name: '[Test] Require Component Order 1 (Config)'
   m_EditorClassIdentifier: 
   types:
   - canBeModified: 0
@@ -21,6 +21,15 @@ MonoBehaviour:
     category:
       function: 0
       nameSpaceString: 
+  - canBeModified: 1
+    canBeDeleted: 1
+    componentName: Namespace Contains
+    tooltip: All components that contain the given string in their namespace will
+      be placed here.
+    isCategory: 1
+    category:
+      function: 2
+      nameSpaceString: MegaPint
   - canBeModified: 0
     canBeDeleted: 0
     componentName: Fill

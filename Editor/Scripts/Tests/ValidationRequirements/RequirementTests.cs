@@ -22,6 +22,9 @@ internal static class RequirementTests
         ValidationState expectedStateAfterValidation,
         bool canBeFixed)
     {
+        if (settings == null)
+            Assert.Fail("Settings are null!");
+        
         // Create test object
         var testObject = new GameObject();
         var validatableMonoBehaviour = testObject.AddComponent <TestBehaviour>();
@@ -58,8 +61,8 @@ internal static class RequirementTests
         state = validatableMonoBehaviour.Validate(out List <ValidationError> _);
         
         Assert.AreEqual(
-            state,
             ValidationState.Ok,
+            state,
             "AutoFix action did not fix the issue but the requirement expected it to!");
     }
 

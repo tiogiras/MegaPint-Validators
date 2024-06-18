@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MegaPint.SerializeReferenceDropdown.Runtime;
 using UnityEngine;
 
@@ -32,9 +33,12 @@ public class RequireChildrenValidation : ScriptableValidationRequirement
         foreach (ValidatableMonoBehaviourStatus behaviourStatus in behaviourStates)
             myStatus.invalidBehaviours.AddRange(behaviourStatus.invalidBehaviours);
 
+        var hasFixableErrors =
+            myStatus.invalidBehaviours.Any(behaviour => behaviour.errors.Any(error => error.fixAction != null));
+
         var errorText = $"Errors found under the following gameObjects:\n{string.Join("\n", invalidGameObjects)}";
 
-        AddError("Invalid monoBehaviours in children", errorText, severity, null);
+        AddError("Invalid monoBehaviours in children", errorText, severity, hasFixableErrors ? FixAction : null);
     }
 
     #endregion
@@ -77,6 +81,22 @@ public class RequireChildrenValidation : ScriptableValidationRequirement
         }
 
         return behaviourStates;
+    }
+
+    /// <summary> Call fix all on all child <see cref="ValidatableMonoBehaviourStatus" /> </summary>
+    /// <param name="gameObject"> Targeted gameObject </param>
+    private void FixAction(GameObject gameObject)
+    {
+        List <ValidatableMonoBehaviourStatus> behaviourStates = CollectBehaviourStates(
+            gameObject.transform,
+            out List <GameObject> _,
+            out ValidationState _);
+
+        if (behaviourStates.Count == 0)
+            return;
+
+        foreach (ValidatableMonoBehaviourStatus behaviourStatus in behaviourStates)
+            behaviourStatus.FixAll();
     }
 
     #endregion
