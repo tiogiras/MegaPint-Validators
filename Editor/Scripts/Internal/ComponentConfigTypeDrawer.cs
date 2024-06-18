@@ -35,7 +35,9 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
     private void OnDestroy()
     {
         VisualElement upperParent = GUIUtility.SetParentFlexGrowRecursive(_root, 3, false);
-        upperParent.Q <VisualElement>("unity-content-container").style.flexGrow = 0f;
+        
+        if (upperParent != null)
+            upperParent.Q <VisualElement>("unity-content-container").style.flexGrow = 0f;
     }
 
     #endregion

@@ -66,6 +66,7 @@ internal class PackageTests
             Constants.Validators.UserInterface.ValidatorViewItem);
 
         TestsUtility.ValidateResource <Texture2D>(ref isValid, Constants.Validators.Images.ManualIssue);
+        TestsUtility.ValidateResource <Texture2D>(ref isValid, Constants.Validators.Images.Refresh);
 
         TestsUtility.ValidateResource <ValidatorSettings>(ref isValid, Constants.Validators.Tests.RequireGameObjectActive);
         
