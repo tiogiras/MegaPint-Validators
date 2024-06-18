@@ -15,18 +15,19 @@ public abstract class ValidationRequirementMetaData
     /// </summary>
     protected abstract void OnInitialization();
 
-    // TODO commenting
     /// <summary>
     ///     Calls <see cref="OnInitialization" /> when the <see cref="ScriptableValidationRequirement" /> has not been
     ///     initialized
     /// </summary>
+    /// <param name="behaviour"> The <see cref="ValidatableMonoBehaviour" /> that is validated </param>
+    /// <param name="requirement"> The <see cref="IValidationRequirement" /> that is validated </param>
     protected void TryInitialize(ValidatableMonoBehaviour behaviour, IValidationRequirement requirement)
     {
         if (behaviour.IsInitialized(requirement))
             return;
-        
+
         OnInitialization();
-        
+
         behaviour.OnRequirementInitialization(requirement);
     }
 
