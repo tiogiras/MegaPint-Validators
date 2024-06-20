@@ -464,27 +464,13 @@ internal class ValidatorView : EditorWindowBase
     /// <param name="behaviour"> Targeted behaviour </param>
     private static void RemoveFromOldList(ValidatableMonoBehaviourStatus behaviour)
     {
-        if (s_errorGameObjects.Contains(behaviour))
-        {
-            s_errorGameObjects.Remove(behaviour);
+        if (TryRemoveFromErrors(behaviour))
+            return;
 
-            if (s_errorGameObjects.Count == 0)
-                s_displayedListIndex = -1;
-        }
-        else if (s_warningGameObjects.Contains(behaviour))
-        {
-            s_warningGameObjects.Remove(behaviour);
+        if (TryRemoveFromWarnings(behaviour))
+            return;
 
-            if (s_warningGameObjects.Count == 0)
-                s_displayedListIndex = -1;
-        }
-        else if (s_okGameObjects.Contains(behaviour))
-        {
-            s_okGameObjects.Remove(behaviour);
-
-            if (s_okGameObjects.Count == 0)
-                s_displayedListIndex = -1;
-        }
+        TryRemoveFromOk(behaviour);
     }
 
     /// <summary> Reset the displayed items </summary>
@@ -502,6 +488,52 @@ internal class ValidatorView : EditorWindowBase
 
         foreach (ValidatableMonoBehaviourStatus item in s_displayedItems)
             item.onStatusChanged -= OnStatusChanged;
+    }
+
+    /// <summary> If the given behaviour is contained in the errors list remove it </summary>
+    /// <param name="behaviour"> Targeted behaviour </param>
+    /// <returns> If the behaviour was found and removed </returns>
+    private static bool TryRemoveFromErrors(ValidatableMonoBehaviourStatus behaviour)
+    {
+        if (!s_errorGameObjects.Contains(behaviour))
+            return false;
+
+        s_errorGameObjects.Remove(behaviour);
+
+        if (s_errorGameObjects.Count == 0 && s_displayedListIndex == 0)
+            s_displayedListIndex = -1;
+
+        return true;
+    }
+
+    /// <summary> If the given behaviour is contained in the ok list remove it </summary>
+    /// <param name="behaviour"> Targeted behaviour </param>
+    /// <returns> If the behaviour was found and removed </returns>
+    private static void TryRemoveFromOk(ValidatableMonoBehaviourStatus behaviour)
+    {
+        if (!s_okGameObjects.Contains(behaviour))
+            return;
+
+        s_okGameObjects.Remove(behaviour);
+
+        if (s_okGameObjects.Count == 0 && s_displayedListIndex == 2)
+            s_displayedListIndex = -1;
+    }
+
+    /// <summary> If the given behaviour is contained in the warnings list remove it </summary>
+    /// <param name="behaviour"> Targeted behaviour </param>
+    /// <returns> If the behaviour was found and removed </returns>
+    private static bool TryRemoveFromWarnings(ValidatableMonoBehaviourStatus behaviour)
+    {
+        if (!s_warningGameObjects.Contains(behaviour))
+            return false;
+
+        s_warningGameObjects.Remove(behaviour);
+
+        if (s_warningGameObjects.Count == 0 && s_displayedListIndex == 1)
+            s_displayedListIndex = -1;
+
+        return true;
     }
 
     /// <summary> Update the visuals of the behaviour buttons </summary>
@@ -597,7 +629,7 @@ internal class ValidatorView : EditorWindowBase
         s_btnErrors.text = $"Errors ({s_errorGameObjects.Count})";
         s_btnWarnings.text = $"Warnings ({s_warningGameObjects.Count})";
         s_btnOk.text = $"Ok ({s_okGameObjects.Count})";
-
+        
         if (s_displayedListIndex < 0)
             return;
 

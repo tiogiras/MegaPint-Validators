@@ -109,17 +109,28 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
     private void DrawIMGUITypeDropdown(Rect rect, SerializedProperty property, GUIContent label)
     {
         var index = int.Parse(label.text.Replace("Element ", ""));
-        var validatableMonoBehaviour = (ValidatableMonoBehaviour)property.serializedObject.targetObject;
 
         Type currentValue = null;
         List <Type> addedRequirements = new();
+        List <IValidationRequirement> requirements = new();
+        
+        switch (property.serializedObject.targetObject)
+        {
+            case ValidatableMonoBehaviour validatableMonoBehaviour:
+                requirements = validatableMonoBehaviour.Requirements();
 
-        List <IValidationRequirement> requirements = validatableMonoBehaviour.Requirements();
+                break;
+
+            case ValidatorSettings settings:
+                requirements = settings.Requirements();
+
+                break;
+        }
         
         if (requirements is {Count: > 0})
         {
             addedRequirements.AddRange(
-                from requirement in validatableMonoBehaviour.Requirements()
+                from requirement in requirements
                 where requirement != null
                 select requirement.GetType());
 
