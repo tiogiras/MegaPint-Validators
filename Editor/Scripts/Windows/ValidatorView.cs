@@ -545,8 +545,6 @@ internal class ValidatorView : EditorWindowBase
     /// <summary> Update the left pane </summary>
     private static void UpdateLeftPane()
     {
-        Debug.Log("Update left Pane"); // TODO remove
-        
         GUIUtility.ToggleActiveButtonInGroup(s_isSceneMode ? 0 : 1, s_btnSceneMode, s_btnProjectMode);
         GUIUtility.ToggleActiveButtonInGroup(-1, s_btnErrors, s_btnWarnings, s_btnOk);
 
@@ -588,7 +586,7 @@ internal class ValidatorView : EditorWindowBase
     /// <summary> Update the gui of the left pane </summary>
     private static void UpdateLeftPaneGUI()
     {
-        Debug.Log("Update Left Pane GUI"); // TODO remove
+        Debug.Log(s_displayedListIndex); // TODO remove
         
         ResetDisplayedItems();
 
@@ -602,6 +600,8 @@ internal class ValidatorView : EditorWindowBase
         s_btnWarnings.text = $"Warnings ({s_warningGameObjects.Count})";
         s_btnOk.text = $"Ok ({s_okGameObjects.Count})";
 
+        Debug.Log(s_displayedListIndex); // TODO remove
+        
         if (s_displayedListIndex < 0)
             return;
 
