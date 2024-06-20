@@ -472,21 +472,31 @@ internal class ValidatorView : EditorWindowBase
             s_errorGameObjects.Remove(behaviour);
 
             if (s_errorGameObjects.Count == 0)
+            {
+                Debug.Log("removed from errors and set to -1"); // TODO remove
                 s_displayedListIndex = -1;
+            }
+                
         }
         else if (s_warningGameObjects.Contains(behaviour))
         {
             s_warningGameObjects.Remove(behaviour);
 
             if (s_warningGameObjects.Count == 0)
+            {
+                Debug.Log("removed from warnings and set to -1"); // TODO remove
                 s_displayedListIndex = -1;
+            }
         }
         else if (s_okGameObjects.Contains(behaviour))
         {
             s_okGameObjects.Remove(behaviour);
 
             if (s_okGameObjects.Count == 0)
+            {
+                Debug.Log("removed from ok and set to -1"); // TODO remove
                 s_displayedListIndex = -1;
+            }
         }
     }
 
@@ -574,6 +584,7 @@ internal class ValidatorView : EditorWindowBase
 
         s_noBehaviours.style.display = hasBehaviours ? DisplayStyle.None : DisplayStyle.Flex;
 
+        Debug.Log("Set to -1 by gib update"); // TODO remove
         s_displayedListIndex = -1;
 
         if (!hasBehaviours)
