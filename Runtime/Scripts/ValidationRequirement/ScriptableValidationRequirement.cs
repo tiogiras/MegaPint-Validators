@@ -18,16 +18,6 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
 
     #region Public Methods
 
-    #region Unity Event Functions
-
-    /// <summary> Called when the <see cref="ValidatableMonoBehaviour" /> is validated by unity </summary>
-    public virtual void OnValidate(ValidatableMonoBehaviour behaviour)
-    {
-        TryInitialize(behaviour, this);
-    }
-
-    #endregion
-
     /// <summary>
     ///     Validates the gameObject based on the specified <see cref="Validate" /> method.
     ///     Called when validating the <see cref="ValidatableMonoBehaviour" />.
@@ -169,6 +159,22 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
 
         EditorUtility.SetDirty(prefab);
 #endif
+    }
+
+    #endregion
+
+    #region Unity Event Functions
+
+    /// <summary> Called when the <see cref="ValidatableMonoBehaviour" /> is validated by unity </summary>
+    public virtual void OnValidate(ValidatableMonoBehaviour behaviour)
+    {
+        TryInitialize(behaviour, this);
+    }
+
+    /// <summary> Called when the <see cref="ValidatorSettings" /> is validated by unity </summary>
+    public virtual void OnValidate(ValidatorSettings settings)
+    {
+        TryInitialize(settings, this);
     }
 
     #endregion

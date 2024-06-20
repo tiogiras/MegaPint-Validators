@@ -45,18 +45,21 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         if (_activeRequirements is not {Count: > 0})
             return;
 
-        foreach (IValidationRequirement requirement in _activeRequirements)
-            requirement?.OnValidate(this);
+        if (_importedSettings == null)
+        {
+            foreach (IValidationRequirement requirement in _activeRequirements)
+                requirement?.OnValidate(this);   
+            
+            List <string> cleanedInitializedRequirements = (from requirement in _requirements
+                                                            where requirement != null
+                                                            select requirement.GetType().ToString()
+                                                            into typeName
+                                                            where initializedRequirements.Contains(typeName)
+                                                            select initializedRequirements[
+                                                                initializedRequirements.IndexOf(typeName)]).ToList();
 
-        List <string> cleanedInitializedRequirements = (from requirement in _requirements
-                                                        where requirement != null
-                                                        select requirement.GetType().ToString()
-                                                        into typeName
-                                                        where initializedRequirements.Contains(typeName)
-                                                        select initializedRequirements[
-                                                            initializedRequirements.IndexOf(typeName)]).ToList();
-
-        initializedRequirements = cleanedInitializedRequirements;
+            initializedRequirements = cleanedInitializedRequirements;
+        }
 
         _status.ValidateStatus();
     }
