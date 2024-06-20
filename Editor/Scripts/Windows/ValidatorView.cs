@@ -101,7 +101,10 @@ internal class ValidatorView : EditorWindowBase
         }
 
         if (!suppressGUIRefresh)
+        {
+            Debug.Log("Called from behaviour"); // TODO remove
             UpdateLeftPaneGUI();
+        }
     }
 
     public override EditorWindowBase ShowWindow()
@@ -518,6 +521,7 @@ internal class ValidatorView : EditorWindowBase
         foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
             UpdateBehaviourBasedOnState(behaviour, true);
 
+        Debug.Log("Called from behaviours"); // TODO remove
         UpdateLeftPaneGUI();
     }
 
@@ -580,12 +584,15 @@ internal class ValidatorView : EditorWindowBase
             return;
         }
 
+        Debug.Log("Called from big update"); // TODO remove
         UpdateLeftPaneGUI();
     }
 
     /// <summary> Update the gui of the left pane </summary>
     private static void UpdateLeftPaneGUI()
     {
+        Debug.Log("Update Left Pane GUI"); // TODO remove
+        
         Debug.Log(s_displayedListIndex); // TODO remove
         
         ResetDisplayedItems();
