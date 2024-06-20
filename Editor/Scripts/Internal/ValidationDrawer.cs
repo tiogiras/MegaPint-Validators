@@ -22,9 +22,9 @@ internal class ValidationDrawer : UnityEditor.Editor
 
     private Foldout _errorFoldout;
 
-    private ListView _invalidBehaviours;
-
     private Button _fixAllButton;
+
+    private ListView _invalidBehaviours;
     private VisualElement _noFixAction;
 
     private VisualElement _ok;
@@ -60,7 +60,7 @@ internal class ValidationDrawer : UnityEditor.Editor
         UpdateFixAllButton();
 
         _fixAllButton.clicked += _status.FixAll;
-        
+
         _noFixAction = root.Q <VisualElement>("NoFixAction");
         UpdateNoFixAction();
 
@@ -80,7 +80,7 @@ internal class ValidationDrawer : UnityEditor.Editor
             var foldout = element.Q <Foldout>();
             foldout.text = invalidBehaviour.shortBehaviourName;
             foldout.tooltip = invalidBehaviour.behaviourName;
-            
+
             var errors = element.Q <ListView>("Errors");
 
             errors.makeItem = () => GUIUtility.Instantiate(_errorEntry);
@@ -89,7 +89,7 @@ internal class ValidationDrawer : UnityEditor.Editor
             {
                 if (j >= invalidBehaviour.errors.Count)
                     return;
-                
+
                 ValidationError error = invalidBehaviour.errors[j];
 
                 var label = visualElement.Q <Button>("Name");
@@ -109,20 +109,20 @@ internal class ValidationDrawer : UnityEditor.Editor
                     : DisplayStyle.None;
 
                 var hasFixAction = error.fixAction != null;
-                
+
                 var button = visualElement.Q <Button>("BTN_Fix");
                 button.style.display = hasFixAction ? DisplayStyle.Flex : DisplayStyle.None;
 
                 var noFixAction = visualElement.Q <VisualElement>("NoFixAction");
                 noFixAction.style.display = hasFixAction ? DisplayStyle.None : DisplayStyle.Flex;
-                
+
                 if (hasFixAction)
                 {
                     button.clicked += () =>
                     {
                         error.fixAction.Invoke(error.gameObject);
                         _status.ValidateStatus();
-                    };   
+                    };
                 }
             };
 
@@ -161,7 +161,7 @@ internal class ValidationDrawer : UnityEditor.Editor
 
         UpdateFixAllButton();
         UpdateNoFixAction();
-        
+
         List <InvalidBehaviour> invalidBehaviours = _status.invalidBehaviours;
         invalidBehaviours.Sort();
 
@@ -169,11 +169,29 @@ internal class ValidationDrawer : UnityEditor.Editor
         _invalidBehaviours.RefreshItems();
     }
 
+    /// <summary> Update the visibility of the fix all button </summary>
+    private void UpdateFixAllButton()
+    {
+        if (_status.State == ValidationState.Ok)
+        {
+            _fixAllButton.style.display = DisplayStyle.None;
+
+            return;
+        }
+
+        var hasFixActions =
+            _status.invalidBehaviours.Any(behaviour => behaviour.errors.Any(error => error.fixAction != null));
+
+        _fixAllButton.style.display = hasFixActions ? DisplayStyle.Flex : DisplayStyle.None;
+    }
+
+    /// <summary> Update the visibility of the no fix action message </summary>
     private void UpdateNoFixAction()
     {
         if (_status.State == ValidationState.Ok)
         {
             _noFixAction.style.display = DisplayStyle.None;
+
             return;
         }
 
@@ -181,20 +199,6 @@ internal class ValidationDrawer : UnityEditor.Editor
             _status.invalidBehaviours.Any(behaviour => behaviour.errors.Any(error => error.fixAction == null));
 
         _noFixAction.style.display = missingFixAction ? DisplayStyle.Flex : DisplayStyle.None;
-    }
-    
-    private void UpdateFixAllButton()
-    {
-        if (_status.State == ValidationState.Ok)
-        {
-            _fixAllButton.style.display = DisplayStyle.None;
-            return;
-        }
-
-        var hasFixActions =
-            _status.invalidBehaviours.Any(behaviour => behaviour.errors.Any(error => error.fixAction != null));
-        
-        _fixAllButton.style.display = hasFixActions ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     #endregion

@@ -59,12 +59,17 @@ internal class ValidatorView : EditorWindowBase
 
     #region Public Methods
 
+    /// <summary> Schedule the execution of a refresh of the left pane </summary>
     public static void ScheduleRefreshCall()
     {
         s_root.schedule.Execute(
             () => {onRefresh?.Invoke();});
     }
 
+    /// <summary> Move a behaviour to a new list based on it's state </summary>
+    /// <param name="behaviour"> Targeted behaviour </param>
+    /// <param name="suppressGUIRefresh"> If true the gui will not be updated automatically </param>
+    /// <exception cref="ArgumentOutOfRangeException"> Behaviour state not found </exception>
     public static void UpdateBehaviourBasedOnState(
         ValidatableMonoBehaviourStatus behaviour,
         bool suppressGUIRefresh = false)
@@ -222,18 +227,6 @@ internal class ValidatorView : EditorWindowBase
         EditorSceneManager.sceneClosed += OnSceneClosed;
     }
 
-    private static void OnSceneClosed(Scene scene)
-    {
-        if (s_isSceneMode)
-            UpdateLeftPane();
-    }
-
-    private static void OnSceneLoaded(Scene scene, OpenSceneMode mode)
-    {
-        if (s_isSceneMode)
-            UpdateLeftPane();
-    }
-
     protected override void UnRegisterCallbacks()
     {
         onRefresh -= UpdateLeftPane;
@@ -261,8 +254,22 @@ internal class ValidatorView : EditorWindowBase
 
     #region Private Methods
 
-    // TODO comments
-    private static bool CollectInvalidGameObjects(
+    /// <summary> Change the current mode (scene/project) </summary>
+    /// <param name="isSceneMode"> New mode </param>
+    private static void ChangeMode(bool isSceneMode)
+    {
+        s_isSceneMode = isSceneMode;
+        UpdateLeftPane();
+
+        RightPane.Clear();
+    }
+
+    /// <summary> Collect all <see cref="ValidatableMonoBehaviourStatus" /> based on the current settings </summary>
+    /// <param name="errors"> Found behaviours with the severity = error </param>
+    /// <param name="warnings"> Found behaviours with the severity = warning </param>
+    /// <param name="ok"> Found behaviours with the severity = ok </param>
+    /// <returns> If any behaviours where found </returns>
+    private static bool CollectValidatableMonoBehaviours(
         out List <ValidatableMonoBehaviourStatus> errors,
         out List <ValidatableMonoBehaviourStatus> warnings,
         out List <ValidatableMonoBehaviourStatus> ok)
@@ -285,7 +292,7 @@ internal class ValidatorView : EditorWindowBase
     private static void DisplayBySearchField()
     {
         StopListeningToValidationEvents();
-        
+
         if (s_gameObjectsItems is not {Count: > 0})
             s_displayedItems = new List <ValidatableMonoBehaviourStatus>();
         else
@@ -304,7 +311,7 @@ internal class ValidatorView : EditorWindowBase
 
         s_displayedItems.Sort();
         ListenToValidationEvents();
-        
+
         s_gameObjectsView.itemsSource = s_displayedItems;
 
         UpdateGameObjectsListViewVisibility();
@@ -312,37 +319,20 @@ internal class ValidatorView : EditorWindowBase
         s_gameObjectsView.ClearSelection();
     }
 
-    // TODO comments
-    private static void StopListeningToValidationEvents()
+    /// <summary> Fix all displayed behaviours that can be fixed </summary>
+    private static void FixAll()
     {
-        if (s_displayedItems.Count == 0)
-            return;
-        
-        foreach (ValidatableMonoBehaviourStatus item in s_displayedItems)
-        {
-            item.onStatusChanged -= OnStatusChanged;
-        }
-    }
-    
-    // TODO comments
-    private static void ListenToValidationEvents()
-    {
-        if (s_displayedItems.Count == 0)
-            return;
-        
-        foreach (ValidatableMonoBehaviourStatus item in s_displayedItems)
-        {
-            item.onStatusChanged += OnStatusChanged;
-        }
+        ValidatableMonoBehaviourStatus[] behaviours = GetFixableBehaviours();
+
+        foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
+            behaviour.FixAll();
+
+        RightPane.Clear();
+        UpdateBehavioursBasedOnState(behaviours);
     }
 
-    // TODO comments
-    private static void OnStatusChanged(ValidatableMonoBehaviourStatus behaviour)
-    {
-        UpdateBehaviourBasedOnState(behaviour);
-    }
-
-    // TODO comments
+    /// <summary> Find all behaviours with a fixAction in the displayed behaviours </summary>
+    /// <returns> All fixable currently displayed behaviours </returns>
     private static ValidatableMonoBehaviourStatus[] GetFixableBehaviours()
     {
         return s_displayedItems.Where(
@@ -372,6 +362,17 @@ internal class ValidatorView : EditorWindowBase
         return path;
     }
 
+    /// <summary> Listen to all validation events of the displayed behaviours </summary>
+    private static void ListenToValidationEvents()
+    {
+        if (s_displayedItems.Count == 0)
+            return;
+
+        foreach (ValidatableMonoBehaviourStatus item in s_displayedItems)
+            item.onStatusChanged += OnStatusChanged;
+    }
+
+    /// <summary> Error button callback </summary>
     private static void OnErrorButton()
     {
         s_gameObjectsItems = s_errorGameObjects;
@@ -382,6 +383,31 @@ internal class ValidatorView : EditorWindowBase
         RightPane.Clear();
     }
 
+    /// <summary> List selection callback </summary>
+    /// <param name="_"> Callback event </param>
+    private static void OnGameObjectSelected(IEnumerable <int> _)
+    {
+        if (s_gameObjectsView.selectedItem == null)
+            return;
+
+        var status = (ValidatableMonoBehaviourStatus)s_gameObjectsView.selectedItem;
+
+        var parentPath = GetParentPath(status.transform);
+        var path = s_isSceneMode ? parentPath : $"{AssetDatabase.GetAssetPath(status)} => {parentPath}";
+
+        RightPane.Display(status, path);
+    }
+
+    /// <summary> List selection confirmed callback </summary>
+    /// <param name="_"> Callback event </param>
+    private static void OnGameObjectSelectionConfirmed(IEnumerable <object> _)
+    {
+        var status = (ValidatableMonoBehaviourStatus)s_gameObjectsView.selectedItem;
+
+        Selection.activeObject = status;
+    }
+
+    /// <summary> Ok button callback </summary>
     private static void OnOkButton()
     {
         s_gameObjectsItems = s_okGameObjects;
@@ -392,6 +418,38 @@ internal class ValidatorView : EditorWindowBase
         RightPane.Clear();
     }
 
+    /// <summary> Scene closed event callback </summary>
+    /// <param name="scene"> Closed scene </param>
+    private static void OnSceneClosed(Scene scene)
+    {
+        if (s_isSceneMode)
+            UpdateLeftPane();
+    }
+
+    /// <summary> Scene loaded event callback </summary>
+    /// <param name="scene"> Loaded scene </param>
+    /// <param name="mode"> Mode the scene was loaded in </param>
+    private static void OnSceneLoaded(Scene scene, OpenSceneMode mode)
+    {
+        if (s_isSceneMode)
+            UpdateLeftPane();
+    }
+
+    /// <summary> Searchbar callback </summary>
+    /// <param name="_"> Callback event </param>
+    private static void OnSearchFieldChanged(ChangeEvent <string> _)
+    {
+        DisplayBySearchField();
+    }
+
+    /// <summary> Validation event callback </summary>
+    /// <param name="behaviour"> Validated behaviour </param>
+    private static void OnStatusChanged(ValidatableMonoBehaviourStatus behaviour)
+    {
+        UpdateBehaviourBasedOnState(behaviour);
+    }
+
+    /// <summary> Warning button callback </summary>
     private static void OnWarningButton()
     {
         s_gameObjectsItems = s_warningGameObjects;
@@ -402,6 +460,8 @@ internal class ValidatorView : EditorWindowBase
         RightPane.Clear();
     }
 
+    /// <summary> Remove the behaviour from it's old list </summary>
+    /// <param name="behaviour"> Targeted behaviour </param>
     private static void RemoveFromOldList(ValidatableMonoBehaviourStatus behaviour)
     {
         if (s_errorGameObjects.Contains(behaviour))
@@ -427,19 +487,33 @@ internal class ValidatorView : EditorWindowBase
         }
     }
 
+    /// <summary> Reset the displayed items </summary>
     private static void ResetDisplayedItems()
     {
         s_gameObjectsItems = null;
         DisplayBySearchField();
     }
 
+    /// <summary> Stop listening to all validation events of the displayed behaviours </summary>
+    private static void StopListeningToValidationEvents()
+    {
+        if (s_displayedItems.Count == 0)
+            return;
+
+        foreach (ValidatableMonoBehaviourStatus item in s_displayedItems)
+            item.onStatusChanged -= OnStatusChanged;
+    }
+
+    /// <summary> Update the visuals of the behaviour buttons </summary>
     private static void UpdateBehaviourButtons()
     {
         GUIUtility.ToggleActiveButtonInGroup(s_displayedListIndex, s_btnErrors, s_btnWarnings, s_btnOk);
         UpdateNoSelectionVisibility();
     }
 
-    private static void UpdateBehavioursBasedOnState(ValidatableMonoBehaviourStatus[] behaviours)
+    /// <summary> Update many behaviours based on their current state </summary>
+    /// <param name="behaviours"> Targeted behaviours </param>
+    private static void UpdateBehavioursBasedOnState(IEnumerable <ValidatableMonoBehaviourStatus> behaviours)
     {
         foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
             UpdateBehaviourBasedOnState(behaviour, true);
@@ -447,6 +521,7 @@ internal class ValidatorView : EditorWindowBase
         UpdateLeftPaneGUI();
     }
 
+    /// <summary> Update the visibility of the fixAll button </summary>
     private static void UpdateFixAllButton()
     {
         if (s_displayedListIndex is -1 or 2)
@@ -461,11 +536,13 @@ internal class ValidatorView : EditorWindowBase
         s_btnFixAll.style.display = hasFixAction ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
+    /// <summary> Update the visibility of the main list </summary>
     private static void UpdateGameObjectsListViewVisibility()
     {
         s_gameObjectsView.style.display = s_displayedItems.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
+    /// <summary> Update the left pane </summary>
     private static void UpdateLeftPane()
     {
         GUIUtility.ToggleActiveButtonInGroup(s_isSceneMode ? 0 : 1, s_btnSceneMode, s_btnProjectMode);
@@ -486,7 +563,7 @@ internal class ValidatorView : EditorWindowBase
             LeftPaneProjectMode.RegisterCallbacks();
         }
 
-        var hasBehaviours = CollectInvalidGameObjects(
+        var hasBehaviours = CollectValidatableMonoBehaviours(
             out s_errorGameObjects,
             out s_warningGameObjects,
             out s_okGameObjects);
@@ -506,6 +583,7 @@ internal class ValidatorView : EditorWindowBase
         UpdateLeftPaneGUI();
     }
 
+    /// <summary> Update the gui of the left pane </summary>
     private static void UpdateLeftPaneGUI()
     {
         ResetDisplayedItems();
@@ -534,55 +612,10 @@ internal class ValidatorView : EditorWindowBase
         DisplayBySearchField();
     }
 
+    /// <summary> Update the visibility of the noSelection element </summary>
     private static void UpdateNoSelectionVisibility()
     {
         s_noSelection.style.display = s_displayedListIndex >= 0 ? DisplayStyle.None : DisplayStyle.Flex;
-    }
-
-    private void ChangeMode(bool isSceneMode)
-    {
-        s_isSceneMode = isSceneMode;
-        UpdateLeftPane();
-
-        RightPane.Clear();
-    }
-
-    private void FixAll()
-    {
-        ValidatableMonoBehaviourStatus[] behaviours = GetFixableBehaviours();
-
-        foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
-        {
-            behaviour.FixAll();
-        }
-
-        RightPane.Clear();
-        UpdateBehavioursBasedOnState(behaviours);
-    }
-
-    private void OnGameObjectSelected(IEnumerable <int> _)
-    {
-        if (s_gameObjectsView.selectedItem == null)
-            return;
-
-        var status = (ValidatableMonoBehaviourStatus)s_gameObjectsView.selectedItem;
-
-        var parentPath = GetParentPath(status.transform);
-        var path = s_isSceneMode ? parentPath : $"{AssetDatabase.GetAssetPath(status)} => {parentPath}";
-
-        RightPane.Display(status, path);
-    }
-
-    private void OnGameObjectSelectionConfirmed(IEnumerable <object> _)
-    {
-        var status = (ValidatableMonoBehaviourStatus)s_gameObjectsView.selectedItem;
-
-        Selection.activeObject = status;
-    }
-
-    private void OnSearchFieldChanged(ChangeEvent <string> _)
-    {
-        DisplayBySearchField();
     }
 
     #endregion

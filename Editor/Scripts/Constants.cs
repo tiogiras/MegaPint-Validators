@@ -34,20 +34,24 @@ internal static partial class Constants
                 s_tests,
                 "GameObject",
                 "[Test] Require Game Object Active");
-            
-            public static readonly string RequireChildrenValidation = Path.Combine(s_tests, "[Test] Require Children Validation");
 
-            private static readonly string s_componentOrder = Path.Combine(s_tests, "Component Order");
-            
-            public static readonly string RequireComponentOrder = Path.Combine(s_componentOrder, "[Test] Require Component Order");
-            public static readonly string RequireComponentOrder1 = Path.Combine(s_componentOrder, "[Test] Require Component Order 1");
-            public static readonly string RequireComponentOrder2 = Path.Combine(s_componentOrder, "[Test] Require Component Order 2");
-            
+            public static readonly string RequireChildrenValidation = Path.Combine(
+                s_tests,
+                "[Test] Require Children Validation");
+
             private static readonly string s_customNaming = Path.Combine(s_tests, "Custom Naming");
-            
-            public static readonly string RequireCustomNaming = Path.Combine(s_customNaming, "[Test] Require Custom Naming");
-            public static readonly string RequireCustomNaming1 = Path.Combine(s_customNaming, "[Test] Require Custom Naming 1");
-            public static readonly string RequireCustomNaming2 = Path.Combine(s_customNaming, "[Test] Require Custom Naming 2");
+
+            public static readonly string RequireCustomNaming = Path.Combine(
+                s_customNaming,
+                "[Test] Require Custom Naming");
+
+            public static readonly string RequireCustomNaming1 = Path.Combine(
+                s_customNaming,
+                "[Test] Require Custom Naming 1");
+
+            public static readonly string RequireCustomNaming2 = Path.Combine(
+                s_customNaming,
+                "[Test] Require Custom Naming 2");
 
             private static readonly string s_transform = Path.Combine(s_tests, "Transform");
             private static readonly string s_defaultTransform = Path.Combine(s_transform, "Default");

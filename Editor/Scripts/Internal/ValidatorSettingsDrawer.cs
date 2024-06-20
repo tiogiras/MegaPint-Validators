@@ -1,5 +1,4 @@
 ﻿#if UNITY_EDITOR
-
 using UnityEditor;
 
 namespace MegaPint.Editor.Scripts.Internal
@@ -12,5 +11,4 @@ internal class ValidatorSettingsDrawer : UnityEditor.Editor
 }
 
 }
-
 #endif

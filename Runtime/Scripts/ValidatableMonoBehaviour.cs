@@ -8,7 +8,7 @@ using UnityEngine;
 namespace MegaPint
 {
 
-/// <summary> MonoBehaviour that extends to be validatable via <see cref="ScriptableValidationRequirement"/> </summary>
+/// <summary> MonoBehaviour that extends to be validatable via <see cref="ScriptableValidationRequirement" /> </summary>
 [RequireComponent(typeof(ValidatableMonoBehaviourStatus))]
 public abstract class ValidatableMonoBehaviour : MonoBehaviour
 {
@@ -19,31 +19,14 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
     [SerializeField] private ValidatorSettings _importedSettings;
 
+    [HideInInspector]
+    public List <string> initializedRequirements;
+
     [SerializeReferenceDropdown] [SerializeReference]
     private List <IValidationRequirement> _requirements;
 
-    //[HideInInspector] // TODO reenable
-    public List <string> initializedRequirements;
-
     private ValidatableMonoBehaviourStatus _status;
 
-    // TODO commenting
-    public bool IsInitialized(IValidationRequirement requirement)
-    {
-        initializedRequirements ??= new List <string>();
-
-        return initializedRequirements.Contains(requirement.GetType().ToString());
-    }
-
-    // TODO commenting
-    public void OnRequirementInitialization(IValidationRequirement requirement)
-    {
-        initializedRequirements ??= new List <string>();
-        
-        if (!initializedRequirements.Contains(requirement.GetType().ToString()))
-            initializedRequirements.Add(requirement.GetType().ToString());
-    }
-    
     #region Unity Event Functions
 
     public void OnValidate()
@@ -63,9 +46,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
             return;
 
         foreach (IValidationRequirement requirement in _activeRequirements)
-        {
             requirement?.OnValidate(this);
-        }
 
         List <string> cleanedInitializedRequirements = (from requirement in _requirements
                                                         where requirement != null
@@ -84,6 +65,26 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
     #region Public Methods
 
+    /// <summary> Check if the requirement was initialized on this behaviour </summary>
+    /// <param name="requirement"> Targeted requirement </param>
+    /// <returns> Initialization status of the targeted requirement </returns>
+    public bool IsInitialized(IValidationRequirement requirement)
+    {
+        initializedRequirements ??= new List <string>();
+
+        return initializedRequirements.Contains(requirement.GetType().ToString());
+    }
+
+    /// <summary> Callback on initialization of a requirement </summary>
+    /// <param name="requirement"> Targeted requirement </param>
+    public void OnRequirementInitialization(IValidationRequirement requirement)
+    {
+        initializedRequirements ??= new List <string>();
+
+        if (!initializedRequirements.Contains(requirement.GetType().ToString()))
+            initializedRequirements.Add(requirement.GetType().ToString());
+    }
+
     /// <summary> Get all requirements on this gameObject </summary>
     /// <returns> All defined requirements </returns>
     public List <IValidationRequirement> Requirements()
@@ -98,7 +99,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         _importedSettings = settings;
     }
 
-    /// <summary> Validate this gameObject based on the set <see cref="ScriptableValidationRequirement"/> </summary>
+    /// <summary> Validate this gameObject based on the set <see cref="ScriptableValidationRequirement" /> </summary>
     /// <param name="errors"> Found errors </param>
     /// <returns> Validation state after validation </returns>
     public ValidationState Validate(out List <ValidationError> errors)
@@ -125,7 +126,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         return state;
     }
 
-    /// <summary> Check if the requirements include <see cref="RequireChildrenValidation"/> </summary>
+    /// <summary> Check if the requirements include <see cref="RequireChildrenValidation" /> </summary>
     /// <returns> If the requirement is set on this gameObject </returns>
     public bool ValidatesChildren()
     {
