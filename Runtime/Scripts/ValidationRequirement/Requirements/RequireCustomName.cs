@@ -8,7 +8,7 @@ namespace MegaPint.ValidationRequirement.Requirements
 
 /// <summary> Validation requirement requiring a custom name based on a defined regex ruleset </summary>
 [Serializable]
-[SerializeReferenceDropdownName("Regex Naming Validation", 101)]
+[SerializeReferenceDropdownName("Regex Naming Validation", typeof(RequireCustomName), 101)]
 public class RequireCustomName : ScriptableValidationRequirement
 {
     [HideInInspector] public string name;
