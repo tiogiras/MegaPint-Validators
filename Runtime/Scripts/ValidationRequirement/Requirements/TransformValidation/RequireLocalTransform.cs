@@ -32,7 +32,10 @@ public class RequireLocalTransform : ScriptableValidationRequirement
         Transform transform = gameObject.transform;
 
         var validPosition = transform.localPosition == _localPosition.value || !_localPosition.enabled;
-        var validRotation = transform.localRotation == Quaternion.Euler(_localRotation.value) || !_localRotation.enabled;
+
+        var validRotation = transform.localRotation == Quaternion.Euler(_localRotation.value) ||
+                            !_localRotation.enabled;
+
         var validScale = transform.localScale == _localScale.value || !_localScale.enabled;
 
         if (validPosition && validRotation && validScale)

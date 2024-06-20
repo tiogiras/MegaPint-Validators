@@ -28,7 +28,7 @@ public class RequireGameObjectActive : ScriptableValidationRequirement
             return;
 
         var errorMessage = $"GameObject should be {(_targetState ? "active" : "inactive")}";
-        
+
         AddError(
             "Incorrect active state",
             errorMessage,

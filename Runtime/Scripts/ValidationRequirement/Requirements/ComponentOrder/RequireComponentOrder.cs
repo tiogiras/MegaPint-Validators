@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using MegaPint.SerializeReferenceDropdown.Runtime;
+using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditorInternal;
-using UnityEngine;
+#endif
 
 namespace MegaPint.ValidationRequirement.Requirements.ComponentOrder
 {
@@ -212,8 +214,6 @@ public class RequireComponentOrder : ScriptableValidationRequirement
             statusComp.FixAll();
 
             PrefabUtility.SaveAsPrefabAsset(prefab, assetPath);
-
-            // TODO prefabUtility is editor only
 
             return;
         }

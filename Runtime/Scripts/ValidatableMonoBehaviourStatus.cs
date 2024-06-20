@@ -6,60 +6,30 @@ using UnityEngine;
 namespace MegaPint
 {
 
-// TODO commenting & cleanup
 /// <summary> Behaviour to display the status of a gameObject with <see cref="ValidatableMonoBehaviour" /> </summary>
 public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <ValidatableMonoBehaviourStatus>
 {
     public ValidationState State {get; private set;}
 
     public readonly List <InvalidBehaviour> invalidBehaviours = new();
-
-    public Action <ValidationState> onStatusUpdate;
     public Action <ValidatableMonoBehaviourStatus> onStatusChanged;
 
+    public Action <ValidationState> onStatusUpdate;
+
     private List <ValidatableMonoBehaviour> _behaviours = new();
+
+    #region Unity Event Functions
 
     private void OnValidate()
     {
         if (ValidatesChildren())
             ListenToChildValidations();
-        else 
+        else
             StopListenToChildValidations();
     }
 
-    private void ListenToChildValidations()
-    {
-        ValidatableMonoBehaviourStatus[] children =
-            gameObject.GetComponentsInChildren <ValidatableMonoBehaviourStatus>(true);
+    #endregion
 
-        if (children.Length == 0)
-            return;
-        
-        foreach (ValidatableMonoBehaviourStatus status in children)
-        {
-            status.onStatusChanged += OnChildStatusChanged;
-        }
-    }
-
-    private void StopListenToChildValidations()
-    {
-        ValidatableMonoBehaviourStatus[] children =
-            gameObject.GetComponentsInChildren <ValidatableMonoBehaviourStatus>(true);
-
-        if (children.Length == 0)
-            return;
-        
-        foreach (ValidatableMonoBehaviourStatus status in children)
-        {
-            status.onStatusChanged -= OnChildStatusChanged;
-        }
-    }
-
-    private void OnChildStatusChanged(ValidatableMonoBehaviourStatus _)
-    {
-        ValidateStatus();
-    }
-    
     #region Public Methods
 
     /// <summary> Compare against other status </summary>
@@ -70,10 +40,7 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
         if ((int)State > (int)other.State)
             return -1;
 
-        if ((int)State < (int)other.State)
-            return 1;
-
-        return string.CompareOrdinal(gameObject.name, other.gameObject.name);
+        return (int)State < (int)other.State ? 1 : string.CompareOrdinal(gameObject.name, other.gameObject.name);
     }
 
     /// <summary> Add a <see cref="ValidatableMonoBehaviour" /> to this status </summary>
@@ -90,7 +57,7 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
     public void FixAll()
     {
         ValidationError[] errors = invalidBehaviours.SelectMany(invalidBehaviour => invalidBehaviour.errors).ToArray();
-        
+
         for (var i = errors.Length - 1; i >= 0; i--)
         {
             ValidationError error = errors[i];
@@ -111,7 +78,7 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
     public void ValidateStatus()
     {
         ValidationState previousState = State;
-        
+
         State = ValidationState.Ok;
         invalidBehaviours.Clear();
 
@@ -121,7 +88,7 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
         if (_behaviours.Count == 0)
         {
             onStatusUpdate?.Invoke(State);
-            
+
             if (previousState != State)
                 onStatusChanged?.Invoke(this);
 
@@ -157,7 +124,7 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
         }
 
         onStatusUpdate?.Invoke(State);
-        
+
         if (previousState != State)
             onStatusChanged?.Invoke(this);
     }
@@ -187,6 +154,39 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
         nameParts.Reverse();
 
         return string.Join(".", nameParts);
+    }
+
+    /// <summary> Listen to the validation events of any child <see cref="ValidatableMonoBehaviourStatus" /> </summary>
+    private void ListenToChildValidations()
+    {
+        ValidatableMonoBehaviourStatus[] children =
+            gameObject.GetComponentsInChildren <ValidatableMonoBehaviourStatus>(true);
+
+        if (children.Length == 0)
+            return;
+
+        foreach (ValidatableMonoBehaviourStatus status in children)
+            status.onStatusChanged += OnChildStatusChanged;
+    }
+
+    /// <summary> Callback when a child <see cref="ValidatableMonoBehaviourStatus" /> changed their status </summary>
+    /// <param name="_"> Callback event </param>
+    private void OnChildStatusChanged(ValidatableMonoBehaviourStatus _)
+    {
+        ValidateStatus();
+    }
+
+    /// <summary> Stop listening to the validation events of any child <see cref="ValidatableMonoBehaviourStatus" /> </summary>
+    private void StopListenToChildValidations()
+    {
+        ValidatableMonoBehaviourStatus[] children =
+            gameObject.GetComponentsInChildren <ValidatableMonoBehaviourStatus>(true);
+
+        if (children.Length == 0)
+            return;
+
+        foreach (ValidatableMonoBehaviourStatus status in children)
+            status.onStatusChanged -= OnChildStatusChanged;
     }
 
     #endregion

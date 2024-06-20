@@ -12,13 +12,13 @@ namespace MegaPint.ValidationRequirement.Requirements.TransformValidation
 public class RequireGlobalTransform : ScriptableValidationRequirement
 {
     [SerializeField] [Tooltip("The transform is required to have this specified global position")]
-    private ToggleableSetting<Vector3> _globalPosition;
+    private ToggleableSetting <Vector3> _globalPosition;
 
     [SerializeField] [Tooltip("The transform is required to have this specified global rotation")]
-    private ToggleableSetting<Vector3> _globalRotation;
+    private ToggleableSetting <Vector3> _globalRotation;
 
     [SerializeField] [Tooltip("The transform is required to have this specified global scale")]
-    private ToggleableSetting<Vector3> _globalScale;
+    private ToggleableSetting <Vector3> _globalScale;
 
     #region Protected Methods
 

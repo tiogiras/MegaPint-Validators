@@ -19,10 +19,7 @@ internal class RequireGameObjectActive
 
         yield return RequirementTests.TestRequirement(
             settings,
-            o =>
-            {
-                o.SetActive(false);
-            },
+            o => {o.SetActive(false);},
             ValidationState.Warning,
             true);
     }

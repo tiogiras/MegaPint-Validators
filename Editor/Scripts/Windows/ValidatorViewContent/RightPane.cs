@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,7 +9,7 @@ using GUIUtility = MegaPint.Editor.Scripts.GUI.Utility.GUIUtility;
 namespace MegaPint.Editor.Scripts.Windows.ValidatorViewContent
 {
 
-// TODO commenting
+/// <summary> Handles the display of the right pane of <see cref="ValidatorView" /> </summary>
 internal static class RightPane
 {
     private static Label s_gameObjectName;
@@ -34,6 +35,7 @@ internal static class RightPane
 
     #region Public Methods
 
+    /// <summary> Clear the right pane </summary>
     public static void Clear()
     {
         s_foldoutStates.Clear();
@@ -46,6 +48,10 @@ internal static class RightPane
         s_invalidBehavioursView.RefreshItems();
     }
 
+    /// <summary> Instantiate the right pane </summary>
+    /// <param name="root"> VisualRootElement of the right pane </param>
+    /// <param name="invalidBehaviourItem"> Template item for the invalidBehaviour entries </param>
+    /// <param name="errorItem"> Template item for the error entries </param>
     public static void CreateGUI(VisualElement root, VisualTreeAsset invalidBehaviourItem, VisualTreeAsset errorItem)
     {
         s_content = root.Q <VisualElement>("RightPaneContent");
@@ -65,6 +71,9 @@ internal static class RightPane
         s_content.style.display = DisplayStyle.None;
     }
 
+    /// <summary> Display the given <see cref="ValidatableMonoBehaviourStatus" /> in the right pane </summary>
+    /// <param name="status"> Targeted <see cref="ValidatableMonoBehaviourStatus" /> </param>
+    /// <param name="path"> Path to the status object </param>
     public static void Display(ValidatableMonoBehaviourStatus status, string path)
     {
         Clear();
@@ -83,8 +92,6 @@ internal static class RightPane
         s_content.style.display = DisplayStyle.Flex;
 
         s_content.schedule.Execute(Refresh);
-        
-        //Refresh();
     }
 
     #endregion
@@ -100,6 +107,7 @@ internal static class RightPane
         Refresh();
     }
 
+    /// <summary> Refresh the right pane </summary>
     private static void Refresh()
     {
         var hasErrors = s_status.invalidBehaviours.Count > 0;
@@ -135,6 +143,7 @@ internal static class RightPane
             });
     }
 
+    /// <summary> Register all callbacks </summary>
     private static void RegisterCallbacks()
     {
         s_btnFixAll.clicked += FixAll;
@@ -175,7 +184,10 @@ internal static class RightPane
         };
     }
 
-    private static void RegisterErrorCallbacks(ListView errorsView, List <ValidationError> errors)
+    /// <summary> Register all callbacks for an error listView </summary>
+    /// <param name="errorsView"> Targeted listView </param>
+    /// <param name="errors"> List of errors to display </param>
+    private static void RegisterErrorCallbacks(ListView errorsView, IReadOnlyList <ValidationError> errors)
     {
         errorsView.makeItem = () => GUIUtility.Instantiate(s_errorItem);
 
@@ -204,7 +216,7 @@ internal static class RightPane
 
             var noFixAction = element.Q <VisualElement>("NoFixAction");
             noFixAction.style.display = !hasFixAction ? DisplayStyle.Flex : DisplayStyle.None;
-            
+
             var fixButton = element.Q <Button>("BTN_Fix");
             fixButton.style.display = hasFixAction ? DisplayStyle.Flex : DisplayStyle.None;
 
@@ -212,18 +224,19 @@ internal static class RightPane
                 () =>
                 {
                     ValidationState status = s_status.State;
-                    
+
                     error.fixAction.Invoke(error.gameObject);
                     s_status.ValidateStatus();
-                    
+
                     if (status != s_status.State)
                         ValidatorView.UpdateBehaviourBasedOnState(s_status);
-                    
+
                     Refresh();
                 });
         };
     }
 
+    /// <summary> Unregister all callbacks </summary>
     private static void UnregisterCallbacks()
     {
         s_btnFixAll.clicked -= FixAll;
@@ -233,3 +246,4 @@ internal static class RightPane
 }
 
 }
+#endif

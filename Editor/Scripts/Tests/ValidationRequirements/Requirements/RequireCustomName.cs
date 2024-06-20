@@ -36,7 +36,7 @@ internal class RequireCustomName
             ValidationState.Warning,
             false);
     }
-    
+
     [UnityTest] [Order(2)]
     public IEnumerator Test2()
     {
@@ -60,7 +60,7 @@ internal class RequireCustomName
             ValidationState.Warning,
             false);
     }
-    
+
     [UnityTest] [Order(4)]
     public IEnumerator Test4()
     {

@@ -7,14 +7,14 @@ namespace MegaPint.ValidationRequirement
 /// <summary> Interface to call the validation methods on the <see cref="ScriptableValidationRequirement" /> </summary>
 public interface IValidationRequirement
 {
-    #region Public Methods
-
     #region Unity Event Functions
 
     /// <summary> Called when the <see cref="ValidatableMonoBehaviour" /> is validated by unity  </summary>
     public void OnValidate(ValidatableMonoBehaviour behaviour);
 
     #endregion
+
+    #region Public Methods
 
     /// <summary> Called when validating a <see cref="ValidatableMonoBehaviour" /> </summary>
     /// <param name="gameObject"> The gameObject the <see cref="ValidatableMonoBehaviour" /> is added to </param>
