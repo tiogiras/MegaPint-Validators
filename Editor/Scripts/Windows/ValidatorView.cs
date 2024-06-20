@@ -101,10 +101,7 @@ internal class ValidatorView : EditorWindowBase
         }
 
         if (!suppressGUIRefresh)
-        {
-            Debug.Log("Called from behaviour"); // TODO remove
             UpdateLeftPaneGUI();
-        }
     }
 
     public override EditorWindowBase ShowWindow()
@@ -467,37 +464,13 @@ internal class ValidatorView : EditorWindowBase
     /// <param name="behaviour"> Targeted behaviour </param>
     private static void RemoveFromOldList(ValidatableMonoBehaviourStatus behaviour)
     {
-        if (s_errorGameObjects.Contains(behaviour))
-        {
-            s_errorGameObjects.Remove(behaviour);
+        if (TryRemoveFromErrors(behaviour))
+            return;
 
-            if (s_errorGameObjects.Count == 0)
-            {
-                Debug.Log("removed from errors and set to -1"); // TODO remove
-                s_displayedListIndex = -1;
-            }
-                
-        }
-        else if (s_warningGameObjects.Contains(behaviour))
-        {
-            s_warningGameObjects.Remove(behaviour);
+        if (TryRemoveFromWarnings(behaviour))
+            return;
 
-            if (s_warningGameObjects.Count == 0)
-            {
-                Debug.Log("removed from warnings and set to -1"); // TODO remove
-                s_displayedListIndex = -1;
-            }
-        }
-        else if (s_okGameObjects.Contains(behaviour))
-        {
-            s_okGameObjects.Remove(behaviour);
-
-            if (s_okGameObjects.Count == 0)
-            {
-                Debug.Log("removed from ok and set to -1"); // TODO remove
-                s_displayedListIndex = -1;
-            }
-        }
+        TryRemoveFromOk(behaviour);
     }
 
     /// <summary> Reset the displayed items </summary>
@@ -517,6 +490,52 @@ internal class ValidatorView : EditorWindowBase
             item.onStatusChanged -= OnStatusChanged;
     }
 
+    /// <summary> If the given behaviour is contained in the errors list remove it </summary>
+    /// <param name="behaviour"> Targeted behaviour </param>
+    /// <returns> If the behaviour was found and removed </returns>
+    private static bool TryRemoveFromErrors(ValidatableMonoBehaviourStatus behaviour)
+    {
+        if (!s_errorGameObjects.Contains(behaviour))
+            return false;
+
+        s_errorGameObjects.Remove(behaviour);
+
+        if (s_errorGameObjects.Count == 0 && s_displayedListIndex == 0)
+            s_displayedListIndex = -1;
+
+        return true;
+    }
+
+    /// <summary> If the given behaviour is contained in the ok list remove it </summary>
+    /// <param name="behaviour"> Targeted behaviour </param>
+    /// <returns> If the behaviour was found and removed </returns>
+    private static void TryRemoveFromOk(ValidatableMonoBehaviourStatus behaviour)
+    {
+        if (!s_okGameObjects.Contains(behaviour))
+            return;
+
+        s_okGameObjects.Remove(behaviour);
+
+        if (s_okGameObjects.Count == 0 && s_displayedListIndex == 2)
+            s_displayedListIndex = -1;
+    }
+
+    /// <summary> If the given behaviour is contained in the warnings list remove it </summary>
+    /// <param name="behaviour"> Targeted behaviour </param>
+    /// <returns> If the behaviour was found and removed </returns>
+    private static bool TryRemoveFromWarnings(ValidatableMonoBehaviourStatus behaviour)
+    {
+        if (!s_warningGameObjects.Contains(behaviour))
+            return false;
+
+        s_warningGameObjects.Remove(behaviour);
+
+        if (s_warningGameObjects.Count == 0 && s_displayedListIndex == 1)
+            s_displayedListIndex = -1;
+
+        return true;
+    }
+
     /// <summary> Update the visuals of the behaviour buttons </summary>
     private static void UpdateBehaviourButtons()
     {
@@ -531,7 +550,6 @@ internal class ValidatorView : EditorWindowBase
         foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
             UpdateBehaviourBasedOnState(behaviour, true);
 
-        Debug.Log("Called from behaviours"); // TODO remove
         UpdateLeftPaneGUI();
     }
 
@@ -584,7 +602,6 @@ internal class ValidatorView : EditorWindowBase
 
         s_noBehaviours.style.display = hasBehaviours ? DisplayStyle.None : DisplayStyle.Flex;
 
-        Debug.Log("Set to -1 by gib update"); // TODO remove
         s_displayedListIndex = -1;
 
         if (!hasBehaviours)
@@ -595,17 +612,12 @@ internal class ValidatorView : EditorWindowBase
             return;
         }
 
-        Debug.Log("Called from big update"); // TODO remove
         UpdateLeftPaneGUI();
     }
 
     /// <summary> Update the gui of the left pane </summary>
     private static void UpdateLeftPaneGUI()
     {
-        Debug.Log("Update Left Pane GUI"); // TODO remove
-        
-        Debug.Log(s_displayedListIndex); // TODO remove
-        
         ResetDisplayedItems();
 
         s_btnErrors.style.display = s_errorGameObjects.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
@@ -617,8 +629,6 @@ internal class ValidatorView : EditorWindowBase
         s_btnErrors.text = $"Errors ({s_errorGameObjects.Count})";
         s_btnWarnings.text = $"Warnings ({s_warningGameObjects.Count})";
         s_btnOk.text = $"Ok ({s_okGameObjects.Count})";
-
-        Debug.Log(s_displayedListIndex); // TODO remove
         
         if (s_displayedListIndex < 0)
             return;
