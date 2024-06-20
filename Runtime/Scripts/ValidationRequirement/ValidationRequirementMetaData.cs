@@ -1,4 +1,6 @@
-﻿namespace MegaPint.ValidationRequirement
+﻿using UnityEngine;
+
+namespace MegaPint.ValidationRequirement
 {
 
 /// <summary>
@@ -25,10 +27,26 @@ public abstract class ValidationRequirementMetaData
     {
         if (behaviour.IsInitialized(requirement))
             return;
-
+        
         OnInitialization();
 
         behaviour.OnRequirementInitialization(requirement);
+    }
+
+    /// <summary>
+    ///     Calls <see cref="OnInitialization" /> when the <see cref="ScriptableValidationRequirement" /> has not been
+    ///     initialized
+    /// </summary>
+    /// <param name="settings"> The <see cref="ValidatorSettings" /> that is validated </param>
+    /// <param name="requirement"> The <see cref="IValidationRequirement" /> that is validated </param>
+    protected void TryInitialize(ValidatorSettings settings, IValidationRequirement requirement)
+    {
+        if (settings.IsInitialized(requirement))
+            return;
+
+        OnInitialization();
+
+        settings.OnRequirementInitialization(requirement);
     }
 
     #endregion
