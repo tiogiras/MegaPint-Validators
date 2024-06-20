@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using MegaPint.SerializeReferenceDropdown.Runtime;
+using MegaPint.ValidationRequirement;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEditor.UIElements;
@@ -85,7 +86,7 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
     private static SerializeReferenceDropdownNameAttribute GetType(Type type)
     {
         if (type == null)
-            return new SerializeReferenceDropdownNameAttribute(NullName, -30);
+            return new SerializeReferenceDropdownNameAttribute(NullName, null, -30);
 
         return type.GetCustomAttribute <SerializeReferenceDropdownNameAttribute>();
     }
@@ -107,6 +108,24 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
 
     private void DrawIMGUITypeDropdown(Rect rect, SerializedProperty property, GUIContent label)
     {
+        var index = int.Parse(label.text.Replace("Element ", ""));
+        var validatableMonoBehaviour = (ValidatableMonoBehaviour)property.serializedObject.targetObject;
+
+        Type currentValue = null;
+        List <Type> addedRequirements = new();
+
+        List <IValidationRequirement> requirements = validatableMonoBehaviour.Requirements();
+        
+        if (requirements is {Count: > 0})
+        {
+            addedRequirements.AddRange(
+                from requirement in validatableMonoBehaviour.Requirements()
+                where requirement != null
+                select requirement.GetType());
+
+            currentValue = requirements[index]?.GetType();
+        }
+
         _assignableTypes ??= GetAssignableTypes(property);
         Type referenceType = TypeUtils.ExtractTypeFromString(property.managedReferenceFullTypename);
 
@@ -123,7 +142,9 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
             var dropdown = new SerializeReferenceDropdownAdvancedDropdown(
                 new AdvancedDropdownState(),
                 _assignableTypes.Select(GetType),
-                index => WriteNewInstanceByIndexType(index, property));
+                addedRequirements.ToArray(),
+                currentValue,
+                i => WriteNewInstanceByIndexType(i, property));
 
             dropdown.Show(dropdownRect);
         }

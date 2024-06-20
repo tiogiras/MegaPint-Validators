@@ -52,14 +52,23 @@ public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
 
     private readonly Action <int> _onSelectedTypeIndex;
 
+    private readonly Type[] _addedRequirements;
+    private readonly Dictionary <AdvancedDropdownItem, Type> _itemTypes = new();
+
+    private readonly Type _currentValue;
+
     public SerializeReferenceDropdownAdvancedDropdown(
         AdvancedDropdownState state,
         IEnumerable <SerializeReferenceDropdownNameAttribute> attributes,
+        Type[] addedRequirements,
+        Type currentValue,
         Action <int> onSelectedNewType) :
         base(state)
     {
         _attributes = attributes.Where(attr => attr != null);
+        _addedRequirements = addedRequirements;
         _onSelectedTypeIndex = onSelectedNewType;
+        _currentValue = currentValue;
 
         minimumSize = new Vector2(minimumSize.x, 300);
     }
@@ -70,6 +79,7 @@ public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
     {
         var root = new AdvancedDropdownItem("Requirements");
         _itemAndIndexes.Clear();
+        _itemTypes.Clear();
         _dropdownTree.Clear();
 
         var index = 0;
@@ -99,6 +109,7 @@ public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
 
                     if (i == parts.Length - 1)
                     {
+                        _itemTypes.Add(element.item, attribute.requirementType);
                         _itemAndIndexes.Add(element.item, index);
                         index++;
                     }
@@ -124,7 +135,8 @@ public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
                         : default);
 
                 _dropdownTree.TryAdd($"{attribute.name}{element.order}", element);
-
+                
+                _itemTypes.Add(element.item, attribute.requirementType);
                 _itemAndIndexes.Add(element.item, index);
                 index++;
             }
@@ -139,8 +151,25 @@ public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
     {
         base.ItemSelected(item);
 
+        if (ItemIsAdded(item))
+        {
+            Debug.LogWarning("The requirement already exists on this gameObject and cannot be added multiple times.");
+            
+            return;
+        }
+        
         if (_itemAndIndexes.TryGetValue(item, out var index))
             _onSelectedTypeIndex.Invoke(index);
+    }
+
+    private bool ItemIsAdded(AdvancedDropdownItem item)
+    {
+        Type type = _itemTypes[item];
+
+        if (type == _currentValue)
+            return false;
+        
+        return type != null && _addedRequirements.Contains(type);
     }
 
     #endregion
