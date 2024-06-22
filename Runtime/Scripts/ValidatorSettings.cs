@@ -2,8 +2,10 @@
 using System.Linq;
 using MegaPint.SerializeReferenceDropdown.Runtime;
 using MegaPint.ValidationRequirement;
-using UnityEditor;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MegaPint
 {
@@ -60,7 +62,9 @@ public class ValidatorSettings : ScriptableObject
             return;
 
         initializedRequirements.Add(requirement.GetType().ToString());
-        EditorUtility.SetDirty(this);
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(this);  
+#endif
     }
 
     public List <IValidationRequirement> Requirements()
