@@ -1,16 +1,14 @@
 ﻿#if UNITY_EDITOR
-
 using UnityEditor;
 
-namespace Editor.Scripts.Internal
+namespace MegaPint.Editor.Scripts.Internal
 {
 
-// This class is needed since the requirements only draw in custom editors
+/// <summary> This class is needed to allow the requirements to draw in custom editors and inspector</summary>
 [CustomEditor(typeof(ValidatorSettings), true)]
 internal class ValidatorSettingsDrawer : UnityEditor.Editor
 {
 }
 
 }
-
 #endif

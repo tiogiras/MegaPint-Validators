@@ -1,12 +1,12 @@
 ﻿#if UNITY_EDITOR
-
 using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace Editor.Scripts.Internal
+namespace MegaPint.Editor.Scripts.Internal
 {
 
+/// <summary> Drawer class for the <see cref="ValidatableMonoBehaviour" /> class </summary>
 [CustomEditor(typeof(ValidatableMonoBehaviour), true)]
 internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 {
@@ -36,14 +36,17 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
                 var controlID = GUIUtility.GetControlID(FocusType.Passive);
                 EditorGUIUtility.ShowObjectPicker <ValidatorSettings>(null, false, "", controlID);
             }
-            
+
             if (Event.current.commandName == "ObjectSelectorClosed" && _listening)
             {
                 _listening = false;
-                ((ValidatableMonoBehaviour)target).SetImportedSettings((ValidatorSettings)EditorGUIUtility.GetObjectPickerObject());
+
+                ((ValidatableMonoBehaviour)target).SetImportedSettings(
+                    (ValidatorSettings)EditorGUIUtility.GetObjectPickerObject());
+
                 ((ValidatableMonoBehaviour)target).OnValidate();
             }
-            
+
             EditorGUILayout.EndHorizontal();
         }
 
@@ -56,11 +59,19 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 
     #region Private Methods
 
+    /// <summary> Export the saved requirements to an external file </summary>
     private void ExportRequirements()
     {
         try
         {
-            var path = EditorUtility.SaveFilePanelInProject("Export Requirements", "Requirements", "asset", "Hello World");
+            var path = EditorUtility.SaveFilePanelInProject(
+                "Export Requirements",
+                "Requirements",
+                "asset",
+                "Hello World");
+
+            if (string.IsNullOrEmpty(path))
+                return;
 
             var requirements = CreateInstance <ValidatorSettings>();
             requirements.SetRequirements(((ValidatableMonoBehaviour)target).Requirements());

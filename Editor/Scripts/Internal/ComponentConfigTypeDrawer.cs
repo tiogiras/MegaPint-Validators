@@ -1,23 +1,21 @@
 ﻿#if UNITY_EDITOR
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MegaPint.Editor.Scripts.GUI;
+using MegaPint.ValidationRequirement.Requirements.ComponentOrder;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using ValidationRequirement.Requirements.ComponentOrder;
+using GUIUtility = MegaPint.Editor.Scripts.GUI.Utility.GUIUtility;
 
-namespace Editor.Scripts.Internal
+namespace MegaPint.Editor.Scripts.Internal
 {
 
+/// <summary> Drawer class for the <see cref="ComponentOrderConfig" /> class </summary>
 [CustomEditor(typeof(ComponentOrderConfig))]
 internal class ComponentConfigTypeDrawer : UnityEditor.Editor
 {
-    private const string BasePath = "Validators/User Interface/ComponentOrder/";
-    private const string ConfigPath = BasePath + "Config";
-    private const string TypeEntryPath = BasePath + "TypeEntry";
-
     private const string AddCategoryNiceName = "Add Category";
     private const string NonUnityComponentsNiceName = "Non-Unity Components";
     private const string NamespaceContainsNiceName = "Namespace Contains";
@@ -25,32 +23,41 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
 
     private VisualTreeAsset _configTemplate;
 
-    private bool _isDirty;
-
     private ListView _listView;
+
+    private VisualElement _root;
     private VisualTreeAsset _typeEntryTemplate;
 
     private List <ComponentOrderConfig.Type> _types;
+
+    #region Unity Event Functions
+
+    private void OnDestroy()
+    {
+        VisualElement upperParent = GUIUtility.SetParentFlexGrowRecursive(_root, 3, false);
+
+        if (upperParent != null)
+            upperParent.Q <VisualElement>("unity-content-container").style.flexGrow = 0f;
+    }
+
+    #endregion
 
     #region Public Methods
 
     public override VisualElement CreateInspectorGUI()
     {
-        var root = new VisualElement();
+        _configTemplate = Resources.Load <VisualTreeAsset>(Constants.Validators.UserInterface.ComponentOrderConfig);
 
-        _configTemplate = Resources.Load <VisualTreeAsset>(ConfigPath);
-        TemplateContainer configBase = _configTemplate.Instantiate();
-        root.Add(configBase);
+        _root = GUIUtility.Instantiate(_configTemplate);
+        _root.style.flexGrow = 1f;
 
-        root.RegisterCallback <FocusOutEvent>(Save);
-
-        var addButton = root.Q <Button>("BTN_Add");
+        var addButton = _root.Q <Button>("BTN_Add");
         addButton.clicked += AddListElement;
 
-        var removeButton = root.Q <Button>("BTN_Remove");
+        var removeButton = _root.Q <Button>("BTN_Remove");
         removeButton.clicked += RemoveListElement;
 
-        var categoryDropdown = root.Q <DropdownField>("CategoryDropdown");
+        var categoryDropdown = _root.Q <DropdownField>("CategoryDropdown");
         categoryDropdown.choices = Enum.GetNames(typeof(ComponentOrderConfig.CategoryFunction)).ToList();
         categoryDropdown.choices.Remove("Fill");
 
@@ -70,11 +77,12 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                 categoryDropdown.index = 0;
             });
 
-        _listView = root.Q <ListView>();
+        _listView = _root.Q <ListView>();
 
-        _typeEntryTemplate = Resources.Load <VisualTreeAsset>(TypeEntryPath);
+        _typeEntryTemplate =
+            Resources.Load <VisualTreeAsset>(Constants.Validators.UserInterface.ComponentOrderTypeEntry);
 
-        _listView.makeItem = () => _typeEntryTemplate.Instantiate();
+        _listView.makeItem = () => GUIUtility.Instantiate(_typeEntryTemplate);
 
         _listView.bindItem = UpdateEntry;
 
@@ -82,13 +90,30 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
         _listView.itemsSource = _types;
         _listView.RefreshItems();
 
-        return root;
+        _root.schedule.Execute(
+            () =>
+            {
+                _root.parent.styleSheets.Add(StyleSheetValues.BaseStyleSheet);
+                _root.parent.styleSheets.Add(StyleSheetValues.AttributesStyleSheet);
+
+                VisualElement upperParent = GUIUtility.SetParentFlexGrowRecursive(_root, 3, true);
+                upperParent.Q <VisualElement>("unity-content-container").style.flexGrow = 1f;
+
+                GUIUtility.ApplyRootElementTheme(_root.parent);
+                _root.parent.AddToClassList(StyleSheetClasses.Background.Color.Tertiary);
+            });
+
+        return _root;
     }
 
     #endregion
 
     #region Private Methods
 
+    /// <summary> Get the tooltip for the given function </summary>
+    /// <param name="categoryFunction"> Category that will be called </param>
+    /// <returns> Tooltip of the targeted  function </returns>
+    /// <exception cref="ArgumentOutOfRangeException"> Function not found </exception>
     private static string CategoryFunctionTooltip(ComponentOrderConfig.CategoryFunction categoryFunction)
     {
         return categoryFunction switch
@@ -98,11 +123,16 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                        "All components that are not in the UnityEngine namespace will be placed here.",
                    ComponentOrderConfig.CategoryFunction.NamespaceContains =>
                        "All components that contain the given string in their namespace will be placed here.",
-                   ComponentOrderConfig.CategoryFunction.NamespaceEquals => "All components that are in the specified namespace will be placed here",
+                   ComponentOrderConfig.CategoryFunction.NamespaceEquals =>
+                       "All components that are in the specified namespace will be placed here",
                    var _ => throw new ArgumentOutOfRangeException(nameof(categoryFunction), categoryFunction, null)
                };
     }
 
+    /// <summary> Translate the different category functions to each other </summary>
+    /// <param name="category"> Category to translate </param>
+    /// <returns> Translated function call </returns>
+    /// <exception cref="ArgumentOutOfRangeException"> Function not found </exception>
     private static string TranslateCategoryFunctions(string category)
     {
         if (Enum.TryParse(category, out ComponentOrderConfig.CategoryFunction function))
@@ -127,6 +157,8 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                };
     }
 
+    /// <summary> Add the list an element of the category type </summary>
+    /// <param name="categoryFunction"> Function deciding the category to add </param>
     private void AddCategoryListElement(string categoryFunction)
     {
         var function = Enum.Parse <ComponentOrderConfig.CategoryFunction>(TranslateCategoryFunctions(categoryFunction));
@@ -142,19 +174,21 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                 category = {function = function}
             });
 
-        _isDirty = true;
+        Save();
 
         _listView.RefreshItems();
     }
 
+    /// <summary> Add a normal list item </summary>
     private void AddListElement()
     {
         _types.Add(new ComponentOrderConfig.Type());
-        _isDirty = true;
+        Save();
 
         _listView.RefreshItems();
     }
 
+    /// <summary> Remove a list item </summary>
     private void RemoveListElement()
     {
         var index = _listView.selectedItem == null ? _types.Count - 1 : _listView.selectedIndex;
@@ -163,25 +197,22 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
             return;
 
         _types.RemoveAt(index);
-        _isDirty = true;
+        Save();
 
         _listView.RefreshItems();
     }
 
-    private void Save(FocusOutEvent evt)
+    /// <summary> Save the current list </summary>
+    private void Save()
     {
-        if (!_isDirty)
-            return;
-
-        _isDirty = false;
-
         serializedObject.ApplyModifiedProperties();
-#if UNITY_EDITOR
         EditorUtility.SetDirty(serializedObject.targetObject);
-        AssetDatabase.SaveAssetIfDirty(serializedObject.targetObject);
-#endif
     }
 
+    /// <summary> Update the content of an category list item </summary>
+    /// <param name="element"> Item to be updated </param>
+    /// <param name="entry"> Corresponding entry of the list item </param>
+    /// <exception cref="ArgumentOutOfRangeException"> Function of entry not found </exception>
     private void UpdateCategoryContent(VisualElement element, ComponentOrderConfig.Type entry)
     {
         switch (entry.category.function)
@@ -202,7 +233,8 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                     ? "Control String"
                     : "Namespace";
 
-                var namespaceField = new TextField(title) {value = entry.category.nameSpaceString, style = {flexGrow = 1}};
+                var namespaceField =
+                    new TextField(title) {value = entry.category.nameSpaceString, style = {flexGrow = 1}};
 
                 element.Add(namespaceField);
 
@@ -210,7 +242,7 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                     evt =>
                     {
                         entry.category.nameSpaceString = evt.newValue;
-                        _isDirty = true;
+                        Save();
                     });
 
                 break;
@@ -220,6 +252,9 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
         }
     }
 
+    /// <summary> Update the content of a normal list item </summary>
+    /// <param name="element"> Element to be updated </param>
+    /// <param name="i"> Index of the element </param>
     private void UpdateEntry(VisualElement element, int i)
     {
         ComponentOrderConfig.Type entry = _types[i];
@@ -249,6 +284,9 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
         {
             var componentName = componentContent.Q <TextField>();
             componentName.isReadOnly = !entry.canBeModified;
+            componentName.pickingMode = entry.canBeModified ? PickingMode.Position : PickingMode.Ignore;
+            componentName.focusable = entry.canBeModified;
+
             componentName.value = entry.componentName;
 
             componentName.RegisterValueChangedCallback(
@@ -258,7 +296,7 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                         return;
 
                     _types[i].componentName = evt.newValue;
-                    _isDirty = true;
+                    Save();
                 });
         }
     }
