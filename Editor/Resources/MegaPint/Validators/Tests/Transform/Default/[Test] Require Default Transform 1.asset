@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74d3942af42a4cdf99dcbb5260b15292, type: 3}
   m_Name: '[Test] Require Default Transform 1'
   m_EditorClassIdentifier: 
+  initializedRequirements:
+  - MegaPint.ValidationRequirement.Requirements.TransformValidation.RequireDefaultTransform
   _requirements:
   - rid: 2612410337079328775
   references:
