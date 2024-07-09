@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace MegaPint.ValidationRequirement.Requirements.CSharp.VariablesLogic
 {
@@ -8,29 +8,27 @@ namespace MegaPint.ValidationRequirement.Requirements.CSharp.VariablesLogic
 [Serializable]
 public class Variable
 {
-    public Properties properties;
-    
     [Serializable]
     public class Properties
     {
         public string name;
         public Type type;
-        
+
         public ObjectRequirement objectRequirement;
         public StringRequirement stringRequirement;
         public BooleanRequirement boolRequirement;
         public IntegerRequirement intRequirement;
         public FloatRequirement floatRequirement;
 
-        public UnityEngine.Object targetObjectValue;
+        public Object targetObjectValue;
         public string targetStringValue;
         public bool targetBoolValue;
-        
+
         public int targetIntValue;
         public int intReferenceValue;
         public int intRangeMin;
         public int intRangeMax;
-        
+
         public float targetFloatValue;
         public float floatReferenceValue;
         public float floatRangeMin;
@@ -38,51 +36,51 @@ public class Variable
 
         public float propertyHeight;
     }
-    
 
-
-    // TODO Drawer for this class (The drawer then decides what to draw based oin the requirement enum)
-        
-    public enum Type
-    {
-        Object, String, Bool, Int, Float
-    }
-    
-    public enum ObjectRequirement
-    {
-        None, NotNull, Equals
-    }
-    
-    public enum StringRequirement
-    {
-        None, NotNull, Equals
-    }
-    
     public enum BooleanRequirement
     {
         None, Equals
     }
-    
-    public enum IntegerRequirement
-    {
-        None, Equals, GreaterThan, GreaterEqualsThan, LesserThan, LesserEqualsThan, Range
-    }
-    
+
     public enum FloatRequirement
     {
         None, Equals, GreaterThan, GreaterEqualsThan, LesserThan, LesserEqualsThan, Range
     }
 
+    public enum IntegerRequirement
+    {
+        None, Equals, GreaterThan, GreaterEqualsThan, LesserThan, LesserEqualsThan, Range
+    }
+
+    public enum ObjectRequirement
+    {
+        None, NotNull, Equals
+    }
+
+    public enum StringRequirement
+    {
+        None, NotNull, Equals
+    }
+
+    // TODO Drawer for this class (The drawer then decides what to draw based oin the requirement enum)
+
+    public enum Type
+    {
+        Object, String, Bool, Int, Float
+    }
+
+    public Properties properties;
+
+    #region Public Methods
+
     public bool Validate(object value, out List <ValidationError> errors)
     {
-        Debug.Log($"Validating variable: {properties.name}"); // TODO remove
-
         var isValid = true;
+
+        List <ValidationError> newErrors;
 
         errors = new List <ValidationError>();
 
-        Debug.Log(properties.type);
-        
         switch (properties.type)
         {
             case Type.Object:
@@ -92,12 +90,21 @@ public class Variable
                         value,
                         properties.objectRequirement,
                         properties.targetObjectValue,
-                        out List <ValidationError> newErrors))
+                        out newErrors))
                     errors.AddRange(newErrors);
 
                 break;
 
             case Type.String:
+                if (!StringRequirements.Validate(
+                        ref isValid,
+                        properties,
+                        value,
+                        properties.stringRequirement,
+                        properties.targetStringValue,
+                        out newErrors))
+                    errors.AddRange(newErrors);
+
                 break;
 
             case Type.Bool:
@@ -112,9 +119,11 @@ public class Variable
             default:
                 throw new ArgumentOutOfRangeException();
         }
-        
+
         return isValid;
     }
+
+    #endregion
 }
 
 }

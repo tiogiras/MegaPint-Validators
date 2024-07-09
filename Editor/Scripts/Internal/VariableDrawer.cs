@@ -245,45 +245,6 @@ internal class VariableDrawer : PropertyDrawer
     }
 
     #endregion
-
-    /*public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-    {
-        /*EditorGUILayout.BeginHorizontal();
-
-        GUILayout.Button("Hello World");
-        
-        EditorGUILayout.EndHorizontal();#1#
-    }*/
-
-    /*
-    public override VisualElement CreatePropertyGUI(SerializedProperty property)
-    {
-        var root = new VisualElement();
-
-        var label = new Label("Hello World");
-        
-        root.Add(label);
-        
-        /*var template = Resources.Load <VisualTreeAsset>(Constants.Validators.UserInterface.Variable);
-
-        VisualElement root = GUIUtility.Instantiate(template);
-        root.style.flexGrow = 1f;
-        root.style.flexShrink = 1f;#1#
-
-        return root;
-    }
-    */
-
-    /*public override VisualElement CreateInspectorGUI()
-    {
-    /*var template = Resources.Load <VisualTreeAsset>(Constants.Validators.UserInterface.Variable);
-    
-    VisualElement root = GUI.Utility.GUIUtility.Instantiate(template);
-    root.style.flexGrow = 1f;
-    root.style.flexShrink = 1f;
-    
-    return root;#1#
-    }*/
 }
 
 }
