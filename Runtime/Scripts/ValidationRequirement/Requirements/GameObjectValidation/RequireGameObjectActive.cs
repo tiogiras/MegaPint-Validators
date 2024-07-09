@@ -7,7 +7,7 @@ namespace MegaPint.ValidationRequirement.Requirements.GameObjectValidation
 
 /// <summary> Validation requirement requiring a specific active state on a gameObject </summary>
 [Serializable]
-[SerializeReferenceDropdownName("GameObject/Active", typeof(RequireGameObjectActive), -10, 0)]
+[SerializeReferenceDropdownName("GameObject/Active", typeof(RequireGameObjectActive), -30, 0)]
 public class RequireGameObjectActive : ScriptableValidationRequirement
 {
     [SerializeField] [Tooltip("The state the gameObject should have")]

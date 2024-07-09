@@ -8,7 +8,7 @@ namespace MegaPint.ValidationRequirement.Requirements.TransformValidation
 
 /// <summary> Validation requirement for custom values on a transform component </summary>
 [Serializable]
-[SerializeReferenceDropdownName("Transform/Custom Global", typeof(RequireGlobalTransform), -10, 2)]
+[SerializeReferenceDropdownName("Transform/Custom Global", typeof(RequireGlobalTransform), -29, 2)]
 public class RequireGlobalTransform : ScriptableValidationRequirement
 {
     [SerializeField] [Tooltip("The transform is required to have this specified global position")]

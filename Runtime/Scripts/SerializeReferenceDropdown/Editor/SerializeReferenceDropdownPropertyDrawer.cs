@@ -86,7 +86,7 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
     private static SerializeReferenceDropdownNameAttribute GetType(Type type)
     {
         if (type == null)
-            return new SerializeReferenceDropdownNameAttribute(NullName, null, -30);
+            return new SerializeReferenceDropdownNameAttribute(NullName, null, Int32.MinValue + 1);
 
         return type.GetCustomAttribute <SerializeReferenceDropdownNameAttribute>();
     }
@@ -108,7 +108,8 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
 
     private void DrawIMGUITypeDropdown(Rect rect, SerializedProperty property, GUIContent label)
     {
-        var index = int.Parse(label.text.Replace("Element ", ""));
+        if (!int.TryParse(label.text.Replace("Element ", ""), out var index))
+            return;
 
         Type currentValue = null;
         List <Type> addedRequirements = new();
