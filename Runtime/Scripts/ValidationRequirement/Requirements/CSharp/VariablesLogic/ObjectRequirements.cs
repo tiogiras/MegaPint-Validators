@@ -15,7 +15,7 @@ public static class ObjectRequirements
         Variable.Properties variable,
         object value,
         Variable.ObjectRequirement requirement,
-        object objectEquals,
+        object targetedValue,
         out List <ValidationError> errors)
     {
         errors = new List <ValidationError>();
@@ -34,7 +34,7 @@ public static class ObjectRequirements
                 break;
 
             case Variable.ObjectRequirement.Equals:
-                if (!ValidateEquals(ref isValid, variable, value, objectEquals, out error))
+                if (!ValidateEquals(ref isValid, variable, value, targetedValue, out error))
                     errors.Add(error);
 
                 break;
@@ -67,7 +67,7 @@ public static class ObjectRequirements
         error = new ValidationError
         {
             errorName = "Not Equal",
-            errorText = $"The variable {variable.name} is not equal to {objectEquals}",
+            errorText = $"The variable {variable.name} is not equal to [{objectEquals}]",
             severity = ValidationState.Error,
             fixAction = null
         };
