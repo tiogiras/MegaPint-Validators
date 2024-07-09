@@ -82,6 +82,13 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
             });
     }
 
+    // TODO commenting
+    protected void AddErrors(List <ValidationError> errors)
+    {
+        foreach (ValidationError error in errors)
+            AddError(error.errorName, error.errorText, error.severity, error.fixAction);
+    }
+
     /// <summary> Validates the gameObject </summary>
     /// <param name="gameObject"> GameObject that is validated </param>
     protected abstract void Validate(GameObject gameObject);
