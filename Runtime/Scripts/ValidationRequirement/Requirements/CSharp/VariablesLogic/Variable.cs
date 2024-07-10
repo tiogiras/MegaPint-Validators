@@ -38,6 +38,10 @@ public class Variable
 
         // Used to store the height of the list entry instance
         public float propertyHeight;
+
+        // Storing information for the gui to display
+        public bool fieldFound;
+        public int typeIndex;
     }
 
     public enum BooleanRequirement
@@ -79,6 +83,8 @@ public class Variable
         var isValid = true;
 
         errors = new List <ValidationError>();
+
+        SetTypeIndex(value);
 
         switch (properties.type)
         {
@@ -170,6 +176,19 @@ public class Variable
                 properties.targetObjectValue,
                 out List <ValidationError> newErrors))
             errors.AddRange(newErrors);
+    }
+
+    private void SetTypeIndex(object value)
+    {
+        properties.typeIndex = value switch
+                               {
+                                   Object => 0,
+                                   string => 1,
+                                   bool => 2,
+                                   int => 3,
+                                   float => 4,
+                                   var _ => properties.typeIndex
+                               };
     }
 
     private void StringValidation(ref bool isValid, object value, List <ValidationError> errors)

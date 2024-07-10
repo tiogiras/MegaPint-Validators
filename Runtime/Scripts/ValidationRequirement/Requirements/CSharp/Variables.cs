@@ -20,6 +20,8 @@ public class Variables : ScriptableValidationRequirement
     [SerializeField] private string _className;
     [SerializeField] private string _assemblyName;
 
+    public ClassValidation validation;
+
     [FormerlySerializedAs("_variableName")]
     [Space]
     [SerializeField] private List <Variable> _variables;
@@ -32,13 +34,17 @@ public class Variables : ScriptableValidationRequirement
 
     protected override void Validate(GameObject gameObject)
     {
-        if (_variables.Count == 0)
-            return;
-        
+        validation.foundClass = false;
+
         if (!TryGetClassType(out Type type))
             return;
         
         if (!TryGetClassComponent(gameObject, type, out Component comp))
+            return;
+
+        validation.foundClass = true;
+        
+        if (_variables.Count == 0)
             return;
         
         foreach (Variable variable in _variables)
@@ -52,7 +58,11 @@ public class Variables : ScriptableValidationRequirement
                 variableName,
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Default);
 
-            if (field == null)
+            var fieldFound = field != null;
+
+            variable.properties.fieldFound = fieldFound;
+            
+            if (!fieldFound)
                 continue;
 
             if (!variable.Validate(field.GetValue(comp), out List <ValidationError> errors))
@@ -85,9 +95,6 @@ public class Variables : ScriptableValidationRequirement
             return false;
 
         type = Type.GetType($"{_classNamespace}.{_className}, {_assemblyName}");
-        
-        if (type == null)
-            Debug.LogWarning("The type of the given script could not be found. Please check the namespace, className and assemblyName.");
 
         return type != null;
     }
