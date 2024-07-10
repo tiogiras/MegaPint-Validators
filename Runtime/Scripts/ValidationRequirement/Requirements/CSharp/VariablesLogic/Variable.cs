@@ -51,22 +51,22 @@ public class Variable
 
     public enum FloatRequirement
     {
-        None, Equals, GreaterThan, GreaterEqualsThan, LesserThan, LesserEqualsThan, Range
+        None, Equals, GreaterThan, GreaterEqualsThan, LesserThan, LesserEqualsThan, Range, IsNot
     }
 
     public enum IntegerRequirement
     {
-        None, Equals, GreaterThan, GreaterEqualsThan, LesserThan, LesserEqualsThan, Range
+        None, Equals, GreaterThan, GreaterEqualsThan, LesserThan, LesserEqualsThan, Range, IsNot
     }
 
     public enum ObjectRequirement
     {
-        None, NotNull, Equals
+        None, NotNull, Equals, IsNot
     }
 
     public enum StringRequirement
     {
-        None, NotNull, Equals
+        None, NotNull, Equals, IsNot
     }
 
     public enum Type

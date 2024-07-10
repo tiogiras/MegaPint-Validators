@@ -37,6 +37,12 @@ public static class StringRequirements
 
                 break;
 
+            case Variable.StringRequirement.IsNot:
+                if (!ValidateIsNot(ref isValid, variable, value, targetedValue, out error))
+                    errors.Add(error);
+
+                break;
+            
             default:
                 throw new ArgumentOutOfRangeException(nameof(requirement), requirement, null);
         }
@@ -69,6 +75,34 @@ public static class StringRequirements
         {
             errorName = "Not Equal",
             errorText = $"The variable {variable.name} is not equal to [{targetedValue}]",
+            severity = ValidationState.Error,
+            fixAction = null
+        };
+
+        return false;
+    }
+    
+    private static bool ValidateIsNot(
+        ref bool isValid,
+        Variable.Properties variable,
+        object value,
+        string targetedValue,
+        out ValidationError error)
+    {
+        error = new ValidationError();
+
+        if (value is not string stringValue)
+            return true;
+
+        if (!stringValue.Equals(targetedValue))
+            return true;
+
+        isValid = false;
+
+        error = new ValidationError
+        {
+            errorName = "Is Forbidden Value",
+            errorText = $"The variable {variable.name} is equal to [{targetedValue}]",
             severity = ValidationState.Error,
             fixAction = null
         };

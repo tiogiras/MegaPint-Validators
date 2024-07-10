@@ -136,7 +136,7 @@ internal class VariableDrawer : PropertyDrawer
             case 0:
                 break;
 
-            case 1:
+            case 1 or 7:
                 Rect targetValueRect = GetNewRect(position, propertyHeight, 5);
                 SerializedProperty targetValueProperty = property.FindPropertyRelative("targetFloatValue");
                 EditorGUI.PropertyField(targetValueRect, targetValueProperty, new GUIContent("Expected Value"));
@@ -177,7 +177,7 @@ internal class VariableDrawer : PropertyDrawer
             case 0:
                 break;
 
-            case 1:
+            case 1 or 7:
                 Rect targetValueRect = GetNewRect(position, propertyHeight, 5);
                 SerializedProperty targetValueProperty = property.FindPropertyRelative("targetIntValue");
                 EditorGUI.PropertyField(targetValueRect, targetValueProperty, new GUIContent("Expected Value"));
@@ -218,7 +218,7 @@ internal class VariableDrawer : PropertyDrawer
             case 0 or 1:
                 break;
 
-            case 2:
+            case 2 or 3:
                 Rect targetValueRect = GetNewRect(position, propertyHeight, 5);
                 SerializedProperty targetValueProperty = property.FindPropertyRelative("targetObjectValue");
                 EditorGUI.PropertyField(targetValueRect, targetValueProperty, new GUIContent("Expected Value"));
@@ -241,7 +241,7 @@ internal class VariableDrawer : PropertyDrawer
             case 0 or 1:
                 break;
 
-            case 2:
+            case 2 or 3:
                 Rect targetValueRect = GetNewRect(position, propertyHeight, 5);
                 SerializedProperty targetValueProperty = property.FindPropertyRelative("targetStringValue");
                 EditorGUI.PropertyField(targetValueRect, targetValueProperty, new GUIContent("Expected Value"));

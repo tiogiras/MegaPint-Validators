@@ -66,6 +66,12 @@ public static class FloatRequirements
 
                 break;
 
+            case Variable.FloatRequirement.IsNot:
+                if (!ValidateIsNot(ref isValid, variable, value, targetedValue, out error))
+                    errors.Add(error);
+
+                break;
+
             default:
                 throw new ArgumentOutOfRangeException(nameof(requirement), requirement, null);
         }
@@ -155,6 +161,35 @@ public static class FloatRequirements
         {
             errorName = "Not Greater",
             errorText = $"The variable {variable.name} is not greater than [{referenceValue}]",
+            severity = ValidationState.Error,
+            fixAction = null
+        };
+
+        return false;
+    }
+
+    private static bool ValidateIsNot(
+        ref bool isValid,
+        Variable.Properties variable,
+        object value,
+        float targetedValue,
+        out ValidationError error)
+    {
+        error = new ValidationError();
+
+        if (value is not float floatValue)
+            return true;
+
+        // ReSharper disable once CompareOfFloatsByEqualityOperator
+        if (floatValue != targetedValue)
+            return true;
+
+        isValid = false;
+
+        error = new ValidationError
+        {
+            errorName = "Is Forbidden Value",
+            errorText = $"The variable {variable.name} is equal to [{targetedValue}]",
             severity = ValidationState.Error,
             fixAction = null
         };
