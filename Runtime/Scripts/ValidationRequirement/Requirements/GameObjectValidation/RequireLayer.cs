@@ -1,5 +1,6 @@
 ﻿using System;
 using MegaPint.SerializeReferenceDropdown.Runtime;
+using UnityEditor;
 using UnityEngine;
 
 namespace MegaPint.ValidationRequirement.Requirements.GameObjectValidation
@@ -21,13 +22,13 @@ public class RequireLayer : ScriptableValidationRequirement
     {
         if (string.IsNullOrEmpty(_layerName))
             return;
-        
+
         if (gameObject.layer != LayerMask.NameToLayer(_layerName))
         {
             AddError(
                 "Incorrect Layer",
                 $"Expected layer {_layerName}, but found {LayerMask.LayerToName(gameObject.layer)}",
-                ValidationState.Error,
+                ValidationState.Warning,
                 FixAction);
         }
     }
