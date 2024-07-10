@@ -18,7 +18,7 @@ internal class VariableDrawer : PropertyDrawer
     {
         return property.FindPropertyRelative("propertyHeight").floatValue;
     }
-    
+
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
         SerializedProperty propertyHeight = GetHeightProperty(property);
@@ -32,6 +32,17 @@ internal class VariableDrawer : PropertyDrawer
 
         EditorGUI.PropertyField(nameRect, nameProperty, new GUIContent("Name"));
         EditorGUI.PropertyField(typeRect, typeProperty, new GUIContent("Type"));
+
+        if (!property.FindPropertyRelative("fieldFound").boolValue ||
+            property.FindPropertyRelative("typeIndex").intValue != typeProperty.enumValueFlag)
+        {
+            Rect fieldNotFoundRect = GetNewRect(position, propertyHeight, 8);
+
+            EditorGUI.LabelField(
+                fieldNotFoundRect,
+                $"No {GetVariableTypeName(typeProperty.enumValueFlag)} with the name [ <b>{nameProperty.stringValue}</b> ] found in the selected class!",
+                new GUIStyle {normal = {textColor = Color.red}});
+        }
 
         EditorGUI.DrawRect(
             new Rect(position.x, position.y + propertyHeight.floatValue, position.width, 1),
@@ -74,6 +85,19 @@ internal class VariableDrawer : PropertyDrawer
     #endregion
 
     #region Private Methods
+
+    private static string GetVariableTypeName(int type)
+    {
+        return type switch
+               {
+                   0 => "Object",
+                   1 => "String",
+                   2 => "Bool",
+                   3 => "Integer",
+                   4 => "Float",
+                   var _ => "TypeNotFound"
+               };
+    }
 
     private void DrawBoolProperty(Rect position, SerializedProperty property)
     {
