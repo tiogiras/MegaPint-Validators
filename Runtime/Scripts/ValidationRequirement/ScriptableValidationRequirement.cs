@@ -13,6 +13,8 @@ namespace MegaPint.ValidationRequirement
 /// <summary> Abstract class to create validation requirements for the <see cref="ValidatableMonoBehaviour" /> </summary>
 public abstract class ScriptableValidationRequirement : ValidationRequirementMetaData, IValidationRequirement
 {
+    [HideInInspector] public string preventListHeaderIssues;
+    
     private List <ValidationError> _errors;
     private GameObject _gameObject;
 
