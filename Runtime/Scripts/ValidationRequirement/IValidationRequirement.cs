@@ -22,11 +22,9 @@ public interface IValidationRequirement
 
     #region Unity Event Functions
 
-    /// <summary> Called when the <see cref="ValidatableMonoBehaviour" /> is validated by unity  </summary>
-    public void OnValidate(ValidatableMonoBehaviour behaviour);
-
-    /// <summary> Called when the <see cref="ValidatorSettings" /> is validated by unity  </summary>
-    public void OnValidate(ValidatorSettings settings);
+    /// <summary> Called when the holder of the requirement is validated by unity  </summary>
+    /// <param name="o"> Object that was validated by unity </param>
+    public void OnValidate(Object o);
 
     #endregion
 }
