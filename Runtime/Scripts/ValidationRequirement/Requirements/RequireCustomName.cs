@@ -24,10 +24,8 @@ public class RequireCustomName : ScriptableValidationRequirement
 
     protected override void Validate(GameObject gameObject)
     {
-        if (Regex.IsMatch(gameObject.name, _regexPattern))
-            return;
-
-        AddError(
+        AddErrorIf(
+            !Regex.IsMatch(gameObject.name, _regexPattern),
             "Invalid gameObject naming",
             "The name of the gameObject does not correspond to the specified regexPattern",
             ValidationState.Warning,

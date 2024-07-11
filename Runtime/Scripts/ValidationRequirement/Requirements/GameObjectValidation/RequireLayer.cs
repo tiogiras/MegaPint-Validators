@@ -23,14 +23,12 @@ public class RequireLayer : ScriptableValidationRequirement
         if (string.IsNullOrEmpty(_layerName))
             return;
 
-        if (gameObject.layer != LayerMask.NameToLayer(_layerName))
-        {
-            AddError(
-                "Incorrect Layer",
-                $"Expected layer {_layerName}, but found {LayerMask.LayerToName(gameObject.layer)}",
-                ValidationState.Warning,
-                FixAction);
-        }
+        AddErrorIf(
+            gameObject.layer != LayerMask.NameToLayer(_layerName),
+            "Incorrect Layer",
+            $"Expected layer {_layerName}, but found {LayerMask.LayerToName(gameObject.layer)}",
+            ValidationState.Warning,
+            FixAction);
     }
 
     #endregion
