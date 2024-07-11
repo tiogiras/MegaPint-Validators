@@ -34,10 +34,8 @@ public class RequireComponent : ScriptableValidationRequirement
 
         Type type = GetTypeByName();
 
-        if (gameObject.GetComponent(type))
-            return;
-
-        AddError(
+        AddErrorIf(
+            !gameObject.GetComponent(type),
             "Missing Component",
             $"The gameObject is missing a component of type {type}",
             ValidationState.Warning,

@@ -84,6 +84,23 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
             });
     }
 
+    /// <summary> Add an error to the validation result when the statement is true </summary>
+    /// <param name="statement"> Add the error when this is true </param>
+    /// <param name="errorName"> Name of the error </param>
+    /// <param name="errorText"> Additional information about the error </param>
+    /// <param name="severity"> <see cref="ValidationState" /> of the error </param>
+    /// <param name="fixAction"> Action that is called when attempting to fix the error </param>
+    protected void AddErrorIf(
+        bool statement,
+        string errorName,
+        string errorText,
+        ValidationState severity,
+        Action <GameObject> fixAction)
+    {
+        if (statement)
+            AddError(errorName, errorText, severity, fixAction);
+    }
+
     // TODO commenting
     protected void AddErrors(List <ValidationError> errors)
     {
