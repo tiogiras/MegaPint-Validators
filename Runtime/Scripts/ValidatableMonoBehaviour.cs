@@ -101,6 +101,13 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     {
         _importedSettings = settings;
     }
+    
+    /// <summary> Get the imported settings </summary>
+    /// <returns> The imported settings of the behaviour </returns>
+    public ValidatorSettings GetImportedSettings()
+    {
+        return _importedSettings;
+    }
 
     /// <summary> Validate this gameObject based on the set <see cref="ScriptableValidationRequirement" /> </summary>
     /// <param name="errors"> Found errors </param>

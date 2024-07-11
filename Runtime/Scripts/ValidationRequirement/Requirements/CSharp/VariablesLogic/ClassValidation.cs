@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MegaPint.ValidationRequirement.Requirements.CSharp
+namespace MegaPint.ValidationRequirement.Requirements.CSharp.VariablesLogic
 {
 
 [Serializable]

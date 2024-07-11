@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using MegaPint.SerializeReferenceDropdown.Runtime;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -46,16 +47,19 @@ public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
         #endregion
     }
 
-    private readonly IEnumerable <SerializeReferenceDropdownNameAttribute> _attributes;
-    private readonly Dictionary <string, TreeElement> _dropdownTree = new();
-    private readonly Dictionary <AdvancedDropdownItem, int> _itemAndIndexes = new();
-
-    private readonly Action <int> _onSelectedTypeIndex;
-
     private readonly Type[] _addedRequirements;
-    private readonly Dictionary <AdvancedDropdownItem, Type> _itemTypes = new();
+
+    private readonly IEnumerable <SerializeReferenceDropdownNameAttribute> _attributes;
 
     private readonly Type _currentValue;
+    private readonly Dictionary <string, TreeElement> _dropdownTree = new();
+
+    private readonly Dictionary <AdvancedDropdownItem, bool> _itemAndAllowMultiple = new();
+    private readonly Dictionary <AdvancedDropdownItem, Type[]> _itemAndIncompatibles = new();
+    private readonly Dictionary <AdvancedDropdownItem, int> _itemAndIndexes = new();
+    private readonly Dictionary <AdvancedDropdownItem, Type> _itemTypes = new();
+
+    private readonly Action <int> _onSelectedTypeIndex;
 
     public SerializeReferenceDropdownAdvancedDropdown(
         AdvancedDropdownState state,
@@ -79,6 +83,9 @@ public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
     {
         var root = new AdvancedDropdownItem("Requirements");
         _itemAndIndexes.Clear();
+        _itemAndAllowMultiple.Clear();
+        _itemAndIncompatibles.Clear();
+
         _itemTypes.Clear();
         _dropdownTree.Clear();
 
@@ -111,6 +118,9 @@ public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
                     {
                         _itemTypes.Add(element.item, attribute.requirementType);
                         _itemAndIndexes.Add(element.item, index);
+                        _itemAndAllowMultiple.Add(element.item, attribute.allowMultiple);
+                        _itemAndIncompatibles.Add(element.item, attribute.incompatibleRequirements);
+
                         index++;
                     }
 
@@ -135,9 +145,12 @@ public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
                         : default);
 
                 _dropdownTree.TryAdd($"{attribute.name}{element.order}", element);
-                
+
                 _itemTypes.Add(element.item, attribute.requirementType);
                 _itemAndIndexes.Add(element.item, index);
+                _itemAndAllowMultiple.Add(element.item, attribute.allowMultiple);
+                _itemAndIncompatibles.Add(element.item, attribute.incompatibleRequirements);
+
                 index++;
             }
         }
@@ -151,25 +164,30 @@ public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
     {
         base.ItemSelected(item);
 
-        if (ItemIsAdded(item))
+        if (HasIncompatibleRequirements(item, out Type[] incompatibleRequirements))
         {
-            Debug.LogWarning("The requirement already exists on this gameObject and cannot be added multiple times.");
-            
+            var message = new StringBuilder();
+
+            message.AppendLine(
+                "The requirement is not compatible with the following requirements on this gameObject and therefor cannot be added.");
+
+            foreach (Type requirement in incompatibleRequirements)
+                message.AppendLine($"- {requirement.Name}");
+
+            Debug.LogWarning(message.ToString()[..^2]);
+
             return;
         }
-        
+
+        if (!_itemAndAllowMultiple[item] && ItemIsAdded(item))
+        {
+            Debug.LogWarning("The requirement already exists on this gameObject and cannot be added multiple times.");
+
+            return;
+        }
+
         if (_itemAndIndexes.TryGetValue(item, out var index))
             _onSelectedTypeIndex.Invoke(index);
-    }
-
-    private bool ItemIsAdded(AdvancedDropdownItem item)
-    {
-        Type type = _itemTypes[item];
-
-        if (type == _currentValue)
-            return false;
-        
-        return type != null && _addedRequirements.Contains(type);
     }
 
     #endregion
@@ -199,6 +217,34 @@ public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
             if (element.subItems.Count > 0)
                 AddItems(element.item, element.subItems.Values.ToList());
         }
+    }
+
+    private bool HasIncompatibleRequirements(AdvancedDropdownItem item, out Type[] types)
+    {
+        types = null;
+
+        Type[] incompatibles = _itemAndIncompatibles[item];
+
+        if (incompatibles is not {Length: > 0})
+            return false;
+
+        types =
+            _addedRequirements.Where(requirement => incompatibles.Contains(requirement)).ToArray();
+
+        if (types.Length == 1 && types[0] == _currentValue)
+            return false;
+
+        return types.Length > 0;
+    }
+
+    private bool ItemIsAdded(AdvancedDropdownItem item)
+    {
+        Type type = _itemTypes[item];
+
+        if (type == _currentValue)
+            return false;
+
+        return type != null && _addedRequirements.Contains(type);
     }
 
     #endregion

@@ -11,7 +11,7 @@ namespace MegaPint.ValidationRequirement.Requirements.CSharp
 
 /// <summary> Validation requirement for variables checking for NotNull </summary>
 [Serializable]
-[SerializeReferenceDropdownName("C#/Variables", typeof(Variables), -40)]
+[SerializeReferenceDropdownName("C#/Variables", typeof(Variables), true, -40)]
 public class Variables : ScriptableValidationRequirement
 {
     [HideInInspector] public string name;
