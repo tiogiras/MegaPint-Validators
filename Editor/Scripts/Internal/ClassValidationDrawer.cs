@@ -2,6 +2,7 @@
 
 #if UNITY_EDITOR
 using MegaPint.ValidationRequirement.Requirements.CSharp;
+using MegaPint.ValidationRequirement.Requirements.CSharp.VariablesLogic;
 using UnityEditor;
 using UnityEngine;
 

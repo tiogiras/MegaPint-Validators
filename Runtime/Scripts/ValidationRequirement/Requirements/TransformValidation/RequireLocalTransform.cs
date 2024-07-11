@@ -8,7 +8,13 @@ namespace MegaPint.ValidationRequirement.Requirements.TransformValidation
 
 /// <summary> Validation requirement for custom values on a local transform </summary>
 [Serializable]
-[SerializeReferenceDropdownName("Transform/Custom Local", typeof(RequireLocalTransform), -29, 1)]
+[SerializeReferenceDropdownName(
+    "Transform/Custom Local",
+    typeof(RequireLocalTransform),
+    false,
+    new[] {typeof(RequireDefaultTransform), typeof(RequireGlobalTransform)},
+    -29,
+    1)]
 public class RequireLocalTransform : ScriptableValidationRequirement
 {
     [SerializeField] [Tooltip("The transform is required to have this specified local position")]
