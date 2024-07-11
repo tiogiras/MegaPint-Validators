@@ -17,7 +17,7 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
     [HideInInspector] public string preventListHeaderIssues;
 
     [HideInInspector] public bool initialized;
-    public ValidationState severityOverwrite; // TODO hide in inspector
+    [HideInInspector] public ValidationState severityOverwrite;
     [HideInInspector] public GameObject gameObject;
     [HideInInspector] public Object objectReference;
 
@@ -25,8 +25,6 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
 
     public void ChangeSeverityOverwrite()
     {
-        Debug.Log("changing...");
-        
         severityOverwrite = severityOverwrite switch
                             {
                                 ValidationState.Unknown or ValidationState.Ok => ValidationState.Warning,
@@ -36,8 +34,6 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
                             };
         
         SetDirty();
-
-        Debug.Log($"New State: {severityOverwrite}]");
     }
     
     #region Unity Event Functions
@@ -227,11 +223,6 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
     }
 
     #endregion
-
-    public ValidationState GetSeverityOverwrite()
-    {
-        return severityOverwrite;
-    }
 }
 
 }
