@@ -87,14 +87,14 @@ public class Variables : ScriptableValidationRequirement
     private bool TryGetClassType(out Type type)
     {
         type = null;
-
-        if (string.IsNullOrEmpty(_classNamespace))
-            return false;
-
+        
         if (string.IsNullOrEmpty(_className))
             return false;
 
-        type = Type.GetType($"{_classNamespace}.{_className}, {_assemblyName}");
+        var namespaceString = $"{_classNamespace}{(string.IsNullOrEmpty(_classNamespace) ? "" : ".")}";
+        var assemblyString = $"{(string.IsNullOrEmpty(_assemblyName) ? ", Assembly-CSharp" : ", ")}{_assemblyName}";
+
+        type = Type.GetType($"{namespaceString}{_className}{assemblyString}");
 
         return type != null;
     }
