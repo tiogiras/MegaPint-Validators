@@ -120,8 +120,9 @@ public class RequireComponentOrder : ScriptableValidationRequirement
             for (var i = components.Count - 1; i >= 0; i--)
             {
                 var nameSpace = components[i].GetType().Namespace;
+                var name = components[i].GetType().Name;
 
-                if (!IsInCategory(nameSpace, category))
+                if (!IsInCategory(name, nameSpace, category))
                     continue;
 
                 category.components.Add(components[i]);
@@ -175,8 +176,9 @@ public class RequireComponentOrder : ScriptableValidationRequirement
                            {
                                ComponentOrderConfig.CategoryFunction.AddCategory => 0,
                                ComponentOrderConfig.CategoryFunction.NonUnityComponents => 0,
-                               ComponentOrderConfig.CategoryFunction.NamespaceContains => 1,
-                               ComponentOrderConfig.CategoryFunction.NamespaceEquals => 2,
+                               ComponentOrderConfig.CategoryFunction.NamespaceContains => 2,
+                               ComponentOrderConfig.CategoryFunction.NamespaceEquals => 3,
+                               ComponentOrderConfig.CategoryFunction.NameContains => 1,
                                ComponentOrderConfig.CategoryFunction.Fill => 0,
                                var _ => throw new ArgumentOutOfRangeException()
                            }
@@ -257,10 +259,11 @@ public class RequireComponentOrder : ScriptableValidationRequirement
     }
 
     /// <summary> Check if the namespace is in the category </summary>
+    /// <param name="name"> Targeted name </param>
     /// <param name="nameSpace"> Targeted namespace </param>
     /// <param name="category"> Targeted category </param>
     /// <returns> If the namespace corresponds to the category </returns>
-    private bool IsInCategory(string nameSpace, Category category)
+    private bool IsInCategory(string name, string nameSpace, Category category)
     {
         return category.type.category.function switch
                {
@@ -269,6 +272,7 @@ public class RequireComponentOrder : ScriptableValidationRequirement
                    ComponentOrderConfig.CategoryFunction.NonUnityComponents => IsNonUnityComponent(nameSpace),
                    ComponentOrderConfig.CategoryFunction.NamespaceContains => NamespaceContains(nameSpace, category),
                    ComponentOrderConfig.CategoryFunction.NamespaceEquals => NamespaceEquals(nameSpace, category),
+                   ComponentOrderConfig.CategoryFunction.NameContains => NameContains(name, category),
                    var _ => false
                };
     }
@@ -297,13 +301,23 @@ public class RequireComponentOrder : ScriptableValidationRequirement
 #endif
     }
 
+    /// <summary> Check if the name contains the set string </summary>
+    /// <param name="name"> Targeted name </param>
+    /// <param name="category"> Targeted category </param>
+    /// <returns> If the name contains the set string </returns>
+    private bool NameContains(string name, Category category)
+    {
+        return !string.IsNullOrEmpty(name) && name.ToLower().Contains(category.type.category.nameSpaceString.ToLower());
+    }
+
     /// <summary> Check if the namespace contains the set string </summary>
     /// <param name="nameSpace"> Targeted namespace </param>
     /// <param name="category"> Targeted category </param>
     /// <returns> If the namespace contains the set string </returns>
     private bool NamespaceContains(string nameSpace, Category category)
     {
-        return !string.IsNullOrEmpty(nameSpace) && nameSpace.Contains(category.type.category.nameSpaceString);
+        return !string.IsNullOrEmpty(nameSpace) &&
+               nameSpace.ToLower().Contains(category.type.category.nameSpaceString.ToLower());
     }
 
     /// <summary> Check if the namespace equals the set string </summary>
