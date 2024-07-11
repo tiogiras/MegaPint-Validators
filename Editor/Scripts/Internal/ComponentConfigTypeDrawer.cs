@@ -20,6 +20,7 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
     private const string NonUnityComponentsNiceName = "Non-Unity Components";
     private const string NamespaceContainsNiceName = "Namespace Contains";
     private const string NamespaceEqualsNiceName = "Namespace Equals";
+    private const string NameContainsNiceName = "Name Contains";
 
     private VisualTreeAsset _configTemplate;
 
@@ -125,6 +126,8 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                        "All components that contain the given string in their namespace will be placed here.",
                    ComponentOrderConfig.CategoryFunction.NamespaceEquals =>
                        "All components that are in the specified namespace will be placed here",
+                   ComponentOrderConfig.CategoryFunction.NameContains => 
+                       "All components that contain the given string in their name will be placed here.",
                    var _ => throw new ArgumentOutOfRangeException(nameof(categoryFunction), categoryFunction, null)
                };
     }
@@ -143,6 +146,7 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                        ComponentOrderConfig.CategoryFunction.NonUnityComponents => NonUnityComponentsNiceName,
                        ComponentOrderConfig.CategoryFunction.NamespaceContains => NamespaceContainsNiceName,
                        ComponentOrderConfig.CategoryFunction.NamespaceEquals => NamespaceEqualsNiceName,
+                       ComponentOrderConfig.CategoryFunction.NameContains => NameContainsNiceName,
                        var _ => throw new ArgumentOutOfRangeException()
                    };
         }
@@ -153,6 +157,7 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                    NonUnityComponentsNiceName => ComponentOrderConfig.CategoryFunction.NonUnityComponents.ToString(),
                    NamespaceContainsNiceName => ComponentOrderConfig.CategoryFunction.NamespaceContains.ToString(),
                    NamespaceEqualsNiceName => ComponentOrderConfig.CategoryFunction.NamespaceEquals.ToString(),
+                   NameContainsNiceName => ComponentOrderConfig.CategoryFunction.NameContains.ToString(),
                    var _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
                };
     }
@@ -227,11 +232,12 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                 break;
 
             case ComponentOrderConfig.CategoryFunction.NamespaceContains or
-                ComponentOrderConfig.CategoryFunction.NamespaceEquals:
-
-                var title = entry.category.function == ComponentOrderConfig.CategoryFunction.NamespaceContains
-                    ? "Control String"
-                    : "Namespace";
+                ComponentOrderConfig.CategoryFunction.NamespaceEquals or
+                ComponentOrderConfig.CategoryFunction.NameContains:
+                
+                var title = entry.category.function == ComponentOrderConfig.CategoryFunction.NamespaceEquals
+                    ? "Namespace"
+                    : "Control String";
 
                 var namespaceField =
                     new TextField(title) {value = entry.category.nameSpaceString, style = {flexGrow = 1}};

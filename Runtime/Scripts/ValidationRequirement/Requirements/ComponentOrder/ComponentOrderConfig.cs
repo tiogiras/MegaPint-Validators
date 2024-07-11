@@ -30,7 +30,7 @@ public class ComponentOrderConfig : ScriptableObject
 
     public enum CategoryFunction
     {
-        AddCategory, NonUnityComponents, NamespaceContains, NamespaceEquals, Fill
+        AddCategory, NonUnityComponents, NamespaceContains, NamespaceEquals, NameContains, Fill
     }
 
     public List <Type> types = new()
