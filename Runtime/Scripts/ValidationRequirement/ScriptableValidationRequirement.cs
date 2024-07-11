@@ -23,19 +23,6 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
 
     private List <ValidationError> _errors;
 
-    public void ChangeSeverityOverwrite()
-    {
-        severityOverwrite = severityOverwrite switch
-                            {
-                                ValidationState.Unknown or ValidationState.Ok => ValidationState.Warning,
-                                ValidationState.Warning => ValidationState.Error,
-                                ValidationState.Error => ValidationState.Unknown,
-                                var _ => throw new ArgumentOutOfRangeException()
-                            };
-        
-        SetDirty();
-    }
-    
     #region Unity Event Functions
 
     public virtual void OnValidate(Object o)
@@ -73,6 +60,19 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
             severity = error.severity;
 
         return severity;
+    }
+
+    public void ChangeSeverityOverwrite()
+    {
+        severityOverwrite = severityOverwrite switch
+                            {
+                                ValidationState.Unknown or ValidationState.Ok => ValidationState.Warning,
+                                ValidationState.Warning => ValidationState.Error,
+                                ValidationState.Error => ValidationState.Unknown,
+                                var _ => throw new ArgumentOutOfRangeException()
+                            };
+
+        SetDirty();
     }
 
     public void SetDirty()
@@ -115,7 +115,7 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
                 errorText = errorText,
                 gameObject = gameObject,
                 fixAction = finalFixAction,
-                severity = severity
+                severity = GetSeverity(severity)
             });
     }
 
@@ -136,7 +136,8 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
             AddError(errorName, errorText, severity, fixAction);
     }
 
-    // TODO commenting
+    /// <summary> Add a range of errors </summary>
+    /// <param name="errors"> Errors to add </param>
     protected void AddErrors(List <ValidationError> errors)
     {
         foreach (ValidationError error in errors)
@@ -220,6 +221,14 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
 
         EditorUtility.SetDirty(prefab);
 #endif
+    }
+
+    /// <summary> Get the severity to send with the error based on if the severity overwrite is active </summary>
+    /// <param name="severity"> Severity given by the source error </param>
+    /// <returns> Severity to send with the error </returns>
+    private ValidationState GetSeverity(ValidationState severity)
+    {
+        return severityOverwrite is ValidationState.Unknown or ValidationState.Ok ? severity : severityOverwrite;
     }
 
     #endregion
