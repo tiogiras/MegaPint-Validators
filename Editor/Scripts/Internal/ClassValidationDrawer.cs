@@ -22,13 +22,12 @@ internal class ClassValidationDrawer : PropertyDrawer
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
-        SerializedProperty propertyHeight = property.FindPropertyRelative("propertyHeight");
-        propertyHeight.floatValue = 0;
+        var height = 0f;
 
         if (!property.FindPropertyRelative("foundClass").boolValue)
         {
             var rect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
-            propertyHeight.floatValue += EditorGUIUtility.singleLineHeight;
+            height += EditorGUIUtility.singleLineHeight;
 
             EditorGUI.LabelField(
                 rect,
@@ -36,6 +35,7 @@ internal class ClassValidationDrawer : PropertyDrawer
                 new GUIStyle {normal = {textColor = Color.red}});
         }
 
+        property.FindPropertyRelative("propertyHeight").floatValue = height;
         property.serializedObject.ApplyModifiedProperties();
     }
 

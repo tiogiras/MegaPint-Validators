@@ -19,24 +19,23 @@ internal class RequireComponentPropertiesDrawer : PropertyDrawer
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
-        SerializedProperty propertyHeight = property.FindPropertyRelative("propertyHeight");
-        propertyHeight.floatValue = 5;
+        var height = 5f;
 
         var labelRect = new Rect(
             position.x,
-            position.y + propertyHeight.floatValue,
+            position.y + height,
             position.width,
             EditorGUIUtility.singleLineHeight);
 
-        propertyHeight.floatValue += EditorGUIUtility.singleLineHeight + 2;
+        height += EditorGUIUtility.singleLineHeight + 2;
 
         var dropDownRect = new Rect(
             position.x,
-            position.y + propertyHeight.floatValue,
+            position.y + height,
             position.width,
             EditorGUIUtility.singleLineHeight);
 
-        propertyHeight.floatValue += EditorGUIUtility.singleLineHeight + 10;
+        height += EditorGUIUtility.singleLineHeight + 10;
 
         SerializedProperty typeNameProperty = property.FindPropertyRelative("typeName");
         SerializedProperty typeFullNameProperty = property.FindPropertyRelative("typeFullName");
@@ -78,6 +77,7 @@ internal class RequireComponentPropertiesDrawer : PropertyDrawer
 
         EditorGUI.indentLevel = indentLevel;
 
+        property.FindPropertyRelative("propertyHeight").floatValue = height;
         property.serializedObject.ApplyModifiedProperties();
     }
 
