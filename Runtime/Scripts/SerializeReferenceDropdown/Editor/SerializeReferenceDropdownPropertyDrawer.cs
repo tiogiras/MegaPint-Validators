@@ -27,7 +27,7 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         var root = new VisualElement();
-
+        
         if (property.propertyType != SerializedPropertyType.ManagedReference)
             root.Add(new PropertyField(property));
 
@@ -40,7 +40,9 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
     }
 
     public override void OnGUI(Rect rect, SerializedProperty property, GUIContent label)
-    {
+    {   
+        // TODO some hacking magic here 
+
         EditorGUI.BeginProperty(rect, label, property);
 
         var indent = EditorGUI.indentLevel;
@@ -114,6 +116,8 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
         Type currentValue = null;
         List <Type> addedRequirements = new();
         List <IValidationRequirement> requirements = new();
+
+        IValidationRequirement currentRequirement = null;
         
         switch (property.serializedObject.targetObject)
         {
@@ -135,7 +139,8 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
                 where requirement != null
                 select requirement.GetType());
 
-            currentValue = requirements[index]?.GetType();
+            currentRequirement = requirements[index];
+            currentValue = currentRequirement?.GetType();
         }
 
         _assignableTypes ??= GetAssignableTypes(property);
@@ -148,6 +153,11 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
         var dropdownTypeContent = new GUIContent(
             GetType(referenceType).name,
             GetTypeTooltip(referenceType));
+
+        if (currentRequirement != null)
+        {
+            DrawSeverityOverwriteButton(dropdownRect, (ScriptableValidationRequirement)currentRequirement);
+        }
 
         if (EditorGUI.DropdownButton(dropdownRect, dropdownTypeContent, FocusType.Keyboard))
         {
@@ -173,6 +183,54 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
 
             return mRect;
         }
+    }
+
+    private void DrawSeverityOverwriteButton(Rect dropdownRect, ScriptableValidationRequirement requirement)
+    {
+        // TODO continue here
+        // TODO images / colors
+        // TODO tooltips
+        // TODO actual values
+        // TODO onclick event change values
+        
+        const int ButtonWidth = 15;
+        const int ButtonOffset = 5;
+
+        var rect = new Rect(
+            dropdownRect.x - (ButtonWidth + ButtonOffset),
+            dropdownRect.y + dropdownRect.height * .125f,
+            ButtonWidth,
+            dropdownRect.height * .75f);
+
+        //var bgColor = GUI.backgroundColor;
+        var color = GUI.color;
+        //GUI.backgroundColor = new Color(0, 0, 0,.5f);
+
+        GUI.color = GetColorBySeverityOverwrite(color, requirement);
+        
+        if (GUI.Button(rect, ""))
+        {
+            requirement.ChangeSeverityOverwrite();
+        }
+        
+        //GUI.backgroundColor = bgColor;
+        GUI.color = color;
+    }
+
+
+    private Color GetColorBySeverityOverwrite(Color baseColor, ScriptableValidationRequirement requirement)
+    {
+        return requirement.GetSeverityOverwrite() switch
+               {
+                   ValidationState.Unknown or ValidationState.Ok => new Color(
+                       baseColor.r,
+                       baseColor.g,
+                       baseColor.b,
+                       .5f),
+                   ValidationState.Warning => baseColor,
+                   ValidationState.Error => baseColor,
+                   _ => throw new ArgumentOutOfRangeException()
+               };
     }
 
     private void WriteNewInstanceByIndexType(int typeIndex, SerializedProperty property)

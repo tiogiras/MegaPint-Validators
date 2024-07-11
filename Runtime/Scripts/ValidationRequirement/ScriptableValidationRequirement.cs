@@ -11,12 +11,44 @@ namespace MegaPint.ValidationRequirement
 {
 
 /// <summary> Abstract class to create validation requirements for the <see cref="ValidatableMonoBehaviour" /> </summary>
+[Serializable]
 public abstract class ScriptableValidationRequirement : ValidationRequirementMetaData, IValidationRequirement
 {
     [HideInInspector] public string preventListHeaderIssues;
-    
+
+    [HideInInspector] public bool initialized;
+    public ValidationState severityOverwrite; // TODO hide in inspector
+    [HideInInspector] public GameObject gameObject;
+    [HideInInspector] public Object objectReference;
+
     private List <ValidationError> _errors;
-    private GameObject _gameObject;
+
+    public void ChangeSeverityOverwrite()
+    {
+        Debug.Log("changing...");
+        
+        severityOverwrite = severityOverwrite switch
+                            {
+                                ValidationState.Unknown or ValidationState.Ok => ValidationState.Warning,
+                                ValidationState.Warning => ValidationState.Error,
+                                ValidationState.Error => ValidationState.Unknown,
+                                var _ => throw new ArgumentOutOfRangeException()
+                            };
+        
+        SetDirty();
+
+        Debug.Log($"New State: {severityOverwrite}]");
+    }
+    
+    #region Unity Event Functions
+
+    public virtual void OnValidate(Object o)
+    {
+        objectReference = o;
+        TryInitialize(this);
+    }
+
+    #endregion
 
     #region Public Methods
 
@@ -24,13 +56,13 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
     ///     Validates the gameObject based on the specified <see cref="Validate" /> method.
     ///     Called when validating the <see cref="ValidatableMonoBehaviour" />.
     /// </summary>
-    /// <param name="gameObject"> GameObject that is validated </param>
+    /// <param name="targetGameObject"> GameObject that is validated </param>
     /// <param name="errors"> All found <see cref="ValidationError" /> </param>
     /// <returns> The highest <see cref="ValidationState" /> found in the <see cref="ValidationError" /> </returns>
-    public ValidationState Validate(GameObject gameObject, out List <ValidationError> errors)
+    public ValidationState Validate(GameObject targetGameObject, out List <ValidationError> errors)
     {
         _errors = new List <ValidationError>();
-        _gameObject = gameObject;
+        gameObject = targetGameObject;
 
         Validate(gameObject);
 
@@ -45,6 +77,13 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
             severity = error.severity;
 
         return severity;
+    }
+
+    public void SetDirty()
+    {
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(objectReference);
+#endif
     }
 
     #endregion
@@ -78,7 +117,7 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
             {
                 errorName = errorName,
                 errorText = errorText,
-                gameObject = _gameObject,
+                gameObject = gameObject,
                 fixAction = finalFixAction,
                 severity = severity
             });
@@ -173,12 +212,12 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
 
         var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
 
-        GameObject gameObject = GetObjectByParentPath(GetPathToRoot(o.transform), instance.transform);
+        GameObject go = GetObjectByParentPath(GetPathToRoot(o.transform), instance.transform);
 
-        if (gameObject == null)
+        if (go == null)
             return;
 
-        fixAction.Invoke(gameObject);
+        fixAction.Invoke(go);
 
         PrefabUtility.ApplyPrefabInstance(instance, InteractionMode.AutomatedAction);
         Object.DestroyImmediate(instance);
@@ -189,21 +228,10 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
 
     #endregion
 
-    #region Unity Event Functions
-
-    /// <summary> Called when the <see cref="ValidatableMonoBehaviour" /> is validated by unity </summary>
-    public virtual void OnValidate(ValidatableMonoBehaviour behaviour)
+    public ValidationState GetSeverityOverwrite()
     {
-        TryInitialize(behaviour, this);
+        return severityOverwrite;
     }
-
-    /// <summary> Called when the <see cref="ValidatorSettings" /> is validated by unity </summary>
-    public virtual void OnValidate(ValidatorSettings settings)
-    {
-        TryInitialize(settings, this);
-    }
-
-    #endregion
 }
 
 }

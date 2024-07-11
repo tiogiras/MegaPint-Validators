@@ -4,6 +4,9 @@ using MegaPint.SerializeReferenceDropdown.Runtime;
 using MegaPint.ValidationRequirement;
 using MegaPint.ValidationRequirement.Requirements;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MegaPint
 {
@@ -19,16 +22,13 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
     [SerializeField] private ValidatorSettings _importedSettings;
 
-    [HideInInspector]
-    public List <string> initializedRequirements;
-
     [SerializeReferenceDropdown] [SerializeReference]
     private List <IValidationRequirement> _requirements;
-
+    
     private ValidatableMonoBehaviourStatus _status;
 
     #region Unity Event Functions
-
+    
     public void OnValidate()
     {
         BeforeValidation();
@@ -48,17 +48,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         if (_importedSettings == null)
         {
             foreach (IValidationRequirement requirement in _activeRequirements)
-                requirement?.OnValidate(this);   
-            
-            List <string> cleanedInitializedRequirements = (from requirement in _requirements
-                                                            where requirement != null
-                                                            select requirement.GetType().ToString()
-                                                            into typeName
-                                                            where initializedRequirements.Contains(typeName)
-                                                            select initializedRequirements[
-                                                                initializedRequirements.IndexOf(typeName)]).ToList();
-
-            initializedRequirements = cleanedInitializedRequirements;
+                requirement?.OnValidate(this);
         }
 
         _status.ValidateStatus();
@@ -67,26 +57,6 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     #endregion
 
     #region Public Methods
-
-    /// <summary> Check if the requirement was initialized on this behaviour </summary>
-    /// <param name="requirement"> Targeted requirement </param>
-    /// <returns> Initialization status of the targeted requirement </returns>
-    public bool IsInitialized(IValidationRequirement requirement)
-    {
-        initializedRequirements ??= new List <string>();
-
-        return initializedRequirements.Contains(requirement.GetType().ToString());
-    }
-
-    /// <summary> Callback on initialization of a requirement </summary>
-    /// <param name="requirement"> Targeted requirement </param>
-    public void OnRequirementInitialization(IValidationRequirement requirement)
-    {
-        initializedRequirements ??= new List <string>();
-
-        if (!initializedRequirements.Contains(requirement.GetType().ToString()))
-            initializedRequirements.Add(requirement.GetType().ToString());
-    }
 
     /// <summary> Get all requirements on this gameObject </summary>
     /// <returns> All defined requirements </returns>
