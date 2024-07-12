@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MegaPint.SerializeReferenceDropdown.Runtime;
 using MegaPint.ValidationRequirement;
 using MegaPint.ValidationRequirement.Requirements;
 using UnityEngine;
+using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -38,7 +40,11 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
             if (_importedSettings.Count == 0)
                 return _activeRequirements;
 
-            foreach (ValidatorSettings setting in _importedSettings.Where(setting => setting != null))
+            IEnumerable <ValidatorSettings> importedSettings = _importedSettings.Where(setting => setting != null);
+
+            importedSettings = importedSettings.OrderBy(GetSettingPriority);
+
+            foreach (ValidatorSettings setting in importedSettings)
             {
                 if (setting.Requirements().Count == 0)
                     continue;
@@ -99,6 +105,16 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         }
 
         _importedSettings.Add(setting);
+        
+        settingPriorities.Add(new SettingPriority
+        {
+            priority = settingPriorities.Count + 1,
+            setting = setting
+        });
+
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(this);
+#endif
     }
     
     /// <summary> Get the imported settings </summary>
@@ -158,6 +174,10 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     protected void SetRequirements(List <ScriptableValidationRequirement> requirements)
     {
         _requirements = requirements;
+        
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(this);
+#endif
     }
 
     #endregion
@@ -165,6 +185,69 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     public void RemoveImportedSetting(ValidatorSettings setting)
     {
         _importedSettings.Remove(setting);
+
+        var index = -1;
+
+        foreach (SettingPriority settingPriority in settingPriorities.Where(settingPriority => settingPriority.setting == setting))
+        {
+            index = settingPriorities.IndexOf(settingPriority);
+            break;
+        }
+        
+        settingPriorities.RemoveAt(index);
+
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(this);
+#endif
+    }
+
+    [Serializable]
+    public struct SettingPriority
+    {
+        public ValidatorSettings setting;
+        public int priority;
+    }
+
+    [HideInInspector] public List <SettingPriority> settingPriorities;
+
+    public int GetSettingPriority(ValidatorSettings setting)
+    {
+        return settingPriorities.FirstOrDefault(s => s.setting == setting).priority;
+    }
+
+    public string[] GetPriorityOptions(out List <int> values)
+    {
+        values = settingPriorities.Select(s => s.priority).ToList();
+        values.Sort();
+
+        return values.Select(value => value.ToString()).ToArray();
+    }
+
+    public void SetSettingPriority(ValidatorSettings setting, int newPriority)
+    {
+        var oldPriority = settingPriorities.FirstOrDefault(s => s.setting == setting).priority;
+
+        for (var i = 0; i < settingPriorities.Count; i++)
+        {
+            SettingPriority settingPriority = settingPriorities[i];
+
+            if (settingPriority.setting == setting)
+            {
+                settingPriority.priority = newPriority;
+                settingPriorities[i] = settingPriority;
+                continue;
+            }
+
+            if (settingPriority.priority != newPriority)
+                continue;
+
+            settingPriority.priority = oldPriority;
+            settingPriorities[i] = settingPriority;
+        }
+
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(this);
+#endif
     }
 }
 
