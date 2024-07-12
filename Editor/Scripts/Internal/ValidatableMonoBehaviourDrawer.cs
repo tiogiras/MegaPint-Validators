@@ -2,9 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using MegaPint.SerializeReferenceDropdown.Runtime;
 using MegaPint.ValidationRequirement;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace MegaPint.Editor.Scripts.Internal
 {
@@ -110,17 +113,32 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
         List <ScriptableValidationRequirement> activeRequirements =
             castedTarget.ActiveRequirements;
 
-        List <ScriptableValidationRequirement> disabledRequirements = setting.Requirements(true).
-                                                                              Where(
-                                                                                  requirement =>
-                                                                                      !activeRequirements.Any(
-                                                                                          r => r.uniqueID.Equals(
-                                                                                              requirement.uniqueID))).
-                                                                              ToList();
+        List <ScriptableValidationRequirement> sourceRequirements = setting.Requirements(true);
+
+        if (sourceRequirements.Count == 0)
+        {
+            EditorGUILayout.EndHorizontal();
+            
+            return;    
+        }
+
+        List <ScriptableValidationRequirement> disabledRequirements = sourceRequirements.
+                                                                      Where(
+                                                                          requirement =>
+                                                                              !activeRequirements.Any(
+                                                                                  r => r.uniqueID.Equals(
+                                                                                      requirement.uniqueID))).
+                                                                      ToList();
 
         if (disabledRequirements.Count > 0)
         {
-            var tooltip = string.Join("\n", disabledRequirements);
+            List <SerializeReferenceDropdownNameAttribute> attributes = disabledRequirements.ConvertAll(
+                requirement =>
+                    requirement.GetType().
+                                GetCustomAttribute <
+                                    SerializeReferenceDropdownNameAttribute>());
+
+            var tooltip = string.Join("\n", attributes.Select(attr => attr.name));
 
             Color color = UnityEngine.GUI.color;
             UnityEngine.GUI.color = Color.red;
@@ -144,6 +162,15 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
     {
         try
         {
+            List <ScriptableValidationRequirement> sourceRequirements =
+                ((ValidatableMonoBehaviour)target).Requirements(true);
+
+            if (sourceRequirements.Count == 0)
+            {
+                Debug.LogWarning("Nothing to export!");
+                return;
+            }
+            
             var path = EditorUtility.SaveFilePanelInProject(
                 "Export Requirements",
                 "Requirements",
@@ -152,11 +179,22 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 
             if (string.IsNullOrEmpty(path))
                 return;
+            
+            var settingsFile = CreateInstance <ValidatorSettings>();
 
-            var requirements = CreateInstance <ValidatorSettings>();
-            requirements.SetRequirements(((ValidatableMonoBehaviour)target).Requirements());
+            List <ScriptableValidationRequirement> requirements = new();
 
-            AssetDatabase.CreateAsset(requirements, path);
+            foreach (ScriptableValidationRequirement requirement in sourceRequirements)
+            {
+                ScriptableValidationRequirement clone = requirement.Clone();
+                clone.GenerateUniqueID();
+
+                requirements.Add(clone);
+            }
+
+            settingsFile.SetRequirements(requirements);
+
+            AssetDatabase.CreateAsset(settingsFile, path);
             AssetDatabase.Refresh();
         }
         catch (Exception)
