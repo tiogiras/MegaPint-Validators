@@ -95,24 +95,13 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
         if (setting == null)
             return;
 
+        var windowWidth = EditorGUIUtility.currentViewWidth - 30;
+        
         var castedTarget = (ValidatableMonoBehaviour)serializedObject.targetObject;
-
-        EditorGUILayout.BeginHorizontal(EditorStyles.helpBox);
-
-        EditorGUILayout.BeginVertical(GUILayout.Width(15));
-        GUILayout.FlexibleSpace();
-
-        if (GUILayout.Button("X", GUILayout.Width(15), GUILayout.Height(15)))
-            castedTarget.RemoveImportedSetting(setting);
-
-        GUILayout.FlexibleSpace();
-        EditorGUILayout.EndVertical();
-
-        EditorGUILayout.LabelField(setting.name);
 
         List <ScriptableValidationRequirement> activeRequirements =
             castedTarget.ActiveRequirements;
-
+        
         List <ScriptableValidationRequirement> sourceRequirements = setting.Requirements(true);
 
         if (sourceRequirements.Count == 0)
@@ -129,6 +118,27 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
                                                                                   r => r.uniqueID.Equals(
                                                                                       requirement.uniqueID))).
                                                                       ToList();
+        
+        EditorGUILayout.BeginHorizontal(EditorStyles.helpBox);
+
+        EditorGUILayout.BeginVertical(GUILayout.Width(15));
+        GUILayout.FlexibleSpace();
+
+        if (GUILayout.Button("X", GUILayout.Width(15), GUILayout.Height(15)))
+            castedTarget.RemoveImportedSetting(setting);
+
+        GUILayout.FlexibleSpace();
+        EditorGUILayout.EndVertical();
+
+        var labelWidth = windowWidth * (disabledRequirements.Count > 0 ? .6f : 1f);
+        
+        EditorGUILayout.BeginVertical();
+        GUILayout.FlexibleSpace();
+        
+        EditorGUILayout.LabelField(setting.name, GUILayout.MaxWidth(labelWidth));
+        
+        GUILayout.FlexibleSpace();
+        EditorGUILayout.EndVertical();
 
         if (disabledRequirements.Count > 0)
         {
@@ -138,21 +148,46 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
                                 GetCustomAttribute <
                                     SerializeReferenceDropdownNameAttribute>());
 
-            var tooltip = string.Join("\n", attributes.Select(attr => attr.name));
+            var tooltip = $"- {string.Join("\n- ", attributes.Select(attr => attr.name))}";
 
             Color color = UnityEngine.GUI.color;
             UnityEngine.GUI.color = Color.red;
 
+            GUIStyle style = EditorStyles.label;
+            style.wordWrap = true;
+
+            EditorGUILayout.BeginVertical();
+            GUILayout.FlexibleSpace();
+            
             EditorGUILayout.LabelField(
                 new GUIContent
                 {
                     text =
                         "Disabled requirements due to higher priority requirements.",
                     tooltip = tooltip
-                });
+                },
+                style,
+                GUILayout.MaxWidth(windowWidth * .4f));
+            
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndVertical();
 
             UnityEngine.GUI.color = color;
         }
+        
+        EditorGUILayout.BeginVertical(GUILayout.Width(15));
+        GUILayout.FlexibleSpace();
+
+        var priority = castedTarget.GetSettingPriority(setting);
+        var priorityOptions = castedTarget.GetPriorityOptions(out List <int> priorityValues);
+
+        var newPriority = EditorGUILayout.IntPopup("", priority, priorityOptions, priorityValues.ToArray(), GUILayout.Width(35));
+
+        if (newPriority != priority)
+            castedTarget.SetSettingPriority(setting, newPriority);
+
+        GUILayout.FlexibleSpace();
+        EditorGUILayout.EndVertical();
 
         EditorGUILayout.EndHorizontal();
     }
