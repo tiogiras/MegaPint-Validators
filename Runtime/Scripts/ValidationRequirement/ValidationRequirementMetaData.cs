@@ -1,4 +1,5 @@
 ﻿using UnityEditor;
+using UnityEngine;
 
 namespace MegaPint.ValidationRequirement
 {
@@ -30,6 +31,7 @@ public abstract class ValidationRequirementMetaData
         OnInitialization();
 
         requirement.initialized = true;
+        requirement.GenerateUniqueID();
         requirement.SetDirty();
     }
 
