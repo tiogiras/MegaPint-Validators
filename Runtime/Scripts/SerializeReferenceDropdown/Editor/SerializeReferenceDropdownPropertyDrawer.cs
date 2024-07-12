@@ -139,9 +139,9 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
 
         Type currentValue = null;
         List <Type> addedRequirements = new();
-        List <IValidationRequirement> requirements = new();
+        List <ScriptableValidationRequirement> requirements = new();
 
-        IValidationRequirement currentRequirement = null;
+        ScriptableValidationRequirement currentRequirement = null;
 
         switch (property.serializedObject.targetObject)
         {

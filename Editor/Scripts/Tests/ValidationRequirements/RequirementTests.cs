@@ -37,7 +37,7 @@ internal static class RequirementTests
             Assert.Fail("Failed before adding requirement!");
 
         // Import the required settings for this requirement
-        validatableMonoBehaviour.SetImportedSettings(settings);
+        validatableMonoBehaviour.ImportSetting(settings);
 
         // Invoke the setup... used to set the specific values of the object so the next validation returns false
         setup?.Invoke(testObject);

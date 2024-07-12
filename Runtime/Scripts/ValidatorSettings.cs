@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using MegaPint.SerializeReferenceDropdown.Runtime;
 using MegaPint.ValidationRequirement;
 using UnityEngine;
@@ -11,13 +12,13 @@ namespace MegaPint
 public class ValidatorSettings : ScriptableObject
 {
     [SerializeReferenceDropdown] [SerializeReference]
-    private List <IValidationRequirement> _requirements;
+    private List <ScriptableValidationRequirement> _requirements;
 
     #region Unity Event Functions
 
     private void OnValidate()
     {
-        foreach (IValidationRequirement requirement in _requirements)
+        foreach (ScriptableValidationRequirement requirement in _requirements)
             requirement?.OnValidate(this);
     }
 
@@ -25,14 +26,14 @@ public class ValidatorSettings : ScriptableObject
 
     #region Public Methods
 
-    public List <IValidationRequirement> Requirements()
+    public List <ScriptableValidationRequirement> Requirements(bool excludeNulls = false)
     {
-        return _requirements;
+        return excludeNulls ? _requirements.Where(requirement => requirement != null).ToList() : _requirements;
     }
 
     /// <summary> Overwrite the saved requirements </summary>
     /// <param name="requirements"> New requirements </param>
-    public void SetRequirements(List <IValidationRequirement> requirements)
+    public void SetRequirements(List <ScriptableValidationRequirement> requirements)
     {
         _requirements = requirements;
     }

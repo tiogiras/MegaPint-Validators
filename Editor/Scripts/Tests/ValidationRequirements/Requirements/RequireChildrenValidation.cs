@@ -42,7 +42,7 @@ internal class RequireChildrenValidation
 
                 var validatableMonoBehaviour = child.AddComponent <TestBehaviour>();
 
-                validatableMonoBehaviour.SetImportedSettings(childSettings);
+                validatableMonoBehaviour.ImportSetting(childSettings);
                 validatableMonoBehaviour.Validate(out List <ValidationError> _);
 
                 child.transform.SetParent(o.transform);

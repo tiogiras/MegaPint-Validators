@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using MegaPint.SerializeReferenceDropdown.Runtime;
 using UnityEngine;
 using Object = UnityEngine.Object;
 #if UNITY_EDITOR
@@ -17,6 +19,7 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
     [HideInInspector] public string preventListHeaderIssues;
 
     [HideInInspector] public bool initialized;
+    [HideInInspector] public string uniqueID;
     [HideInInspector] public ValidationState severityOverwrite;
     [HideInInspector] public GameObject gameObject;
     [HideInInspector] public Object objectReference;
@@ -62,6 +65,53 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
         return severity;
     }
 
+    // TODO commenting
+    public static List <ScriptableValidationRequirement> GetCompatibleRequirements(
+        List <ScriptableValidationRequirement> highPriority,
+        List <ScriptableValidationRequirement> lowPriority)
+    {
+        List <ScriptableValidationRequirement> compatibles = new();
+
+        foreach (ScriptableValidationRequirement lpRequirement in lowPriority)
+        {
+            if (lpRequirement == null)
+                continue;
+        
+            Type lpType = lpRequirement.GetType();
+
+            var compatible = true;
+            
+            foreach (ScriptableValidationRequirement hpRequirement in highPriority)
+            {
+                if (hpRequirement == null)
+                    continue;
+                
+                Type hpType = hpRequirement.GetType();
+                var hpAttr = hpType.GetCustomAttribute <SerializeReferenceDropdownNameAttribute>();
+
+                if (lpType == hpType && !hpAttr.allowMultiple)
+                {
+                    compatible = false;
+                    break;
+                }
+
+                if (hpAttr.incompatibleRequirements is not {Length: > 0})
+                    continue;
+                
+                if (hpAttr.incompatibleRequirements.Contains(lpType))
+                {
+                    compatible = false;
+                    break;
+                }
+            }
+            
+            if (compatible)
+                compatibles.Add(lpRequirement);
+        }
+        
+        return compatibles;
+    }
+
     public void ChangeSeverityOverwrite()
     {
         severityOverwrite = severityOverwrite switch
@@ -75,10 +125,16 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
         SetDirty();
     }
 
+    public void GenerateUniqueID()
+    {
+        uniqueID = Guid.NewGuid().ToString();
+    }
+
     public void SetDirty()
     {
 #if UNITY_EDITOR
-        EditorUtility.SetDirty(objectReference);
+        if (objectReference != null)
+            EditorUtility.SetDirty(objectReference);
 #endif
     }
 

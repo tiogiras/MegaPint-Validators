@@ -15,20 +15,43 @@ namespace MegaPint
 [RequireComponent(typeof(ValidatableMonoBehaviourStatus))]
 public abstract class ValidatableMonoBehaviour : MonoBehaviour
 {
-    public bool HasImportedSettings => _importedSettings != null;
+    public bool HasImportedSettings => _importedSettings.Count > 0;
 
-    private List <IValidationRequirement> _activeRequirements =>
-        _importedSettings == null ? _requirements : _importedSettings.Requirements();
-
-    [SerializeField] private ValidatorSettings _importedSettings;
+    [SerializeField] private List<ValidatorSettings> _importedSettings;
 
     [SerializeReferenceDropdown] [SerializeReference]
-    private List <IValidationRequirement> _requirements;
+    private List <ScriptableValidationRequirement> _requirements;
     
     private ValidatableMonoBehaviourStatus _status;
 
-    #region Unity Event Functions
+    private List <ScriptableValidationRequirement> _activeRequirements = new();
+
+    [HideInInspector] public bool importedSettingsFoldout;
     
+    public List <ScriptableValidationRequirement> ActiveRequirements
+    {
+        get
+        {
+            _activeRequirements.Clear();
+            _activeRequirements.AddRange(Requirements(true));
+
+            if (_importedSettings.Count == 0)
+                return _activeRequirements;
+
+            foreach (ValidatorSettings setting in _importedSettings.Where(setting => setting != null))
+            {
+                if (setting.Requirements().Count == 0)
+                    continue;
+            
+                _activeRequirements.AddRange(ScriptableValidationRequirement.GetCompatibleRequirements(_activeRequirements, setting.Requirements()));
+            }
+
+            return _activeRequirements;
+        }
+    }
+
+    #region Unity Event Functions
+
     public void OnValidate()
     {
         BeforeValidation();
@@ -42,14 +65,14 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
             _status.AddValidatableMonoBehaviour(this);
         }
 
-        if (_activeRequirements is not {Count: > 0})
-            return;
-
-        if (_importedSettings == null)
+        if (_requirements.Count > 0)
         {
-            foreach (IValidationRequirement requirement in _activeRequirements)
-                requirement?.OnValidate(this);
+            foreach (IValidationRequirement requirement in _requirements)
+                requirement?.OnValidate(this);   
         }
+
+        if (ActiveRequirements is not {Count: > 0})
+            return;
 
         _status.ValidateStatus();
     }
@@ -58,24 +81,32 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
     #region Public Methods
 
-    /// <summary> Get all requirements on this gameObject </summary>
+    /// <summary> Get all non imported requirements on this gameObject </summary>
     /// <returns> All defined requirements </returns>
-    public List <IValidationRequirement> Requirements()
+    public List <ScriptableValidationRequirement> Requirements(bool excludeNulls = false)
     {
-        return _requirements;
+        return excludeNulls ? _requirements.Where(requirement => requirement != null).ToList() : _requirements;
     }
 
     /// <summary> Set the imported settings </summary>
-    /// <param name="settings"> New imported settings </param>
-    public void SetImportedSettings(ValidatorSettings settings)
+    /// <param name="setting"> New imported settings </param>
+    public void ImportSetting(ValidatorSettings setting)
     {
-        _importedSettings = settings;
+        if (_importedSettings.Contains(setting))
+        {
+            Debug.LogWarning("ValidatorSettings already imported.");
+            return;   
+        }
+
+        _importedSettings.Add(setting);
     }
     
     /// <summary> Get the imported settings </summary>
     /// <returns> The imported settings of the behaviour </returns>
-    public ValidatorSettings GetImportedSettings()
+    public List<ValidatorSettings> GetImportedSettings()
     {
+        _importedSettings = _importedSettings.Where(setting => setting != null).ToList();
+        
         return _importedSettings;
     }
 
@@ -87,10 +118,10 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         var state = ValidationState.Ok;
         errors = new List <ValidationError>();
 
-        if (_activeRequirements is not {Count: > 0})
+        if (ActiveRequirements is not {Count: > 0})
             return state;
 
-        foreach (IValidationRequirement requirement in _activeRequirements.Where(requirement => requirement != null))
+        foreach (IValidationRequirement requirement in ActiveRequirements.Where(requirement => requirement != null))
         {
             ValidationState requirementState = requirement.Validate(
                 gameObject,
@@ -110,7 +141,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     /// <returns> If the requirement is set on this gameObject </returns>
     public bool ValidatesChildren()
     {
-        return _activeRequirements.Any(requirement => requirement?.GetType() == typeof(RequireChildrenValidation));
+        return ActiveRequirements.Any(requirement => requirement?.GetType() == typeof(RequireChildrenValidation));
     }
 
     #endregion
@@ -124,12 +155,17 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
     /// <summary> Overwrite the requirements </summary>
     /// <param name="requirements"> new requirements </param>
-    protected void SetRequirements(List <IValidationRequirement> requirements)
+    protected void SetRequirements(List <ScriptableValidationRequirement> requirements)
     {
         _requirements = requirements;
     }
 
     #endregion
+
+    public void RemoveImportedSetting(ValidatorSettings setting)
+    {
+        _importedSettings.Remove(setting);
+    }
 }
 
 }
