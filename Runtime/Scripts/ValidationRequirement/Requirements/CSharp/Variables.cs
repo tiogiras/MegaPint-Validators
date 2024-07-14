@@ -11,6 +11,8 @@ namespace MegaPint.ValidationRequirement.Requirements.CSharp
 
 /// <summary> Validation requirement for variables checking for NotNull </summary>
 [Serializable]
+[TypeTooltip(
+    "With this requirement you can specify a class with it's assembly qualified name (Namespace, Class, Assembly) and enforce different settings for specific variables.")]
 [SerializeReferenceDropdownName("C#/Variables", typeof(Variables), true, -40)]
 public class Variables : ScriptableValidationRequirement
 {
@@ -38,22 +40,22 @@ public class Variables : ScriptableValidationRequirement
 
         if (!TryGetClassType(out Type type))
             return;
-        
+
         if (!TryGetClassComponent(gameObject, type, out Component comp))
             return;
 
         validation.foundClass = true;
-        
+
         if (_variables.Count == 0)
             return;
-        
+
         foreach (Variable variable in _variables)
         {
             var variableName = variable.properties.name;
-            
+
             if (string.IsNullOrEmpty(variableName))
                 continue;
-            
+
             FieldInfo field = type.GetField(
                 variableName,
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Default);
@@ -61,7 +63,7 @@ public class Variables : ScriptableValidationRequirement
             var fieldFound = field != null;
 
             variable.properties.fieldFound = fieldFound;
-            
+
             if (!fieldFound)
                 continue;
 
@@ -77,9 +79,10 @@ public class Variables : ScriptableValidationRequirement
     private bool TryGetClassComponent(GameObject gameObject, Type type, out Component component)
     {
         component = gameObject.GetComponent(type);
-        
+
         if (component == null)
-            Debug.LogWarning("No component of the given type could be found on the gameObject. Make sure to add the component to the gameObject.");
+            Debug.LogWarning(
+                "No component of the given type could be found on the gameObject. Make sure to add the component to the gameObject.");
 
         return component != null;
     }
@@ -87,7 +90,7 @@ public class Variables : ScriptableValidationRequirement
     private bool TryGetClassType(out Type type)
     {
         type = null;
-        
+
         if (string.IsNullOrEmpty(_className))
             return false;
 

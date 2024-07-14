@@ -8,6 +8,7 @@ namespace MegaPint.ValidationRequirement.Requirements
 
 /// <summary> Validation requirement requiring a custom name based on a defined regex ruleset </summary>
 [Serializable]
+[TypeTooltip("With this requirement you can specify custom naming rules for the gameObject based on a regex pattern.")]
 [SerializeReferenceDropdownName("Regex Naming Validation", typeof(RequireCustomName), -8)]
 public class RequireCustomName : ScriptableValidationRequirement
 {

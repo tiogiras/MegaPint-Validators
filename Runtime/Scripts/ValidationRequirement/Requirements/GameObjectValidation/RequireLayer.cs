@@ -1,12 +1,12 @@
 ﻿using System;
 using MegaPint.SerializeReferenceDropdown.Runtime;
-using UnityEditor;
 using UnityEngine;
 
 namespace MegaPint.ValidationRequirement.Requirements.GameObjectValidation
 {
 
 [Serializable]
+[TypeTooltip("This requirement enforces the layer of the gameObject.")]
 [SerializeReferenceDropdownName("GameObject/Layer", typeof(RequireLayer), -30, 1)]
 public class RequireLayer : ScriptableValidationRequirement
 {

@@ -8,6 +8,8 @@ namespace MegaPint.ValidationRequirement.Requirements.TransformValidation
 
 /// <summary> Validation requirement for custom values on a local transform </summary>
 [Serializable]
+[TypeTooltip(
+    "This requirement enforces the transform component to have a specific local position, rotation and scale.")]
 [SerializeReferenceDropdownName(
     "Transform/Custom Local",
     typeof(RequireLocalTransform),

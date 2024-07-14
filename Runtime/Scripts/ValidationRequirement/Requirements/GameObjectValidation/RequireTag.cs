@@ -1,7 +1,7 @@
 ﻿using System;
 using MegaPint.SerializeReferenceDropdown.Runtime;
+using UnityEditorInternal;
 using UnityEngine;
-
 #if UNITY_EDITOR
 using System.Linq;
 #endif
@@ -10,6 +10,7 @@ namespace MegaPint.ValidationRequirement.Requirements.GameObjectValidation
 {
 
 [Serializable]
+[TypeTooltip("This requirement enforces the tag of the gameObject.")]
 [SerializeReferenceDropdownName("GameObject/Tag", typeof(RequireTag), -30, 2)]
 public class RequireTag : ScriptableValidationRequirement
 {
@@ -38,15 +39,6 @@ public class RequireTag : ScriptableValidationRequirement
             FixAction);
     }
 
-    private bool IsValidTag()
-    {
-#if UNITY_EDITOR
-        return UnityEditorInternal.InternalEditorUtility.tags.Contains(_tagNameInternal);
-#else
-        return false;
-#endif
-    }
-    
     #endregion
 
     #region Private Methods
@@ -56,11 +48,20 @@ public class RequireTag : ScriptableValidationRequirement
         if (!IsValidTag())
         {
             Debug.LogWarning("Could not set the gameObject tag, as the targeted tag does not exist.");
-            
-            return;   
+
+            return;
         }
 
         gameObject.tag = _tagNameInternal;
+    }
+
+    private bool IsValidTag()
+    {
+#if UNITY_EDITOR
+        return InternalEditorUtility.tags.Contains(_tagNameInternal);
+#else
+        return false;
+#endif
     }
 
     #endregion
