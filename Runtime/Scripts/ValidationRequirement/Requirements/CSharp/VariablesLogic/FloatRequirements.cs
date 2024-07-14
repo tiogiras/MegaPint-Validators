@@ -5,11 +5,25 @@ using System.Collections.Generic;
 namespace MegaPint.ValidationRequirement.Requirements.CSharp.VariablesLogic
 {
 
-public static class FloatRequirements
+/// <summary> Requirement for floats </summary>
+internal static class FloatRequirements
 {
     #region Public Methods
 
-    // ReSharper disable once CognitiveComplexity
+    /// <summary> Validate the float variable </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="variable"> Properties of the variable </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="requirement"> Current set requirement for the variable </param>
+    /// <param name="targetedValue"> Targeted value for equals requirement </param>
+    /// <param name="rangeMax"> Max value for the range requirement </param>
+    /// <param name="errors"> Validation errors </param>
+    /// <param name="referenceValue"> Value to check against (Greater, GreaterEquals, Lesser, LesserEquals) </param>
+    /// <param name="rangeMin"> Min value for the range requirement </param>
+    /// <returns> If any errors occured </returns>
+    /// <exception cref="ArgumentOutOfRangeException"> Requirement not found </exception>
+
+    // Resharper disable once CognitiveComplexity
     public static bool Validate(
         ref bool isValid,
         Variable.Properties variable,
@@ -83,6 +97,13 @@ public static class FloatRequirements
 
     #region Private Methods
 
+    /// <summary> Validate if the variable equals the target value </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="variable"> Properties of the variable </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="targetedValue"> Targeted value </param>
+    /// <param name="error"> Validation error </param>
+    /// <returns> If an error occured </returns>
     private static bool ValidateEquals(
         ref bool isValid,
         Variable.Properties variable,
@@ -112,6 +133,13 @@ public static class FloatRequirements
         return false;
     }
 
+    /// <summary> Validate if the variable is greater or equal to the reference value </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="variable"> Properties of the variable </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="referenceValue"> Value to check against </param>
+    /// <param name="error"> Validation error </param>
+    /// <returns> If an error occured </returns>
     private static bool ValidateGreaterEqualsThan(
         ref bool isValid,
         Variable.Properties variable,
@@ -140,6 +168,13 @@ public static class FloatRequirements
         return false;
     }
 
+    /// <summary> Validate if the variable is greater than the reference value </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="variable"> Properties of the variable </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="referenceValue"> Value to check against </param>
+    /// <param name="error"> Validation error </param>
+    /// <returns> If an error occured </returns>
     private static bool ValidateGreaterThan(
         ref bool isValid,
         Variable.Properties variable,
@@ -168,6 +203,13 @@ public static class FloatRequirements
         return false;
     }
 
+    /// <summary> Validate if the variable is not the targeted value </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="variable"> Properties of the variable </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="targetedValue"> Targeted value </param>
+    /// <param name="error"> Validation error </param>
+    /// <returns> If an error occured </returns>
     private static bool ValidateIsNot(
         ref bool isValid,
         Variable.Properties variable,
@@ -197,6 +239,13 @@ public static class FloatRequirements
         return false;
     }
 
+    /// <summary> Validate if the variable is lesser or equal to the reference value </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="variable"> Properties of the variable </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="referenceValue"> Value to check against </param>
+    /// <param name="error"> Validation error </param>
+    /// <returns> If an error occured </returns>
     private static bool ValidateLesserEqualsThan(
         ref bool isValid,
         Variable.Properties variable,
@@ -225,6 +274,13 @@ public static class FloatRequirements
         return false;
     }
 
+    /// <summary> Validate if the variable is lesser than the reference value </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="variable"> Properties of the variable </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="referenceValue"> Value to check against </param>
+    /// <param name="error"> Validation error </param>
+    /// <returns> If an error occured </returns>
     private static bool ValidateLesserThan(
         ref bool isValid,
         Variable.Properties variable,
@@ -253,6 +309,14 @@ public static class FloatRequirements
         return false;
     }
 
+    /// <summary> Validate if the variable is in the specified range </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="variable"> Properties of the variable </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="rangeMax"> Range maximum </param>
+    /// <param name="error"> Validation error </param>
+    /// <param name="rangeMin"> Range minimum </param>
+    /// <returns> If an error occured </returns>
     private static bool ValidateRange(
         ref bool isValid,
         Variable.Properties variable,

@@ -5,7 +5,7 @@ namespace MegaPint
 {
 
 /// <summary> Invalid behaviour of <see cref="ValidatableMonoBehaviour" /> </summary>
-public struct InvalidBehaviour : IComparable <InvalidBehaviour>
+internal struct InvalidBehaviour : IComparable <InvalidBehaviour>
 {
     public string behaviourName;
     public string shortBehaviourName;

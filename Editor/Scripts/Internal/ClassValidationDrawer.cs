@@ -1,7 +1,4 @@
-﻿// TODO commenting
-
-#if UNITY_EDITOR
-using MegaPint.ValidationRequirement.Requirements.CSharp;
+﻿#if UNITY_EDITOR
 using MegaPint.ValidationRequirement.Requirements.CSharp.VariablesLogic;
 using UnityEditor;
 using UnityEngine;

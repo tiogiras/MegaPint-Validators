@@ -1,7 +1,4 @@
-﻿using UnityEditor;
-using UnityEngine;
-
-namespace MegaPint.ValidationRequirement
+﻿namespace MegaPint.ValidationRequirement
 {
 
 /// <summary>

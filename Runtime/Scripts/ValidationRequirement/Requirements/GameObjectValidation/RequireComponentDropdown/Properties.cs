@@ -4,8 +4,9 @@ using System.Collections.Generic;
 namespace MegaPint.ValidationRequirement.Requirements.GameObjectValidation.RequireComponentDropdown
 {
 
+/// <summary> Used to store and display information about the selected component </summary>
 [Serializable]
-public class Properties
+internal class Properties
 {
     public string typeName;
     public string typeFullName;

@@ -10,7 +10,7 @@ using UnityEngine;
 namespace MegaPint.SerializeReferenceDropdown.Editor
 {
 
-public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
+internal class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
 {
     private class TreeElement : IComparable <TreeElement>
     {
@@ -49,7 +49,7 @@ public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
 
     private readonly Type[] _addedRequirements;
 
-    private readonly IEnumerable <SerializeReferenceDropdownNameAttribute> _attributes;
+    private readonly IEnumerable <ValidationRequirementNameAttribute> _attributes;
 
     private readonly Type _currentValue;
     private readonly Dictionary <string, TreeElement> _dropdownTree = new();
@@ -63,7 +63,7 @@ public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
 
     public SerializeReferenceDropdownAdvancedDropdown(
         AdvancedDropdownState state,
-        IEnumerable <SerializeReferenceDropdownNameAttribute> attributes,
+        IEnumerable <ValidationRequirementNameAttribute> attributes,
         Type[] addedRequirements,
         Type currentValue,
         Action <int> onSelectedNewType) :
@@ -91,7 +91,7 @@ public class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
 
         var index = 0;
 
-        foreach (SerializeReferenceDropdownNameAttribute attribute in _attributes)
+        foreach (ValidationRequirementNameAttribute attribute in _attributes)
         {
             if (attribute.name.Contains("/"))
             {

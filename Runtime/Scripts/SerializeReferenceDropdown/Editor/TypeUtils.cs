@@ -5,7 +5,7 @@ using System.Reflection;
 namespace MegaPint.SerializeReferenceDropdown.Editor
 {
 
-public static class TypeUtils
+internal static class TypeUtils
 {
     #region Public Methods
 

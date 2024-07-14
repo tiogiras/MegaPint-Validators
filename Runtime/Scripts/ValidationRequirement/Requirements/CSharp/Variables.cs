@@ -11,13 +11,11 @@ namespace MegaPint.ValidationRequirement.Requirements.CSharp
 
 /// <summary> Validation requirement for variables checking for NotNull </summary>
 [Serializable]
-[TypeTooltip(
+[ValidationRequirementTooltip(
     "With this requirement you can specify a class with it's assembly qualified name (Namespace, Class, Assembly) and enforce different settings for specific variables.")]
-[SerializeReferenceDropdownName("C#/Variables", typeof(Variables), true, -40)]
-public class Variables : ScriptableValidationRequirement
+[ValidationRequirementName("C#/Variables", typeof(Variables), true, -40)]
+internal class Variables : ScriptableValidationRequirement
 {
-    [HideInInspector] public string name;
-
     [SerializeField] private string _classNamespace;
     [SerializeField] private string _className;
     [SerializeField] private string _assemblyName;
@@ -76,17 +74,27 @@ public class Variables : ScriptableValidationRequirement
 
     #region Private Methods
 
+    /// <summary> Try to get the component of the set class type </summary>
+    /// <param name="gameObject"> Target gameObject </param>
+    /// <param name="type"> Target type </param>
+    /// <param name="component"> Found component </param>
+    /// <returns> If a component of the target type was found on the target gameObject </returns>
     private bool TryGetClassComponent(GameObject gameObject, Type type, out Component component)
     {
         component = gameObject.GetComponent(type);
 
         if (component == null)
+        {
             Debug.LogWarning(
                 "No component of the given type could be found on the gameObject. Make sure to add the component to the gameObject.");
+        }
 
         return component != null;
     }
 
+    /// <summary> Try to get the type of the specified class </summary>
+    /// <param name="type"> Found type </param>
+    /// <returns> If the type was found </returns>
     private bool TryGetClassType(out Type type)
     {
         type = null;

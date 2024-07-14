@@ -5,9 +5,9 @@ namespace MegaPint.SerializeReferenceDropdown.Runtime
 {
 
 [AttributeUsage(AttributeTargets.Class)]
-public class TypeTooltipAttribute : TooltipAttribute
+public class ValidationRequirementTooltipAttribute : TooltipAttribute
 {
-    public TypeTooltipAttribute(string tooltip) : base(tooltip)
+    public ValidationRequirementTooltipAttribute(string tooltip) : base(tooltip)
     {
     }
 }

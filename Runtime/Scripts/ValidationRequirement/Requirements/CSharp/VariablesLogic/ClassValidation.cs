@@ -3,8 +3,9 @@
 namespace MegaPint.ValidationRequirement.Requirements.CSharp.VariablesLogic
 {
 
+/// <summary> Class to draw information about the selected class in the inspector </summary>
 [Serializable]
-public class ClassValidation
+internal class ClassValidation
 {
     public bool foundClass;
     public float propertyHeight;

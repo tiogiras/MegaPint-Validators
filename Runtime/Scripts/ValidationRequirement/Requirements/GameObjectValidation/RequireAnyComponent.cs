@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using MegaPint.SerializeReferenceDropdown.Runtime;
 using MegaPint.ValidationRequirement.Requirements.GameObjectValidation.RequireComponentDropdown;
-using UnityEditor;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MegaPint.ValidationRequirement.Requirements.GameObjectValidation
 {
@@ -13,8 +15,8 @@ namespace MegaPint.ValidationRequirement.Requirements.GameObjectValidation
 [Serializable]
 [Tooltip(
     "With this requirement you can specify a list of components of which at least one must be on the gameObject.\nWhen fixed automatically the first selected component will be added to the gameObject.")]
-[SerializeReferenceDropdownName("GameObject/Component (Any)", typeof(RequireAnyComponent), true, -30, 21)]
-public class RequireAnyComponent : ScriptableValidationRequirement
+[ValidationRequirementName("GameObject/Component (Any)", typeof(RequireAnyComponent), true, -30, 21)]
+internal class RequireAnyComponent : ScriptableValidationRequirement
 {
     public List <Properties> properties;
 
@@ -78,32 +80,44 @@ public class RequireAnyComponent : ScriptableValidationRequirement
 
     #region Private Methods
 
+    /// <summary> Add the missing component to the fameObject </summary>
+    /// <param name="gameObject"> Target gameObject </param>
     private void FixAction(GameObject gameObject)
     {
         if (string.IsNullOrEmpty(properties[0].typeName))
         {
-            Debug.LogWarning("Cannot add the component to the gameObject. You have no component selected in the first list element!");
+            Debug.LogWarning(
+                "Cannot add the component to the gameObject. You have no component selected in the first list element!");
 
             return;
         }
-        
+
         gameObject.AddComponent(GetTypeByName(properties[0]));
     }
 
+    /// <summary> Get the type by the name specified in the properties </summary>
+    /// <param name="property"> Target properties </param>
+    /// <returns> Found type </returns>
     private Type GetTypeByName(Properties property)
     {
         var typeName = property.typeFullName;
-
+#if UNITY_EDITOR
         return TypeCache.GetTypesDerivedFrom <Component>().
                          FirstOrDefault(t => t.FullName != null && t.FullName.Equals(typeName));
+#else
+        return null;
+#endif
     }
 
+    /// <summary> Get all types of all components and add them to all properties </summary>
     private void GetTypes()
     {
         if (_types == null)
         {
             _types = new List <Type>();
+#if UNITY_EDITOR
             _types.AddRange(TypeCache.GetTypesDerivedFrom <Component>());
+#endif
         }
 
         foreach (Properties property in properties)

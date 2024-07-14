@@ -1,14 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using MegaPint.SerializeReferenceDropdown.Runtime;
 using MegaPint.ValidationRequirement;
 using MegaPint.ValidationRequirement.Requirements;
 using UnityEngine;
-using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+
+[assembly: InternalsVisibleTo("tiogiras.megapint.editor")]
+[assembly: InternalsVisibleTo("tiogiras.megapint.validators.editor")]
+[assembly: InternalsVisibleTo("tiogiras.megapint.validators.runtime.serializereferencedropdown.editor")]
 
 namespace MegaPint
 {
@@ -17,44 +21,28 @@ namespace MegaPint
 [RequireComponent(typeof(ValidatableMonoBehaviourStatus))]
 public abstract class ValidatableMonoBehaviour : MonoBehaviour
 {
+    [Serializable]
+    public struct SettingPriority
+    {
+        public ValidatorSettings setting;
+        public int priority;
+    }
+
     public bool HasImportedSettings => _importedSettings?.Count > 0;
 
-    [SerializeField] private List<ValidatorSettings> _importedSettings;
+    [SerializeField] private List <ValidatorSettings> _importedSettings;
 
     [SerializeReferenceDropdown] [SerializeReference]
     private List <ScriptableValidationRequirement> _requirements;
-    
-    private ValidatableMonoBehaviourStatus _status;
 
-    private List <ScriptableValidationRequirement> _activeRequirements = new();
-
+    // Used to store the toggle state of the imported settings in the gui
     [HideInInspector] public bool importedSettingsFoldout;
-    
-    public List <ScriptableValidationRequirement> ActiveRequirements
-    {
-        get
-        {
-            _activeRequirements.Clear();
-            _activeRequirements.AddRange(Requirements(true));
 
-            if (_importedSettings.Count == 0)
-                return _activeRequirements;
+    [HideInInspector] public List <SettingPriority> settingPriorities;
 
-            IEnumerable <ValidatorSettings> importedSettings = _importedSettings.Where(setting => setting != null);
+    private readonly List <ScriptableValidationRequirement> _activeRequirements = new();
 
-            importedSettings = importedSettings.OrderBy(GetSettingPriority);
-
-            foreach (ValidatorSettings setting in importedSettings)
-            {
-                if (setting.Requirements().Count == 0)
-                    continue;
-            
-                _activeRequirements.AddRange(ScriptableValidationRequirement.GetCompatibleRequirements(_activeRequirements, setting.Requirements()));
-            }
-
-            return _activeRequirements;
-        }
-    }
+    private ValidatableMonoBehaviourStatus _status;
 
     #region Unity Event Functions
 
@@ -74,10 +62,10 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         if (_requirements.Count > 0)
         {
             foreach (IValidationRequirement requirement in _requirements)
-                requirement?.OnValidate(this);   
+                requirement?.OnValidate(this);
         }
 
-        if (ActiveRequirements is not {Count: > 0})
+        if (GetActiveRequirements() is not {Count: > 0})
             return;
 
         _status.ValidateStatus();
@@ -87,11 +75,13 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
     #region Public Methods
 
-    /// <summary> Get all non imported requirements on this gameObject </summary>
-    /// <returns> All defined requirements </returns>
-    public List <ScriptableValidationRequirement> Requirements(bool excludeNulls = false)
+    /// <summary> Get the imported settings </summary>
+    /// <returns> The imported settings of the behaviour </returns>
+    public List <ValidatorSettings> GetImportedSettings()
     {
-        return excludeNulls ? _requirements.Where(requirement => requirement != null).ToList() : _requirements;
+        _importedSettings = _importedSettings.Where(setting => setting != null).ToList();
+
+        return _importedSettings;
     }
 
     /// <summary> Set the imported settings </summary>
@@ -101,29 +91,47 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         if (_importedSettings.Contains(setting))
         {
             Debug.LogWarning("ValidatorSettings already imported.");
-            return;   
+
+            return;
         }
 
         _importedSettings.Add(setting);
-        
-        settingPriorities.Add(new SettingPriority
-        {
-            priority = settingPriorities.Count + 1,
-            setting = setting
-        });
+
+        settingPriorities.Add(new SettingPriority {priority = settingPriorities.Count + 1, setting = setting});
 
 #if UNITY_EDITOR
         EditorUtility.SetDirty(this);
 #endif
     }
-    
-    /// <summary> Get the imported settings </summary>
-    /// <returns> The imported settings of the behaviour </returns>
-    public List<ValidatorSettings> GetImportedSettings()
+
+    /// <summary> Remove an imported setting </summary>
+    /// <param name="setting"> Target setting </param>
+    public void RemoveImportedSetting(ValidatorSettings setting)
     {
-        _importedSettings = _importedSettings.Where(setting => setting != null).ToList();
-        
-        return _importedSettings;
+        _importedSettings.Remove(setting);
+
+        var index = -1;
+
+        foreach (SettingPriority settingPriority in settingPriorities.Where(
+                     settingPriority => settingPriority.setting == setting))
+        {
+            index = settingPriorities.IndexOf(settingPriority);
+
+            break;
+        }
+
+        settingPriorities.RemoveAt(index);
+
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(this);
+#endif
+    }
+
+    /// <summary> Get all non imported requirements on this gameObject </summary>
+    /// <returns> All defined requirements </returns>
+    public List <ScriptableValidationRequirement> Requirements(bool excludeNulls = false)
+    {
+        return excludeNulls ? _requirements.Where(requirement => requirement != null).ToList() : _requirements;
     }
 
     /// <summary> Validate this gameObject based on the set <see cref="ScriptableValidationRequirement" /> </summary>
@@ -134,10 +142,11 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         var state = ValidationState.Ok;
         errors = new List <ValidationError>();
 
-        if (ActiveRequirements is not {Count: > 0})
+        if (GetActiveRequirements() is not {Count: > 0})
             return state;
 
-        foreach (IValidationRequirement requirement in ActiveRequirements.Where(requirement => requirement != null))
+        foreach (IValidationRequirement requirement in
+                 GetActiveRequirements().Where(requirement => requirement != null))
         {
             ValidationState requirementState = requirement.Validate(
                 gameObject,
@@ -151,13 +160,6 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         }
 
         return state;
-    }
-
-    /// <summary> Check if the requirements include <see cref="RequireChildrenValidation" /> </summary>
-    /// <returns> If the requirement is set on this gameObject </returns>
-    public bool ValidatesChildren()
-    {
-        return ActiveRequirements.Any(requirement => requirement?.GetType() == typeof(RequireChildrenValidation));
     }
 
     #endregion
@@ -174,7 +176,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     protected void SetRequirements(List <ScriptableValidationRequirement> requirements)
     {
         _requirements = requirements;
-        
+
 #if UNITY_EDITOR
         EditorUtility.SetDirty(this);
 #endif
@@ -182,40 +184,39 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
     #endregion
 
-    public void RemoveImportedSetting(ValidatorSettings setting)
+    #region Internal Methods
+
+    /// <summary> All requirements that contribute to the validation process of the behaviour </summary>
+    internal List <ScriptableValidationRequirement> GetActiveRequirements()
     {
-        _importedSettings.Remove(setting);
+        _activeRequirements.Clear();
+        _activeRequirements.AddRange(Requirements(true));
 
-        var index = -1;
+        if (_importedSettings.Count == 0)
+            return _activeRequirements;
 
-        foreach (SettingPriority settingPriority in settingPriorities.Where(settingPriority => settingPriority.setting == setting))
+        IEnumerable <ValidatorSettings> importedSettings = _importedSettings.Where(setting => setting != null);
+
+        importedSettings = importedSettings.OrderBy(GetSettingPriority);
+
+        foreach (ValidatorSettings setting in importedSettings)
         {
-            index = settingPriorities.IndexOf(settingPriority);
-            break;
+            if (setting.Requirements().Count == 0)
+                continue;
+
+            _activeRequirements.AddRange(
+                ScriptableValidationRequirement.GetCompatibleRequirements(
+                    _activeRequirements,
+                    setting.Requirements()));
         }
-        
-        settingPriorities.RemoveAt(index);
 
-#if UNITY_EDITOR
-        EditorUtility.SetDirty(this);
-#endif
+        return _activeRequirements;
     }
 
-    [Serializable]
-    public struct SettingPriority
-    {
-        public ValidatorSettings setting;
-        public int priority;
-    }
-
-    [HideInInspector] public List <SettingPriority> settingPriorities;
-
-    public int GetSettingPriority(ValidatorSettings setting)
-    {
-        return settingPriorities.FirstOrDefault(s => s.setting == setting).priority;
-    }
-
-    public string[] GetPriorityOptions(out List <int> values)
+    /// <summary> Get the possible priorities for the imported settings </summary>
+    /// <param name="values"> Possible priorities as values </param>
+    /// <returns> Possible priorities as options </returns>
+    internal string[] GetPriorityOptions(out List <int> values)
     {
         values = settingPriorities.Select(s => s.priority).ToList();
         values.Sort();
@@ -223,7 +224,18 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         return values.Select(value => value.ToString()).ToArray();
     }
 
-    public void SetSettingPriority(ValidatorSettings setting, int newPriority)
+    /// <summary> Get priority of the targeted setting </summary>
+    /// <param name="setting"> Targeted setting </param>
+    /// <returns> Priority of the setting </returns>
+    internal int GetSettingPriority(ValidatorSettings setting)
+    {
+        return settingPriorities.FirstOrDefault(s => s.setting == setting).priority;
+    }
+
+    /// <summary> Set the priority of a setting </summary>
+    /// <param name="setting"> Targeted setting </param>
+    /// <param name="newPriority"> New priority value </param>
+    internal void SetSettingPriority(ValidatorSettings setting, int newPriority)
     {
         var oldPriority = settingPriorities.FirstOrDefault(s => s.setting == setting).priority;
 
@@ -235,6 +247,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
             {
                 settingPriority.priority = newPriority;
                 settingPriorities[i] = settingPriority;
+
                 continue;
             }
 
@@ -249,6 +262,15 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         EditorUtility.SetDirty(this);
 #endif
     }
+
+    /// <summary> Check if the requirements include <see cref="RequireChildrenValidation" /> </summary>
+    /// <returns> If the requirement is set on this gameObject </returns>
+    internal bool ValidatesChildren()
+    {
+        return GetActiveRequirements().Any(requirement => requirement?.GetType() == typeof(RequireChildrenValidation));
+    }
+
+    #endregion
 }
 
 }

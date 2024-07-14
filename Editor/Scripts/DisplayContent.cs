@@ -16,7 +16,7 @@ internal static partial class DisplayContent
     {
         InitializeDisplayContent(
             refs,
-            new TabSettings {info = true, guides = true, help = true},
+            new TabSettings {info = true, guides = true, help = true, api = true},
             new TabActions
             {
                 info = ValidatorsActivateLinks, guides = ValidatorsActivateLinks, help = ValidatorsActivateLinks

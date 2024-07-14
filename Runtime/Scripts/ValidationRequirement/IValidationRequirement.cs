@@ -5,7 +5,7 @@ namespace MegaPint.ValidationRequirement
 {
 
 /// <summary> Interface to call the validation methods on the <see cref="ScriptableValidationRequirement" /> </summary>
-public interface IValidationRequirement
+internal interface IValidationRequirement
 {
     #region Public Methods
 

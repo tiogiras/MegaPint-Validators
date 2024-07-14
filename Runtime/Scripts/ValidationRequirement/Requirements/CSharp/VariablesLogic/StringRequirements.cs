@@ -4,10 +4,22 @@ using System.Collections.Generic;
 namespace MegaPint.ValidationRequirement.Requirements.CSharp.VariablesLogic
 {
 
-public static class StringRequirements
+/// <summary> Requirement for strings </summary>
+internal static class StringRequirements
 {
     #region Public Methods
 
+    /// <summary> Validate the string variable </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="variable"> Properties of the variable </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="requirement"> Current set requirement for the variable </param>
+    /// <param name="targetedValue"> Targeted value for equals requirement </param>
+    /// <param name="errors"> Validation errors </param>
+    /// <returns> If any errors occured </returns>
+    /// <exception cref="ArgumentOutOfRangeException"> Requirement not found </exception>
+
+    // ReSharper disable once CognitiveComplexity
     public static bool Validate(
         ref bool isValid,
         Variable.Properties variable,
@@ -42,7 +54,7 @@ public static class StringRequirements
                     errors.Add(error);
 
                 break;
-            
+
             default:
                 throw new ArgumentOutOfRangeException(nameof(requirement), requirement, null);
         }
@@ -54,6 +66,13 @@ public static class StringRequirements
 
     #region Private Methods
 
+    /// <summary> Validate if the variable equals the target value </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="variable"> Properties of the variable </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="targetedValue"> Targeted value </param>
+    /// <param name="error"> Validation error </param>
+    /// <returns> If an error occured </returns>
     private static bool ValidateEquals(
         ref bool isValid,
         Variable.Properties variable,
@@ -81,7 +100,14 @@ public static class StringRequirements
 
         return false;
     }
-    
+
+    /// <summary> Validate if the variable is not the targeted value </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="variable"> Properties of the variable </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="targetedValue"> Targeted value </param>
+    /// <param name="error"> Validation error </param>
+    /// <returns> If an error occured </returns>
     private static bool ValidateIsNot(
         ref bool isValid,
         Variable.Properties variable,
@@ -110,6 +136,12 @@ public static class StringRequirements
         return false;
     }
 
+    /// <summary> Validate that the variable is not null </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="variable"> Properties of the variable </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="error"> Validation error </param>
+    /// <returns> If an error occured </returns>
     private static bool ValidateNotNull(
         ref bool isValid,
         Variable.Properties variable,

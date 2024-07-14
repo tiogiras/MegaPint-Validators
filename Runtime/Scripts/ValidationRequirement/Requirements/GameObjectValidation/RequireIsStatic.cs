@@ -8,10 +8,11 @@ using UnityEditor;
 namespace MegaPint.ValidationRequirement.Requirements.GameObjectValidation
 {
 
+/// <summary> Validation requirement requires specific static flags on the gameObject </summary>
 [Serializable]
-[TypeTooltip("This requirement enforces the static flags of the gameObject.")]
-[SerializeReferenceDropdownName("GameObject/Is Static", typeof(RequireIsStatic), -30, 3)]
-public class RequireIsStatic : ScriptableValidationRequirement
+[ValidationRequirementTooltip("This requirement enforces the static flags of the gameObject.")]
+[ValidationRequirementName("GameObject/Is Static", typeof(RequireIsStatic), -30, 3)]
+internal class RequireIsStatic : ScriptableValidationRequirement
 {
 #if UNITY_EDITOR
     public StaticEditorFlags staticFlags;
@@ -42,6 +43,8 @@ public class RequireIsStatic : ScriptableValidationRequirement
 
     #region Private Methods
 
+    /// <summary> Set the correct static flags on the gameObject </summary>
+    /// <param name="gameObject"> Target gameObject </param>
     private void FixAction(GameObject gameObject)
     {
 #if UNITY_EDITOR

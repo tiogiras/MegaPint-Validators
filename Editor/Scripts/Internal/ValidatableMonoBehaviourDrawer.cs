@@ -7,7 +7,6 @@ using MegaPint.SerializeReferenceDropdown.Runtime;
 using MegaPint.ValidationRequirement;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace MegaPint.Editor.Scripts.Internal
 {
@@ -17,7 +16,6 @@ namespace MegaPint.Editor.Scripts.Internal
 internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 {
     private static readonly string[] s_exclusion = {"m_Script", "_importedSettings"};
-    private static readonly string[] s_exclusionFull = {"m_Script", "_requirements"};
 
     private bool _listening;
 
@@ -56,32 +54,9 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
         var hasImportedSettings = castedTarget.HasImportedSettings;
 
         if (hasImportedSettings)
-        {
-            SerializedProperty foldoutState = serializedObject.FindProperty("importedSettingsFoldout");
+            DrawImportedSettings(castedTarget);
 
-            foldoutState.boolValue =
-                EditorGUILayout.BeginFoldoutHeaderGroup(foldoutState.boolValue, "Imported Requirements");
-
-            if (foldoutState.boolValue)
-            {
-                List <ValidatorSettings> importedSettings = castedTarget.GetImportedSettings();
-
-                if (importedSettings.Count > 0)
-                {
-                    List <ValidatorSettings> list = castedTarget.GetImportedSettings();
-
-                    for (var i = list.Count - 1; i >= 0; i--)
-                    {
-                        ValidatorSettings setting = list[i];
-                        DrawImportedSetting(setting);
-                    }
-                }
-            }
-
-            EditorGUILayout.EndFoldoutHeaderGroup();
-        }
-
-        DrawPropertiesExcluding(serializedObject, /*importedSettings ? s_exclusionFull : */s_exclusion);
+        DrawPropertiesExcluding(serializedObject, s_exclusion);
 
         serializedObject.ApplyModifiedProperties();
     }
@@ -90,25 +65,27 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 
     #region Private Methods
 
+    /// <summary> Draw one imported setting </summary>
+    /// <param name="setting"> Targeted setting </param>
     private void DrawImportedSetting(ValidatorSettings setting)
     {
         if (setting == null)
             return;
 
         var windowWidth = EditorGUIUtility.currentViewWidth - 30;
-        
+
         var castedTarget = (ValidatableMonoBehaviour)serializedObject.targetObject;
 
         List <ScriptableValidationRequirement> activeRequirements =
-            castedTarget.ActiveRequirements;
-        
+            castedTarget.GetActiveRequirements();
+
         List <ScriptableValidationRequirement> sourceRequirements = setting.Requirements(true);
 
         if (sourceRequirements.Count == 0)
         {
             EditorGUILayout.EndHorizontal();
-            
-            return;    
+
+            return;
         }
 
         List <ScriptableValidationRequirement> disabledRequirements = sourceRequirements.
@@ -118,7 +95,7 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
                                                                                   r => r.uniqueID.Equals(
                                                                                       requirement.uniqueID))).
                                                                       ToList();
-        
+
         EditorGUILayout.BeginHorizontal(EditorStyles.helpBox);
 
         EditorGUILayout.BeginVertical(GUILayout.Width(15));
@@ -131,22 +108,22 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
         EditorGUILayout.EndVertical();
 
         var labelWidth = windowWidth * (disabledRequirements.Count > 0 ? .6f : 1f);
-        
+
         EditorGUILayout.BeginVertical();
         GUILayout.FlexibleSpace();
-        
+
         EditorGUILayout.LabelField(setting.name, GUILayout.MaxWidth(labelWidth));
-        
+
         GUILayout.FlexibleSpace();
         EditorGUILayout.EndVertical();
 
         if (disabledRequirements.Count > 0)
         {
-            List <SerializeReferenceDropdownNameAttribute> attributes = disabledRequirements.ConvertAll(
+            List <ValidationRequirementNameAttribute> attributes = disabledRequirements.ConvertAll(
                 requirement =>
                     requirement.GetType().
                                 GetCustomAttribute <
-                                    SerializeReferenceDropdownNameAttribute>());
+                                    ValidationRequirementNameAttribute>());
 
             var tooltip = $"- {string.Join("\n- ", attributes.Select(attr => attr.name))}";
 
@@ -158,7 +135,7 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 
             EditorGUILayout.BeginVertical();
             GUILayout.FlexibleSpace();
-            
+
             EditorGUILayout.LabelField(
                 new GUIContent
                 {
@@ -168,20 +145,25 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
                 },
                 style,
                 GUILayout.MaxWidth(windowWidth * .4f));
-            
+
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndVertical();
 
             UnityEngine.GUI.color = color;
         }
-        
+
         EditorGUILayout.BeginVertical(GUILayout.Width(15));
         GUILayout.FlexibleSpace();
 
         var priority = castedTarget.GetSettingPriority(setting);
         var priorityOptions = castedTarget.GetPriorityOptions(out List <int> priorityValues);
 
-        var newPriority = EditorGUILayout.IntPopup("", priority, priorityOptions, priorityValues.ToArray(), GUILayout.Width(35));
+        var newPriority = EditorGUILayout.IntPopup(
+            "",
+            priority,
+            priorityOptions,
+            priorityValues.ToArray(),
+            GUILayout.Width(35));
 
         if (newPriority != priority)
             castedTarget.SetSettingPriority(setting, newPriority);
@@ -190,6 +172,34 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
         EditorGUILayout.EndVertical();
 
         EditorGUILayout.EndHorizontal();
+    }
+
+    /// <summary> Draw all imported settings </summary>
+    /// <param name="castedTarget"> Target as ValidatableMonoBehaviour </param>
+    private void DrawImportedSettings(ValidatableMonoBehaviour castedTarget)
+    {
+        SerializedProperty foldoutState = serializedObject.FindProperty("importedSettingsFoldout");
+
+        foldoutState.boolValue =
+            EditorGUILayout.BeginFoldoutHeaderGroup(foldoutState.boolValue, "Imported Requirements");
+
+        if (foldoutState.boolValue)
+        {
+            List <ValidatorSettings> importedSettings = castedTarget.GetImportedSettings();
+
+            if (importedSettings.Count > 0)
+            {
+                List <ValidatorSettings> list = castedTarget.GetImportedSettings();
+
+                for (var i = list.Count - 1; i >= 0; i--)
+                {
+                    ValidatorSettings setting = list[i];
+                    DrawImportedSetting(setting);
+                }
+            }
+        }
+
+        EditorGUILayout.EndFoldoutHeaderGroup();
     }
 
     /// <summary> Export the saved requirements to an external file </summary>
@@ -203,9 +213,10 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
             if (sourceRequirements.Count == 0)
             {
                 Debug.LogWarning("Nothing to export!");
+
                 return;
             }
-            
+
             var path = EditorUtility.SaveFilePanelInProject(
                 "Export Requirements",
                 "Requirements",
@@ -214,7 +225,7 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 
             if (string.IsNullOrEmpty(path))
                 return;
-            
+
             var settingsFile = CreateInstance <ValidatorSettings>();
 
             List <ScriptableValidationRequirement> requirements = new();

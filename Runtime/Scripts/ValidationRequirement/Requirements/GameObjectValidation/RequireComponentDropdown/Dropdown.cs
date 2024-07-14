@@ -6,7 +6,8 @@ using UnityEditor.IMGUI.Controls;
 namespace MegaPint.ValidationRequirement.Requirements.GameObjectValidation.RequireComponentDropdown
 {
 
-public class Dropdown : AdvancedDropdown
+/// <summary> Dropdown used to display all component options </summary>
+internal class Dropdown : AdvancedDropdown
 {
     private readonly Dictionary <AdvancedDropdownItem, string> _itemFullPaths;
 
@@ -44,6 +45,10 @@ public class Dropdown : AdvancedDropdown
 
     #region Private Methods
 
+    /// <summary> Create the dropdown recursively for all components </summary>
+    /// <param name="parent"> Parent item </param>
+    /// <param name="path"> Path of the item </param>
+    /// <param name="fullPath"> Full path of the item </param>
     private void CreateDropdownRecursively(AdvancedDropdownItem parent, string path, string fullPath)
     {
         if (path.Contains("."))

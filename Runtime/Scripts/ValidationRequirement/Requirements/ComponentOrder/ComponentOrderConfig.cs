@@ -7,7 +7,7 @@ namespace MegaPint.ValidationRequirement.Requirements.ComponentOrder
 
 /// <summary> Config file for component order requirements </summary>
 [CreateAssetMenu(fileName = "Config", menuName = "MegaPint/Validators/Component Order Config", order = 1)]
-public class ComponentOrderConfig : ScriptableObject
+internal class ComponentOrderConfig : ScriptableObject
 {
     [Serializable]
     public class Type
