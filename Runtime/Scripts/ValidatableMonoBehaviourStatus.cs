@@ -7,11 +7,11 @@ namespace MegaPint
 {
 
 /// <summary> Behaviour to display the status of a gameObject with <see cref="ValidatableMonoBehaviour" /> </summary>
-public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <ValidatableMonoBehaviourStatus>
+internal class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <ValidatableMonoBehaviourStatus>
 {
     public ValidationState State {get; private set;}
 
-    public readonly List <InvalidBehaviour> invalidBehaviours = new();
+    internal readonly List <InvalidBehaviour> invalidBehaviours = new();
     public Action <ValidatableMonoBehaviourStatus> onStatusChanged;
 
     public Action <ValidationState> onStatusUpdate;
@@ -75,6 +75,8 @@ public class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <Valida
     }
 
     /// <summary> Validate the current status </summary>
+
+    // Resharper disable once CognitiveComplexity
     public void ValidateStatus()
     {
         ValidationState previousState = State;

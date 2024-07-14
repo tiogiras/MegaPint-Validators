@@ -126,7 +126,7 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
                        "All components that contain the given string in their namespace will be placed here.",
                    ComponentOrderConfig.CategoryFunction.NamespaceEquals =>
                        "All components that are in the specified namespace will be placed here",
-                   ComponentOrderConfig.CategoryFunction.NameContains => 
+                   ComponentOrderConfig.CategoryFunction.NameContains =>
                        "All components that contain the given string in their name will be placed here.",
                    var _ => throw new ArgumentOutOfRangeException(nameof(categoryFunction), categoryFunction, null)
                };
@@ -234,7 +234,7 @@ internal class ComponentConfigTypeDrawer : UnityEditor.Editor
             case ComponentOrderConfig.CategoryFunction.NamespaceContains or
                 ComponentOrderConfig.CategoryFunction.NamespaceEquals or
                 ComponentOrderConfig.CategoryFunction.NameContains:
-                
+
                 var title = entry.category.function == ComponentOrderConfig.CategoryFunction.NamespaceEquals
                     ? "Namespace"
                     : "Control String";

@@ -1,6 +1,4 @@
-﻿// TODO commenting
-
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using MegaPint.ValidationRequirement.Requirements.CSharp.VariablesLogic;
 using UnityEditor;
 using UnityEngine;
@@ -86,6 +84,10 @@ internal class VariableDrawer : PropertyDrawer
 
     #region Private Methods
 
+    /// <summary> Draw the properties for a boolean </summary>
+    /// <param name="position"> Rect of the property </param>
+    /// <param name="property"> Parent property </param>
+    /// <param name="height"> Reference to the property height </param>
     private static void DrawBoolProperty(Rect position, SerializedProperty property, ref float height)
     {
         Rect requirementRect = GetNewRect(position, ref height, 2);
@@ -107,6 +109,10 @@ internal class VariableDrawer : PropertyDrawer
         }
     }
 
+    /// <summary> Draw the properties for a float </summary>
+    /// <param name="position"> Rect of the property </param>
+    /// <param name="property"> Parent property </param>
+    /// <param name="height"> Reference to the property height </param>
     private static void DrawFloatProperty(Rect position, SerializedProperty property, ref float height)
     {
         Rect requirementRect = GetNewRect(position, ref height, 2);
@@ -146,6 +152,10 @@ internal class VariableDrawer : PropertyDrawer
         }
     }
 
+    /// <summary> Draw the properties for an integer </summary>
+    /// <param name="position"> Rect of the property </param>
+    /// <param name="property"> Parent property </param>
+    /// <param name="height"> Reference to the property height </param>
     private static void DrawIntProperty(Rect position, SerializedProperty property, ref float height)
     {
         Rect requirementRect = GetNewRect(position, ref height, 2);
@@ -185,6 +195,10 @@ internal class VariableDrawer : PropertyDrawer
         }
     }
 
+    /// <summary> Draw the properties for an Object </summary>
+    /// <param name="position"> Rect of the property </param>
+    /// <param name="property"> Parent property </param>
+    /// <param name="height"> Reference to the property height </param>
     private static void DrawObjectProperty(Rect position, SerializedProperty property, ref float height)
     {
         Rect requirementRect = GetNewRect(position, ref height, 2);
@@ -206,6 +220,10 @@ internal class VariableDrawer : PropertyDrawer
         }
     }
 
+    /// <summary> Draw the properties for a string </summary>
+    /// <param name="position"> Rect of the property </param>
+    /// <param name="property"> Parent property </param>
+    /// <param name="height"> Reference to the property height </param>
     private static void DrawStringProperty(Rect position, SerializedProperty property, ref float height)
     {
         Rect requirementRect = GetNewRect(position, ref height, 2);
@@ -227,6 +245,11 @@ internal class VariableDrawer : PropertyDrawer
         }
     }
 
+    /// <summary> Get a new rect based on the current rect </summary>
+    /// <param name="position"> Current rect </param>
+    /// <param name="height"> Reference to the property height </param>
+    /// <param name="spacing"> Spacing added after the drawn rect </param>
+    /// <returns> Rect to draw in </returns>
     private static Rect GetNewRect(Rect position, ref float height, float spacing = 0f)
     {
         var rect = new Rect(
@@ -240,6 +263,9 @@ internal class VariableDrawer : PropertyDrawer
         return rect;
     }
 
+    /// <summary> Get the type of the variable by the index of their selected type </summary>
+    /// <param name="type"> Selected type </param>
+    /// <returns> Selected type as string </returns>
     private static string GetVariableTypeName(int type)
     {
         return type switch

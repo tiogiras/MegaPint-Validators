@@ -1,14 +1,15 @@
 ﻿using System;
 using MegaPint.SerializeReferenceDropdown.Runtime;
-using UnityEditor;
 using UnityEngine;
 
 namespace MegaPint.ValidationRequirement.Requirements.GameObjectValidation
 {
 
+/// <summary> Requirement requires a specific layer on the gameObject </summary>
 [Serializable]
-[SerializeReferenceDropdownName("GameObject/Layer", typeof(RequireLayer), -30, 1)]
-public class RequireLayer : ScriptableValidationRequirement
+[ValidationRequirementTooltip("This requirement enforces the layer of the gameObject.")]
+[ValidationRequirementName("GameObject/Layer", typeof(RequireLayer), -30, 1)]
+internal class RequireLayer : ScriptableValidationRequirement
 {
     [SerializeField] private string _layerName;
 
@@ -35,6 +36,8 @@ public class RequireLayer : ScriptableValidationRequirement
 
     #region Private Methods
 
+    /// <summary> Set the layer of the gameObject </summary>
+    /// <param name="gameObject"> Targeted gameObject </param>
     private void FixAction(GameObject gameObject)
     {
         var layer = LayerMask.NameToLayer(_layerName);

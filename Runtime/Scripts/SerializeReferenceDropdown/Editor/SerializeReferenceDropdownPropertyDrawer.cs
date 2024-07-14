@@ -17,7 +17,7 @@ namespace MegaPint.SerializeReferenceDropdown.Editor
 {
 
 [CustomPropertyDrawer(typeof(SerializeReferenceDropdownAttribute))]
-public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
+internal class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
 {
     private const string NullName = "None";
     private List <Type> _assignableTypes;
@@ -109,12 +109,12 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
                };
     }
 
-    private static SerializeReferenceDropdownNameAttribute GetType(Type type)
+    private static ValidationRequirementNameAttribute GetType(Type type)
     {
         if (type == null)
-            return new SerializeReferenceDropdownNameAttribute(NullName, null, int.MinValue + 1);
+            return new ValidationRequirementNameAttribute(NullName, null, int.MinValue + 1);
 
-        return type.GetCustomAttribute <SerializeReferenceDropdownNameAttribute>();
+        return type.GetCustomAttribute <ValidationRequirementNameAttribute>();
     }
 
     private static string GetTypeTooltip(Type type)
@@ -122,12 +122,12 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
         if (type == null)
             return string.Empty;
 
-        TypeCache.TypeCollection typesWithTooltip = TypeCache.GetTypesWithAttribute(typeof(TypeTooltipAttribute));
+        TypeCache.TypeCollection typesWithTooltip = TypeCache.GetTypesWithAttribute(typeof(ValidationRequirementTooltipAttribute));
 
         if (!typesWithTooltip.Contains(type))
             return string.Empty;
 
-        var tooltipAttribute = type.GetCustomAttribute <TypeTooltipAttribute>();
+        var tooltipAttribute = type.GetCustomAttribute <ValidationRequirementTooltipAttribute>();
 
         return tooltipAttribute.tooltip;
     }

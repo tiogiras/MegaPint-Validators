@@ -1,17 +1,19 @@
 ﻿using System;
 using MegaPint.SerializeReferenceDropdown.Runtime;
 using UnityEngine;
-
 #if UNITY_EDITOR
+using UnityEditorInternal;
 using System.Linq;
 #endif
 
 namespace MegaPint.ValidationRequirement.Requirements.GameObjectValidation
 {
 
+/// <summary> Requirement requires specific tag on the gameObject </summary>
 [Serializable]
-[SerializeReferenceDropdownName("GameObject/Tag", typeof(RequireTag), -30, 2)]
-public class RequireTag : ScriptableValidationRequirement
+[ValidationRequirementTooltip("This requirement enforces the tag of the gameObject.")]
+[ValidationRequirementName("GameObject/Tag", typeof(RequireTag), -30, 2)]
+internal class RequireTag : ScriptableValidationRequirement
 {
     [SerializeField] private string _tagName;
 
@@ -38,29 +40,33 @@ public class RequireTag : ScriptableValidationRequirement
             FixAction);
     }
 
-    private bool IsValidTag()
-    {
-#if UNITY_EDITOR
-        return UnityEditorInternal.InternalEditorUtility.tags.Contains(_tagNameInternal);
-#else
-        return false;
-#endif
-    }
-    
     #endregion
 
     #region Private Methods
 
+    /// <summary> Set the tag of the gameObject </summary>
+    /// <param name="gameObject"> Targeted gameObject </param>
     private void FixAction(GameObject gameObject)
     {
         if (!IsValidTag())
         {
             Debug.LogWarning("Could not set the gameObject tag, as the targeted tag does not exist.");
-            
-            return;   
+
+            return;
         }
 
         gameObject.tag = _tagNameInternal;
+    }
+
+    /// <summary> Check if the tag is valid </summary>
+    /// <returns> If the tag exists </returns>
+    private bool IsValidTag()
+    {
+#if UNITY_EDITOR
+        return InternalEditorUtility.tags.Contains(_tagNameInternal);
+#else
+        return false;
+#endif
     }
 
     #endregion

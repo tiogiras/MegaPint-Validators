@@ -7,7 +7,7 @@ namespace MegaPint.SerializeReferenceDropdown.Editor
 {
 
 [InitializeOnLoad]
-public class SerializeReferenceCopyPasteContextMenu
+internal class SerializeReferenceCopyPasteContextMenu
 {
     private static SerializedProperty s_lastCopyProperty;
 

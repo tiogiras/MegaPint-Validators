@@ -8,14 +8,15 @@ namespace MegaPint.ValidationRequirement.Requirements.TransformValidation
 
 /// <summary> Validation requirement for default values on a transform component </summary>
 [Serializable]
-[SerializeReferenceDropdownName(
+[ValidationRequirementTooltip("This requirement enforces the default values of the transform component.")]
+[ValidationRequirementName(
     "Transform/Default",
     typeof(RequireDefaultTransform),
     false,
     new[] {typeof(RequireGlobalTransform), typeof(RequireLocalTransform)},
     -29,
     0)]
-public class RequireDefaultTransform : ScriptableValidationRequirement
+internal class RequireDefaultTransform : ScriptableValidationRequirement
 {
     [SerializeField] [Tooltip("If true the transform is required to have a local position of (0,0,0)")]
     private bool _defaultPosition;

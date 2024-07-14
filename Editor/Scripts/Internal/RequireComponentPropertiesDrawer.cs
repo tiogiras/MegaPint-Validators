@@ -1,4 +1,5 @@
-﻿using MegaPint.ValidationRequirement.Requirements.GameObjectValidation.RequireComponentDropdown;
+﻿#if UNITY_EDITOR
+using MegaPint.ValidationRequirement.Requirements.GameObjectValidation.RequireComponentDropdown;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -85,3 +86,4 @@ internal class RequireComponentPropertiesDrawer : PropertyDrawer
 }
 
 }
+#endif

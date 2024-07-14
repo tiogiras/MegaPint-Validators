@@ -13,8 +13,10 @@ namespace MegaPint.ValidationRequirement.Requirements.ComponentOrder
 
 /// <summary> Validation requirement that enforces a specific order of the components on a gameObject </summary>
 [Serializable]
-[SerializeReferenceDropdownName("Component Order", typeof(RequireComponentOrder), -9)]
-public class RequireComponentOrder : ScriptableValidationRequirement
+[ValidationRequirementTooltip(
+    "Enforces a specific order of the components on the gameObject.\nThe order can be defined with any ComponentOrderConfig file.")]
+[ValidationRequirementName("Component Order", typeof(RequireComponentOrder), -9)]
+internal class RequireComponentOrder : ScriptableValidationRequirement
 {
     private struct Category : IComparable <Category>
     {

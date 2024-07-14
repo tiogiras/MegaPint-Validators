@@ -9,8 +9,9 @@ namespace MegaPint.ValidationRequirement.Requirements
 
 /// <summary> Validation requirement requiring all child <see cref="ValidatableMonoBehaviour" /> to be valid </summary>
 [Serializable]
-[SerializeReferenceDropdownName("Child Validation", typeof(RequireChildrenValidation), -10)]
-public class RequireChildrenValidation : ScriptableValidationRequirement
+[ValidationRequirementTooltip("This requirement enforces that all child ValidatableMonoBehaviours are valid.")]
+[ValidationRequirementName("Child Validation", typeof(RequireChildrenValidation), -10)]
+internal class RequireChildrenValidation : ScriptableValidationRequirement
 {
     #region Protected Methods
 

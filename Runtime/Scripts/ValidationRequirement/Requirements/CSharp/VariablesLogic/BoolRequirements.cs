@@ -1,14 +1,23 @@
-﻿// TODO commenting
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MegaPint.ValidationRequirement.Requirements.CSharp.VariablesLogic
 {
 
-public static class BoolRequirements
+/// <summary> Requirement for booleans </summary>
+internal static class BoolRequirements
 {
     #region Public Methods
 
+    /// <summary> Validate the bool variable </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="variable"> Properties of the variable </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="requirement"> Current set requirement for the variable </param>
+    /// <param name="targetedValue"> Targeted value for equals requirement </param>
+    /// <param name="errors"> Validation errors </param>
+    /// <returns> If any errors occured </returns>
+    /// <exception cref="ArgumentOutOfRangeException"> Requirement not found </exception>
     public static bool Validate(
         ref bool isValid,
         Variable.Properties variable,
@@ -25,7 +34,7 @@ public static class BoolRequirements
                 break;
 
             case Variable.BooleanRequirement.Equals:
-                if(!ValidateEquals(ref isValid, variable, value, targetedValue, out ValidationError error))
+                if (!ValidateEquals(ref isValid, variable, value, targetedValue, out ValidationError error))
                     errors.Add(error);
 
                 break;
@@ -41,6 +50,13 @@ public static class BoolRequirements
 
     #region Private Methods
 
+    /// <summary> Validate if the variable equals the target value </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="variable"> Properties of the variable </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="targetedValue"> Targeted value </param>
+    /// <param name="error"> Validation error </param>
+    /// <returns> If an error occured </returns>
     private static bool ValidateEquals(
         ref bool isValid,
         Variable.Properties variable,

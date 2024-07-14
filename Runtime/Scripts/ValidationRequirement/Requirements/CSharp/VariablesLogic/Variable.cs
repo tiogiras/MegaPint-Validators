@@ -1,15 +1,15 @@
-﻿// TODO commenting
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Object = UnityEngine.Object;
 
 namespace MegaPint.ValidationRequirement.Requirements.CSharp.VariablesLogic
 {
 
+/// <summary> Class used to store the settings for a variable and validate it's requirement </summary>
 [Serializable]
-public class Variable
+internal class Variable
 {
+    /// <summary> Class used to store all settings for a variable </summary>
     [Serializable]
     public class Properties
     {
@@ -78,6 +78,11 @@ public class Variable
 
     #region Public Methods
 
+    /// <summary> Validate the variable based on it's type and requirement </summary>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="errors"> Validation errors </param>
+    /// <returns> If any errors occured </returns>
+    /// <exception cref="System.ArgumentOutOfRangeException"> Type not found </exception>
     public bool Validate(object value, out List <ValidationError> errors)
     {
         var isValid = true;
@@ -124,6 +129,10 @@ public class Variable
 
     #region Private Methods
 
+    /// <summary> Validate the variable as a boolean </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="errors"> Validation errors </param>
     private void BoolValidation(ref bool isValid, object value, List <ValidationError> errors)
     {
         if (!BoolRequirements.Validate(
@@ -136,6 +145,10 @@ public class Variable
             errors.AddRange(newErrors);
     }
 
+    /// <summary> Validate the variable as a float </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="errors"> Validation errors </param>
     private void FloatValidation(ref bool isValid, object value, List <ValidationError> errors)
     {
         if (!FloatRequirements.Validate(
@@ -151,6 +164,10 @@ public class Variable
             errors.AddRange(newErrors);
     }
 
+    /// <summary> Validate the variable as an integer </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="errors"> Validation errors </param>
     private void IntValidation(ref bool isValid, object value, List <ValidationError> errors)
     {
         if (!IntRequirements.Validate(
@@ -166,6 +183,10 @@ public class Variable
             errors.AddRange(newErrors);
     }
 
+    /// <summary> Validate the variable as an Object </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="errors"> Validation errors </param>
     private void ObjectValidation(ref bool isValid, object value, List <ValidationError> errors)
     {
         if (!ObjectRequirements.Validate(
@@ -178,6 +199,8 @@ public class Variable
             errors.AddRange(newErrors);
     }
 
+    /// <summary> Set the index based on the type of the variable value </summary>
+    /// <param name="value"> Value of the variable </param>
     private void SetTypeIndex(object value)
     {
         properties.typeIndex = value switch
@@ -191,6 +214,10 @@ public class Variable
                                };
     }
 
+    /// <summary> Validate the variable as a string </summary>
+    /// <param name="isValid"> Validation bool reference </param>
+    /// <param name="value"> Value of the variable </param>
+    /// <param name="errors"> Validation errors </param>
     private void StringValidation(ref bool isValid, object value, List <ValidationError> errors)
     {
         if (!StringRequirements.Validate(

@@ -67,8 +67,11 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
         return severity;
     }
 
-    // TODO commenting
-    public static List <ScriptableValidationRequirement> GetCompatibleRequirements(
+    /// <summary> Get all compatible requirements of the lowPriority list </summary>
+    /// <param name="highPriority"> Requirements with higher priority </param>
+    /// <param name="lowPriority"> Requirements with lower priority </param>
+    /// <returns> All requirements of the lower priority that are compatible with the higher priority </returns>
+    internal static List <ScriptableValidationRequirement> GetCompatibleRequirements(
         List <ScriptableValidationRequirement> highPriority,
         List <ScriptableValidationRequirement> lowPriority)
     {
@@ -81,42 +84,16 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
 
             Type lpType = lpRequirement.GetType();
 
-            var compatible = true;
-
-            foreach (ScriptableValidationRequirement hpRequirement in highPriority)
-            {
-                if (hpRequirement == null)
-                    continue;
-
-                Type hpType = hpRequirement.GetType();
-                var hpAttr = hpType.GetCustomAttribute <SerializeReferenceDropdownNameAttribute>();
-
-                if (lpType == hpType && !hpAttr.allowMultiple)
-                {
-                    compatible = false;
-
-                    break;
-                }
-
-                if (hpAttr.incompatibleRequirements is not {Length: > 0})
-                    continue;
-
-                if (hpAttr.incompatibleRequirements.Contains(lpType))
-                {
-                    compatible = false;
-
-                    break;
-                }
-            }
-
-            if (compatible)
+            if (IsCompatible(highPriority, lpType))
                 compatibles.Add(lpRequirement);
         }
 
         return compatibles;
     }
 
-    public void ChangeSeverityOverwrite()
+    /// <summary> Change the severity overwrite </summary>
+    /// <exception cref="System.ArgumentOutOfRangeException"> Severity not found </exception>
+    internal void ChangeSeverityOverwrite()
     {
         severityOverwrite = severityOverwrite switch
                             {
@@ -129,12 +106,14 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
         SetDirty();
     }
 
-    public void GenerateUniqueID()
+    /// <summary> Generate an unique id </summary>
+    internal void GenerateUniqueID()
     {
         uniqueID = Guid.NewGuid().ToString();
     }
 
-    public void SetDirty()
+    /// <summary> Set the object of the requirement dirty </summary>
+    internal void SetDirty()
     {
 #if UNITY_EDITOR
         if (objectReference != null)
@@ -261,6 +240,40 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
         path.Reverse();
 
         return string.Join("/", path.Select(p => p.name));
+    }
+
+    /// <summary> Check if the lower priority requirement is compatible with the higher priority requirements </summary>
+    /// <param name="highPriority"> Higher priority requirements </param>
+    /// <param name="lpType"> Type of the lower priority requirement </param>
+    /// <returns> If the requirement is compatible </returns>
+
+    // Resharper disable once CognitiveComplexity
+    private static bool IsCompatible(List <ScriptableValidationRequirement> highPriority, Type lpType)
+    {
+        var compatible = true;
+
+        foreach (ScriptableValidationRequirement hpRequirement in highPriority)
+        {
+            if (!compatible)
+                break;
+
+            if (hpRequirement == null)
+                continue;
+
+            Type hpType = hpRequirement.GetType();
+            var hpAttr = hpType.GetCustomAttribute <ValidationRequirementNameAttribute>();
+
+            if (lpType == hpType && !hpAttr.allowMultiple)
+                compatible = false;
+
+            if (hpAttr.incompatibleRequirements is not {Length: > 0})
+                continue;
+
+            if (hpAttr.incompatibleRequirements.Contains(lpType))
+                compatible = false;
+        }
+
+        return compatible;
     }
 
     /// <summary> Execute the fixAction for the targeted child in the prefab </summary>
