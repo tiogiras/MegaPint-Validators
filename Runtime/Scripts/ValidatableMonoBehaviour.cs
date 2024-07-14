@@ -17,7 +17,7 @@ namespace MegaPint
 [RequireComponent(typeof(ValidatableMonoBehaviourStatus))]
 public abstract class ValidatableMonoBehaviour : MonoBehaviour
 {
-    public bool HasImportedSettings => _importedSettings.Count > 0;
+    public bool HasImportedSettings => _importedSettings?.Count > 0;
 
     [SerializeField] private List<ValidatorSettings> _importedSettings;
 

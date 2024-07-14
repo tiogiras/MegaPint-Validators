@@ -21,7 +21,7 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
     [HideInInspector] public bool initialized;
     [HideInInspector] public string uniqueID;
     [HideInInspector] public ValidationState severityOverwrite;
-    [HideInInspector] public GameObject gameObject;
+    [HideInInspector] public GameObject targetGameObject;
     [HideInInspector] public Object objectReference;
 
     private List <ValidationError> _errors;
@@ -32,6 +32,8 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
     {
         objectReference = o;
         TryInitialize(this);
+
+        OnRequirementValidation();
     }
 
     #endregion
@@ -42,15 +44,15 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
     ///     Validates the gameObject based on the specified <see cref="Validate" /> method.
     ///     Called when validating the <see cref="ValidatableMonoBehaviour" />.
     /// </summary>
-    /// <param name="targetGameObject"> GameObject that is validated </param>
+    /// <param name="target"> GameObject that is validated </param>
     /// <param name="errors"> All found <see cref="ValidationError" /> </param>
     /// <returns> The highest <see cref="ValidationState" /> found in the <see cref="ValidationError" /> </returns>
-    public ValidationState Validate(GameObject targetGameObject, out List <ValidationError> errors)
+    public ValidationState Validate(GameObject target, out List <ValidationError> errors)
     {
         _errors = new List <ValidationError>();
-        gameObject = targetGameObject;
+        targetGameObject = target;
 
-        Validate(gameObject);
+        Validate(targetGameObject);
 
         errors = _errors;
 
@@ -76,39 +78,41 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
         {
             if (lpRequirement == null)
                 continue;
-        
+
             Type lpType = lpRequirement.GetType();
 
             var compatible = true;
-            
+
             foreach (ScriptableValidationRequirement hpRequirement in highPriority)
             {
                 if (hpRequirement == null)
                     continue;
-                
+
                 Type hpType = hpRequirement.GetType();
                 var hpAttr = hpType.GetCustomAttribute <SerializeReferenceDropdownNameAttribute>();
 
                 if (lpType == hpType && !hpAttr.allowMultiple)
                 {
                     compatible = false;
+
                     break;
                 }
 
                 if (hpAttr.incompatibleRequirements is not {Length: > 0})
                     continue;
-                
+
                 if (hpAttr.incompatibleRequirements.Contains(lpType))
                 {
                     compatible = false;
+
                     break;
                 }
             }
-            
+
             if (compatible)
                 compatibles.Add(lpRequirement);
         }
-        
+
         return compatibles;
     }
 
@@ -169,7 +173,7 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
             {
                 errorName = errorName,
                 errorText = errorText,
-                gameObject = gameObject,
+                gameObject = targetGameObject,
                 fixAction = finalFixAction,
                 severity = GetSeverity(severity)
             });
@@ -198,6 +202,11 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
     {
         foreach (ValidationError error in errors)
             AddError(error.errorName, error.errorText, error.severity, error.fixAction);
+    }
+
+    /// <summary> Called when requirement is validated even when it is not initializing </summary>
+    protected virtual void OnRequirementValidation()
+    {
     }
 
     /// <summary> Validates the gameObject </summary>

@@ -10,13 +10,13 @@ public interface IValidationRequirement
     #region Public Methods
 
     /// <summary> Called when validating a <see cref="ValidatableMonoBehaviour" /> </summary>
-    /// <param name="gameObject"> The gameObject the <see cref="ValidatableMonoBehaviour" /> is added to </param>
+    /// <param name="target"> The gameObject the <see cref="ValidatableMonoBehaviour" /> is added to </param>
     /// <param name="errors">
     ///     All <see cref="ValidationError" /> found while validating all
     ///     <see cref="ScriptableValidationRequirement" />
     /// </param>
     /// <returns> The highest <see cref="ValidationState" /> in the found <see cref="ValidationError" /> </returns>
-    public ValidationState Validate(GameObject gameObject, out List <ValidationError> errors);
+    public ValidationState Validate(GameObject target, out List <ValidationError> errors);
 
     #endregion
 
