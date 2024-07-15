@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using MegaPint.SerializeReferenceDropdown.Runtime;
@@ -28,26 +29,27 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         public int priority;
     }
 
-    public bool HasImportedSettings => _importedSettings?.Count > 0;
-
-    [SerializeField] private List <ValidatorSettings> _importedSettings;
+    public bool HasImportedSettings => _importedSettings?.Count > 0 || defaultSettings?.Count > 0;
 
     [SerializeReferenceDropdown] [SerializeReference]
-    private List <ScriptableValidationRequirement> _requirements;
+    private List <ScriptableValidationRequirement> _requirements = new();
+
+    [HideInInspector] public List <ValidatorSettings> defaultSettings = new();
+    [SerializeField] private List <ValidatorSettings> _importedSettings = new();
 
     // Used to store the toggle state of the imported settings in the gui
     [HideInInspector] public bool importedSettingsFoldout;
-
-    [HideInInspector] public List <SettingPriority> settingPriorities;
+    [HideInInspector] public List <SettingPriority> settingPriorities = new();
 
     private readonly List <ScriptableValidationRequirement> _activeRequirements = new();
-
     private ValidatableMonoBehaviourStatus _status;
 
     #region Unity Event Functions
 
     public void OnValidate()
     {
+        TryImportDefaultImports();
+
         BeforeValidation();
 
         if (_status == null)
@@ -88,13 +90,13 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     /// <param name="setting"> New imported settings </param>
     public void ImportSetting(ValidatorSettings setting)
     {
-        if (_importedSettings.Contains(setting))
+        if (_importedSettings.Contains(setting) || defaultSettings.Contains(setting))
         {
             Debug.LogWarning("ValidatorSettings already imported.");
 
             return;
         }
-
+        
         _importedSettings.Add(setting);
 
         settingPriorities.Add(new SettingPriority {priority = settingPriorities.Count + 1, setting = setting});
@@ -120,7 +122,20 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
             break;
         }
 
+        var oldPriority = settingPriorities[index].priority;
+
         settingPriorities.RemoveAt(index);
+
+        for (var i = 0; i < settingPriorities.Count; i++)
+        {
+            SettingPriority settingPriority = settingPriorities[i];
+
+            if (settingPriority.priority < oldPriority)
+                continue;
+
+            settingPriority.priority--;
+            settingPriorities[i] = settingPriority;
+        }
 
 #if UNITY_EDITOR
         EditorUtility.SetDirty(this);
@@ -131,6 +146,8 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     /// <returns> All defined requirements </returns>
     public List <ScriptableValidationRequirement> Requirements(bool excludeNulls = false)
     {
+        _requirements ??= new List <ScriptableValidationRequirement>();
+        
         return excludeNulls ? _requirements.Where(requirement => requirement != null).ToList() : _requirements;
     }
 
@@ -171,6 +188,11 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     {
     }
 
+    protected virtual string[] DefaultImports()
+    {
+        return null;
+    }
+
     /// <summary> Overwrite the requirements </summary>
     /// <param name="requirements"> new requirements </param>
     protected void SetRequirements(List <ScriptableValidationRequirement> requirements)
@@ -192,16 +214,15 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         _activeRequirements.Clear();
         _activeRequirements.AddRange(Requirements(true));
 
-        if (_importedSettings.Count == 0)
+        if (_importedSettings.Count == 0 && defaultSettings.Count == 0)
             return _activeRequirements;
 
-        IEnumerable <ValidatorSettings> importedSettings = _importedSettings.Where(setting => setting != null);
-
-        importedSettings = importedSettings.OrderBy(GetSettingPriority);
-
-        foreach (ValidatorSettings setting in importedSettings)
+        List <ValidatorSettings> importedSettings = _importedSettings.Where(setting => setting != null).ToList();
+        importedSettings.AddRange(defaultSettings.Where(setting => setting != null));
+        
+        foreach (ValidatorSettings setting in importedSettings.OrderBy(GetSettingPriority))
         {
-            if (setting.Requirements().Count == 0)
+            if (setting.Requirements(true).Count == 0)
                 continue;
 
             _activeRequirements.AddRange(
@@ -229,6 +250,9 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     /// <returns> Priority of the setting </returns>
     internal int GetSettingPriority(ValidatorSettings setting)
     {
+        if (defaultSettings.Contains(setting))
+            return defaultSettings.IndexOf(setting) - 999;
+        
         return settingPriorities.FirstOrDefault(s => s.setting == setting).priority;
     }
 
@@ -268,6 +292,73 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     internal bool ValidatesChildren()
     {
         return GetActiveRequirements().Any(requirement => requirement?.GetType() == typeof(RequireChildrenValidation));
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    /// <summary> Import the specified default settings </summary>
+    private void ImportDefaultImports()
+    {
+        defaultSettings ??= new List <ValidatorSettings>();
+        
+        defaultSettings.Clear();
+
+        foreach (var import in DefaultImports())
+        {
+            var setting = AssetDatabase.LoadAssetAtPath <ValidatorSettings>(import);
+
+            if (setting is null)
+                continue;
+            
+            defaultSettings.Add(setting);
+        }
+
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(this);
+#endif
+    }
+
+    /// <summary> Try to import the specified default settings </summary>
+    private void TryImportDefaultImports()
+    {
+        var defaultImports = DefaultImports();
+
+        if (defaultImports is null or {Length: <= 0})
+        {
+            defaultSettings.Clear();
+
+            return;
+        }
+
+        if (defaultSettings is not {Count: > 0})
+        {
+            ImportDefaultImports();
+
+            return;
+        }
+
+        var nonNullImports = defaultImports.Select(Path.GetFileNameWithoutExtension).
+                                            Where(path => !string.IsNullOrEmpty(path)).
+                                            ToArray();
+
+        if (!nonNullImports.Any())
+        {
+            defaultSettings.Clear();
+
+            return;
+        }
+
+        if (defaultSettings.Count != nonNullImports.Length)
+        {
+            ImportDefaultImports();
+            
+            return;
+        }
+        
+        if (nonNullImports.Where((import, i) => !defaultSettings[i].name.Equals(import)).Any())
+            ImportDefaultImports();
     }
 
     #endregion
