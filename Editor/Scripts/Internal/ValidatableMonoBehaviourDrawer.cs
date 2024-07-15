@@ -67,12 +67,13 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 
     /// <summary> Draw one imported setting </summary>
     /// <param name="setting"> Targeted setting </param>
-    private void DrawImportedSetting(ValidatorSettings setting)
+    /// <param name="isDefaultImport"> If the setting is imported via the class </param>
+    private void DrawImportedSetting(ValidatorSettings setting, bool isDefaultImport = false)
     {
         if (setting == null)
             return;
 
-        var windowWidth = EditorGUIUtility.currentViewWidth - 30;
+        var windowWidth = EditorGUIUtility.currentViewWidth - (isDefaultImport ? 30 : 0);
 
         var castedTarget = (ValidatableMonoBehaviour)serializedObject.targetObject;
 
@@ -98,14 +99,17 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 
         EditorGUILayout.BeginHorizontal(EditorStyles.helpBox);
 
-        EditorGUILayout.BeginVertical(GUILayout.Width(15));
-        GUILayout.FlexibleSpace();
+        if (!isDefaultImport)
+        {
+            EditorGUILayout.BeginVertical(GUILayout.Width(15));
+            GUILayout.FlexibleSpace();
 
-        if (GUILayout.Button("X", GUILayout.Width(15), GUILayout.Height(15)))
-            castedTarget.RemoveImportedSetting(setting);
+            if (GUILayout.Button("X", GUILayout.Width(15), GUILayout.Height(15)))
+                castedTarget.RemoveImportedSetting(setting);
 
-        GUILayout.FlexibleSpace();
-        EditorGUILayout.EndVertical();
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndVertical();   
+        }
 
         var labelWidth = windowWidth * (disabledRequirements.Count > 0 ? .6f : 1f);
 
@@ -140,7 +144,7 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
                 new GUIContent
                 {
                     text =
-                        "Disabled requirements due to higher priority requirements.",
+                        "Disabled requirements!",
                     tooltip = tooltip
                 },
                 style,
@@ -152,24 +156,27 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
             UnityEngine.GUI.color = color;
         }
 
-        EditorGUILayout.BeginVertical(GUILayout.Width(15));
-        GUILayout.FlexibleSpace();
+        if (!isDefaultImport)
+        {
+            EditorGUILayout.BeginVertical(GUILayout.Width(15));
+            GUILayout.FlexibleSpace();
 
-        var priority = castedTarget.GetSettingPriority(setting);
-        var priorityOptions = castedTarget.GetPriorityOptions(out List <int> priorityValues);
+            var priority = castedTarget.GetSettingPriority(setting);
+            var priorityOptions = castedTarget.GetPriorityOptions(out List <int> priorityValues);
 
-        var newPriority = EditorGUILayout.IntPopup(
-            "",
-            priority,
-            priorityOptions,
-            priorityValues.ToArray(),
-            GUILayout.Width(35));
+            var newPriority = EditorGUILayout.IntPopup(
+                "",
+                priority,
+                priorityOptions,
+                priorityValues.ToArray(),
+                GUILayout.Width(35));
 
-        if (newPriority != priority)
-            castedTarget.SetSettingPriority(setting, newPriority);
+            if (newPriority != priority)
+                castedTarget.SetSettingPriority(setting, newPriority);
 
-        GUILayout.FlexibleSpace();
-        EditorGUILayout.EndVertical();
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndVertical();   
+        }
 
         EditorGUILayout.EndHorizontal();
     }
@@ -185,21 +192,31 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 
         if (foldoutState.boolValue)
         {
-            List <ValidatorSettings> importedSettings = castedTarget.GetImportedSettings();
-
-            if (importedSettings.Count > 0)
-            {
-                List <ValidatorSettings> list = castedTarget.GetImportedSettings();
-
-                for (var i = list.Count - 1; i >= 0; i--)
-                {
-                    ValidatorSettings setting = list[i];
-                    DrawImportedSetting(setting);
-                }
-            }
+            DrawImportedSettingsFor(castedTarget.defaultSettings, true);
+            DrawImportedSettingsFor(castedTarget.GetImportedSettings());
         }
 
         EditorGUILayout.EndFoldoutHeaderGroup();
+    }
+
+    /// <summary> Draw all settings in the targeted list </summary>
+    /// <param name="settings"> Targeted settings </param>
+    /// <param name="isDefaultImport"> If the settings are imported via the class </param>
+    private void DrawImportedSettingsFor(List <ValidatorSettings> settings, bool isDefaultImport = false)
+    {
+        if (settings.Count == 0)
+            return;
+
+        ValidatorSettings[] reversedSettings = new ValidatorSettings[settings.Count];
+        settings.CopyTo(reversedSettings);
+
+        reversedSettings = reversedSettings.Reverse().ToArray();
+
+        for (var i = reversedSettings.Length - 1; i >= 0; i--)
+        {
+            ValidatorSettings setting = reversedSettings[i];
+            DrawImportedSetting(setting, isDefaultImport);
+        }
     }
 
     /// <summary> Export the saved requirements to an external file </summary>

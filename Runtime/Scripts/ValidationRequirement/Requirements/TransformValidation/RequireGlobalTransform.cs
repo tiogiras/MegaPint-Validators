@@ -49,13 +49,13 @@ internal class RequireGlobalTransform : ScriptableValidationRequirement
         var errorText = new StringBuilder();
 
         if (!validPosition)
-            errorText.AppendLine($"Position should be {_globalPosition}");
+            errorText.AppendLine($"Position should be {_globalPosition.value}");
 
         if (!validRotation)
-            errorText.AppendLine($"Rotation should be {_globalRotation}");
+            errorText.AppendLine($"Rotation should be {_globalRotation.value}");
 
         if (!validScale)
-            errorText.Append($"Scale should be {_globalScale}");
+            errorText.Append($"Scale should be {_globalScale.value}");
 
         AddError("Transform differs from specifications", errorText.ToString(), ValidationState.Warning, FixAction);
     }

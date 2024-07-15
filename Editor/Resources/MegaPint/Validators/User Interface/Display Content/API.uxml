@@ -2,15 +2,14 @@
     <Style src="project://database/Packages/com.tiogiras.megapint/Editor/Resources/MegaPint/User%20Interface/MegaPint.uss?fileID=7433441132597879392&amp;guid=54dba4b7e58379b46a03a9a47e130e51&amp;type=3#MegaPint" />
     <Style src="project://database/Packages/com.tiogiras.megapint/Editor/Resources/MegaPint/User%20Interface/MegaPintUnityElements.uss?fileID=7433441132597879392&amp;guid=14475de81743442dad8e397f39ea6ace&amp;type=3#MegaPintUnityElements" />
     <Style src="project://database/Packages/com.tiogiras.megapint/Editor/Resources/MegaPint/User%20Interface/MegaPintAttributes.uss?fileID=7433441132597879392&amp;guid=db4b42bc58d645b8ab6f8c0e914c2a0c&amp;type=3#MegaPintAttributes" />
-    <MegaPint.Editor.Scripts.GUI.Factories.RootElement>
-        <ui:VisualElement class="mp_border-color--secondary" style="flex-grow: 1; margin-left: 20px; margin-top: 10px; margin-right: 10px; margin-bottom: 10px; overflow: hidden;">
-            <ui:VisualElement style="flex-direction: row; flex-wrap: wrap;">
-                <ui:Button text="Button" parse-escape-sequences="true" display-tooltip-when-elided="true" />
-                <ui:Button text="Button" parse-escape-sequences="true" display-tooltip-when-elided="true" />
-                <ui:Button text="Button" parse-escape-sequences="true" display-tooltip-when-elided="true" />
-                <ui:Button text="Button" parse-escape-sequences="true" display-tooltip-when-elided="true" />
-                <ui:Button text="Button" parse-escape-sequences="true" display-tooltip-when-elided="true" />
-            </ui:VisualElement>
+    <MegaPint.Editor.Scripts.GUI.Factories.RootElement style="flex-grow: 1; flex-direction: row;">
+        <MegaPint.Editor.Scripts.GUI.Factories.Backgrounds.BackgroundSecondary name="LeftPane" class="mp_border-color--black" style="width: 325px; padding-top: 10px; padding-right: 0; padding-bottom: 10px; padding-left: 10px; border-right-width: 1px; height: 100%;">
+            <ui:ListView focusable="true" virtualization-method="DynamicHeight" selection-type="Single" name="Entries" style="flex-grow: 1;" />
+        </MegaPint.Editor.Scripts.GUI.Factories.Backgrounds.BackgroundSecondary>
+        <ui:VisualElement name="RightPane" style="flex-grow: 1; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;">
+            <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" name="Title" text="BaseClass.Variable/Method" style="white-space: normal; font-size: 16px;" />
+            <MegaPint.Editor.Scripts.GUI.Factories.Structure.Separator />
+            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="Content" style="flex-grow: 1;" />
         </ui:VisualElement>
     </MegaPint.Editor.Scripts.GUI.Factories.RootElement>
 </ui:UXML>
