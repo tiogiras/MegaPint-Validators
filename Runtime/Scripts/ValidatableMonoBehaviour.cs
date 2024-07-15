@@ -46,7 +46,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
     #region Unity Event Functions
 
-    public void OnValidate()
+    internal void OnValidate()
     {
         TryImportDefaultImports();
 
@@ -63,7 +63,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
         if (_requirements.Count > 0)
         {
-            foreach (IValidationRequirement requirement in _requirements)
+            foreach (ScriptableValidationRequirement requirement in _requirements)
                 requirement?.OnValidate(this);
         }
 
@@ -96,7 +96,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
             return;
         }
-        
+
         _importedSettings.Add(setting);
 
         settingPriorities.Add(new SettingPriority {priority = settingPriorities.Count + 1, setting = setting});
@@ -147,7 +147,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     public List <ScriptableValidationRequirement> Requirements(bool excludeNulls = false)
     {
         _requirements ??= new List <ScriptableValidationRequirement>();
-        
+
         return excludeNulls ? _requirements.Where(requirement => requirement != null).ToList() : _requirements;
     }
 
@@ -162,7 +162,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         if (GetActiveRequirements() is not {Count: > 0})
             return state;
 
-        foreach (IValidationRequirement requirement in
+        foreach (ScriptableValidationRequirement requirement in
                  GetActiveRequirements().Where(requirement => requirement != null))
         {
             ValidationState requirementState = requirement.Validate(
@@ -219,7 +219,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
         List <ValidatorSettings> importedSettings = _importedSettings.Where(setting => setting != null).ToList();
         importedSettings.AddRange(defaultSettings.Where(setting => setting != null));
-        
+
         foreach (ValidatorSettings setting in importedSettings.OrderBy(GetSettingPriority))
         {
             if (setting.Requirements(true).Count == 0)
@@ -252,7 +252,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     {
         if (defaultSettings.Contains(setting))
             return defaultSettings.IndexOf(setting) - 999;
-        
+
         return settingPriorities.FirstOrDefault(s => s.setting == setting).priority;
     }
 
@@ -302,7 +302,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     private void ImportDefaultImports()
     {
         defaultSettings ??= new List <ValidatorSettings>();
-        
+
         defaultSettings.Clear();
 
         foreach (var import in DefaultImports())
@@ -311,7 +311,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
             if (setting is null)
                 continue;
-            
+
             defaultSettings.Add(setting);
         }
 
@@ -353,10 +353,10 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         if (defaultSettings.Count != nonNullImports.Length)
         {
             ImportDefaultImports();
-            
+
             return;
         }
-        
+
         if (nonNullImports.Where((import, i) => !defaultSettings[i].name.Equals(import)).Any())
             ImportDefaultImports();
     }

@@ -15,16 +15,20 @@ public abstract class ValidationRequirementMetaData
     /// </summary>
     protected abstract void OnInitialization();
 
+    #endregion
+
+    #region Internal Methods
+
     /// <summary>
     ///     Calls <see cref="OnInitialization" /> when the <see cref="ScriptableValidationRequirement" /> has not been
     ///     initialized
     /// </summary>
-    /// <param name="requirement"> The <see cref="IValidationRequirement" /> that is validated </param>
-    protected void TryInitialize(ScriptableValidationRequirement requirement)
+    /// <param name="requirement"> The requirement that is validated </param>
+    internal void TryInitialize(ScriptableValidationRequirement requirement)
     {
         if (requirement.initialized)
             return;
-        
+
         OnInitialization();
 
         requirement.initialized = true;

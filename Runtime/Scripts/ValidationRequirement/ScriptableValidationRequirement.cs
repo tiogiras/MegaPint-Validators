@@ -14,7 +14,7 @@ namespace MegaPint.ValidationRequirement
 
 /// <summary> Abstract class to create validation requirements for the <see cref="ValidatableMonoBehaviour" /> </summary>
 [Serializable]
-public abstract class ScriptableValidationRequirement : ValidationRequirementMetaData, IValidationRequirement
+public abstract class ScriptableValidationRequirement : ValidationRequirementMetaData
 {
     [HideInInspector] public string preventListHeaderIssues;
 
@@ -28,97 +28,12 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
 
     #region Unity Event Functions
 
-    public virtual void OnValidate(Object o)
+    internal void OnValidate(Object o)
     {
         objectReference = o;
         TryInitialize(this);
 
         OnRequirementValidation();
-    }
-
-    #endregion
-
-    #region Public Methods
-
-    /// <summary>
-    ///     Validates the gameObject based on the specified <see cref="Validate" /> method.
-    ///     Called when validating the <see cref="ValidatableMonoBehaviour" />.
-    /// </summary>
-    /// <param name="target"> GameObject that is validated </param>
-    /// <param name="errors"> All found <see cref="ValidationError" /> </param>
-    /// <returns> The highest <see cref="ValidationState" /> found in the <see cref="ValidationError" /> </returns>
-    public ValidationState Validate(GameObject target, out List <ValidationError> errors)
-    {
-        _errors = new List <ValidationError>();
-        targetGameObject = target;
-
-        Validate(targetGameObject);
-
-        errors = _errors;
-
-        var severity = ValidationState.Ok;
-
-        if (_errors.Count == 0)
-            return severity;
-
-        foreach (ValidationError error in errors.Where(error => error.severity > severity))
-            severity = error.severity;
-
-        return severity;
-    }
-
-    /// <summary> Get all compatible requirements of the lowPriority list </summary>
-    /// <param name="highPriority"> Requirements with higher priority </param>
-    /// <param name="lowPriority"> Requirements with lower priority </param>
-    /// <returns> All requirements of the lower priority that are compatible with the higher priority </returns>
-    internal static List <ScriptableValidationRequirement> GetCompatibleRequirements(
-        List <ScriptableValidationRequirement> highPriority,
-        List <ScriptableValidationRequirement> lowPriority)
-    {
-        List <ScriptableValidationRequirement> compatibles = new();
-
-        foreach (ScriptableValidationRequirement lpRequirement in lowPriority)
-        {
-            if (lpRequirement == null)
-                continue;
-
-            Type lpType = lpRequirement.GetType();
-
-            if (IsCompatible(highPriority, lpType))
-                compatibles.Add(lpRequirement);
-        }
-
-        return compatibles;
-    }
-
-    /// <summary> Change the severity overwrite </summary>
-    /// <exception cref="System.ArgumentOutOfRangeException"> Severity not found </exception>
-    internal void ChangeSeverityOverwrite()
-    {
-        severityOverwrite = severityOverwrite switch
-                            {
-                                ValidationState.Unknown or ValidationState.Ok => ValidationState.Warning,
-                                ValidationState.Warning => ValidationState.Error,
-                                ValidationState.Error => ValidationState.Unknown,
-                                var _ => throw new ArgumentOutOfRangeException()
-                            };
-
-        SetDirty();
-    }
-
-    /// <summary> Generate an unique id </summary>
-    internal void GenerateUniqueID()
-    {
-        uniqueID = Guid.NewGuid().ToString();
-    }
-
-    /// <summary> Set the object of the requirement dirty </summary>
-    internal void SetDirty()
-    {
-#if UNITY_EDITOR
-        if (objectReference != null)
-            EditorUtility.SetDirty(objectReference);
-#endif
     }
 
     #endregion
@@ -191,6 +106,91 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
     /// <summary> Validates the gameObject </summary>
     /// <param name="gameObject"> GameObject that is validated </param>
     protected abstract void Validate(GameObject gameObject);
+
+    #endregion
+
+    #region Internal Methods
+
+    /// <summary> Get all compatible requirements of the lowPriority list </summary>
+    /// <param name="highPriority"> Requirements with higher priority </param>
+    /// <param name="lowPriority"> Requirements with lower priority </param>
+    /// <returns> All requirements of the lower priority that are compatible with the higher priority </returns>
+    internal static List <ScriptableValidationRequirement> GetCompatibleRequirements(
+        List <ScriptableValidationRequirement> highPriority,
+        List <ScriptableValidationRequirement> lowPriority)
+    {
+        List <ScriptableValidationRequirement> compatibles = new();
+
+        foreach (ScriptableValidationRequirement lpRequirement in lowPriority)
+        {
+            if (lpRequirement == null)
+                continue;
+
+            Type lpType = lpRequirement.GetType();
+
+            if (IsCompatible(highPriority, lpType))
+                compatibles.Add(lpRequirement);
+        }
+
+        return compatibles;
+    }
+
+    /// <summary> Change the severity overwrite </summary>
+    /// <exception cref="System.ArgumentOutOfRangeException"> Severity not found </exception>
+    internal void ChangeSeverityOverwrite()
+    {
+        severityOverwrite = severityOverwrite switch
+                            {
+                                ValidationState.Unknown or ValidationState.Ok => ValidationState.Warning,
+                                ValidationState.Warning => ValidationState.Error,
+                                ValidationState.Error => ValidationState.Unknown,
+                                var _ => throw new ArgumentOutOfRangeException()
+                            };
+
+        SetDirty();
+    }
+
+    /// <summary> Generate an unique id </summary>
+    internal void GenerateUniqueID()
+    {
+        uniqueID = Guid.NewGuid().ToString();
+    }
+
+    /// <summary> Set the object of the requirement dirty </summary>
+    internal void SetDirty()
+    {
+#if UNITY_EDITOR
+        if (objectReference != null)
+            EditorUtility.SetDirty(objectReference);
+#endif
+    }
+
+    /// <summary>
+    ///     Validates the gameObject based on the specified Validate method.
+    ///     Called when validating the <see cref="ValidatableMonoBehaviour" />.
+    /// </summary>
+    /// <param name="target"> GameObject that is validated </param>
+    /// <param name="errors"> All found <see cref="ValidationError" /> </param>
+    /// <returns> The highest <see cref="ValidationState" /> found in the <see cref="ValidationError" /> </returns>
+    internal ValidationState Validate(GameObject target, out List <ValidationError> errors)
+    {
+        _errors = new List <ValidationError>();
+        targetGameObject = target;
+
+        Validate(targetGameObject);
+
+        errors = _errors;
+
+        var severity = ValidationState.Ok;
+
+        if (_errors.Count == 0)
+            return severity;
+
+        foreach (ValidationError error in errors.Where(error => error.severity > severity))
+            severity = error.severity;
+
+        return severity;
+    }
 
     #endregion
 
