@@ -43,16 +43,20 @@ internal static class APIData
     }
 
     // ReSharper disable InconsistentNaming
+    // ReSharper disable IdentifierTypo
     public enum DataKey
     {
         Undefined,
         VRAttr, VRAttr0, VRAttr1, VRAttr2, VRAttr3, VRAttr4,
         SVR, SVR0, SVR1, SVR2, SVR3, SVR4, SVR5, SVR6, SVR7, SVR8, SVR9, SVR10,
         VMB, VMB0, VMB1, VMB2, VMB3, VMB4, VMB5, VMB6, VMB7, VMB8, VMB9, VMB10, VMB11, VMB12,
-        VS,
+        VS, VS0, VS1,
         VErr, VErr0, VErr1, VErr2, VErr3, VErr4,
+        VRMD, VRMD0,
+        SRDAttr, VRTAttr, TS, VState
     }
 
+    // ReSharper restore IdentifierTypo
     // ReSharper restore InconsistentNaming
 
     private static string s_validationRequirementNameAttribute;
@@ -66,9 +70,23 @@ internal static class APIData
 
     private static string s_scriptableValidationRequirement;
     private static string s_scriptableValidationRequirementAssembly;
-    
+
     private static string s_validationError;
     private static string s_validationErrorAssembly;
+
+    private static string s_validatorSettings;
+    private static string s_validatorSettingsAssembly;
+
+    private static string s_serializeReferenceDropdownAttribute;
+    private static string s_serializeReferenceDropdownAttributeAssembly;
+
+    private static string s_validationRequirementTooltipAttribute;
+    private static string s_validationRequirementTooltipAttributeAssembly;
+    
+    private static string s_toggleableSettingAssembly;
+
+    private static string s_validationState;
+    private static string s_validationStateAssembly;
 
     private static readonly List <Data> s_data = new()
     {
@@ -117,9 +135,6 @@ internal static class APIData
                     1,
                     DataKey.VRAttr4)
             }),
-
-        // ====================================================
-
         new Data(
             _ScriptableValidationRequirement,
             _ScriptableValidationRequirement,
@@ -207,113 +222,107 @@ internal static class APIData
                     1,
                     DataKey.SVR10)
             }),
-
-        // ====================================================
-
         new Data(
-        _ValidatableMonoBehaviour,
-        _ValidatableMonoBehaviour,
-        $"Class in {typeof(ValidatableMonoBehaviour).Namespace}\nInherits from {nameof(MonoBehaviour)}",
-        _ValidatableMonoBehaviourAssembly,
-        0,
-        DataKey.VMB,
-        new List <Data>
-        {
-            new(
-                $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.SettingPriority",
-                "SettingPriority",
-                "...",
-                _ValidatableMonoBehaviourAssembly,
-                1,
-                DataKey.VMB0),
-            new(
-                $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.<m>BeforeValidation()</m>",
-                "BeforeValidation()",
-                "...",
-                _ValidatableMonoBehaviourAssembly,
-                1,
-                DataKey.VMB1),            
-            new(
-                $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.<m>DefaultImports()</m>",
-                "DefaultImports()",
-                "...",
-                _ValidatableMonoBehaviourAssembly,
-                1,
-                DataKey.VMB2),
-            new(
-                $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.<m>GetImportedSettings()</m>",
-                "GetImportedSettings()",
-                "...",
-                _ValidatableMonoBehaviourAssembly,
-                1,
-                DataKey.VMB3),
-            new(
-                $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.<m>ImportSetting()</m>",
-                "ImportSetting()",
-                "...",
-                _ValidatableMonoBehaviourAssembly,
-                1,
-                DataKey.VMB4),
-            new(
-                $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.<m>RemoveImportedSetting()</m>",
-                "RemoveImportedSetting()",
-                "...",
-                _ValidatableMonoBehaviourAssembly,
-                1,
-                DataKey.VMB5),
-            new(
-                $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.<m>Requirements()</m>",
-                "Requirements()",
-                "...",
-                _ValidatableMonoBehaviourAssembly,
-                1,
-                DataKey.VMB6),
-            new(
-                $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.<m>SetRequirements()</m>",
-                "SetRequirements()",
-                "...",
-                _ValidatableMonoBehaviourAssembly,
-                1,
-                DataKey.VMB7),
-            new(
-                $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.<m>Validate()</m>",
-                "Validate()",
-                "...",
-                _ValidatableMonoBehaviourAssembly,
-                1,
-                DataKey.VMB8),
-            new(
-                $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.HasImportedSettings",
-                "HasImportedSettings",
-                "...",
-                _ValidatableMonoBehaviourAssembly,
-                1,
-                DataKey.VMB9),
-            new(
-                $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.defaultSettings",
-                "defaultSettings",
-                "...",
-                _ValidatableMonoBehaviourAssembly,
-                1,
-                DataKey.VMB10),
-            new(
-                $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.importedSettingsFoldout",
-                "importedSettingsFoldout",
-                "...",
-                _ValidatableMonoBehaviourAssembly,
-                1,
-                DataKey.VMB11),
-            new(
-                $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.settingPriorities",
-                "settingPriorities",
-                "...",
-                _ValidatableMonoBehaviourAssembly,
-                1,
-                DataKey.VMB12),
-        }),
-        
-        // ====================================================
-        
+            _ValidatableMonoBehaviour,
+            _ValidatableMonoBehaviour,
+            $"Class in {typeof(ValidatableMonoBehaviour).Namespace}\nInherits from {nameof(MonoBehaviour)}",
+            _ValidatableMonoBehaviourAssembly,
+            0,
+            DataKey.VMB,
+            new List <Data>
+            {
+                new(
+                    $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.SettingPriority",
+                    "SettingPriority",
+                    "...",
+                    _ValidatableMonoBehaviourAssembly,
+                    1,
+                    DataKey.VMB0),
+                new(
+                    $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.<m>BeforeValidation()</m>",
+                    "BeforeValidation()",
+                    "...",
+                    _ValidatableMonoBehaviourAssembly,
+                    1,
+                    DataKey.VMB1),
+                new(
+                    $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.<m>DefaultImports()</m>",
+                    "DefaultImports()",
+                    "...",
+                    _ValidatableMonoBehaviourAssembly,
+                    1,
+                    DataKey.VMB2),
+                new(
+                    $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.<m>GetImportedSettings()</m>",
+                    "GetImportedSettings()",
+                    "...",
+                    _ValidatableMonoBehaviourAssembly,
+                    1,
+                    DataKey.VMB3),
+                new(
+                    $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.<m>ImportSetting()</m>",
+                    "ImportSetting()",
+                    "...",
+                    _ValidatableMonoBehaviourAssembly,
+                    1,
+                    DataKey.VMB4),
+                new(
+                    $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.<m>RemoveImportedSetting()</m>",
+                    "RemoveImportedSetting()",
+                    "...",
+                    _ValidatableMonoBehaviourAssembly,
+                    1,
+                    DataKey.VMB5),
+                new(
+                    $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.<m>Requirements()</m>",
+                    "Requirements()",
+                    "...",
+                    _ValidatableMonoBehaviourAssembly,
+                    1,
+                    DataKey.VMB6),
+                new(
+                    $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.<m>SetRequirements()</m>",
+                    "SetRequirements()",
+                    "...",
+                    _ValidatableMonoBehaviourAssembly,
+                    1,
+                    DataKey.VMB7),
+                new(
+                    $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.<m>Validate()</m>",
+                    "Validate()",
+                    "...",
+                    _ValidatableMonoBehaviourAssembly,
+                    1,
+                    DataKey.VMB8),
+                new(
+                    $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.HasImportedSettings",
+                    "HasImportedSettings",
+                    "...",
+                    _ValidatableMonoBehaviourAssembly,
+                    1,
+                    DataKey.VMB9),
+                new(
+                    $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.defaultSettings",
+                    "defaultSettings",
+                    "...",
+                    _ValidatableMonoBehaviourAssembly,
+                    1,
+                    DataKey.VMB10),
+                new(
+                    $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.importedSettingsFoldout",
+                    "importedSettingsFoldout",
+                    "...",
+                    _ValidatableMonoBehaviourAssembly,
+                    1,
+                    DataKey.VMB11),
+                new(
+                    $"<link={DataKey.VMB}>{_ValidatableMonoBehaviour}</link>.settingPriorities",
+                    "settingPriorities",
+                    "...",
+                    _ValidatableMonoBehaviourAssembly,
+                    1,
+                    DataKey.VMB12)
+            }),
         new Data(
             _ValidationError,
             _ValidationError,
@@ -357,70 +366,103 @@ internal static class APIData
                     "...",
                     _ValidationErrorAssembly,
                     1,
-                    DataKey.VErr4),
+                    DataKey.VErr4)
             }),
-        
-        // ====================================================
-
-        /*
-        new Data
-        {
-            title = "ValidationRequirementMetaData",
-            displayName = "ValidationRequirementMetaData",
-            indentLevel = 0,
-            subAPIs = new List <Data>
+        new Data(
+            _ValidationRequirementMetaData,
+            _ValidationRequirementMetaData,
+            $"Class in {typeof(ValidationRequirementMetaData).Namespace}",
+            _ValidationRequirementMetaDataAssembly,
+            0,
+            DataKey.VRMD,
+            new List <Data>
             {
-                new()
-                {
-                    title = "void : ValidationRequirementMetaData.OnInitialization()",
-                    displayName = "OnInitialization()",
-                    indentLevel = 1
-                }
-            }
-        },
-        new Data
-        {
-            title = "ValidatorSettings",
-            displayName = "ValidatorSettings",
-            indentLevel = 0,
-            subAPIs = new List <Data>
+                new(
+                    $"<link={DataKey.VRMD}>{_ValidationRequirementMetaData}</link>.<m>OnInitialization()</m>",
+                    "OnInitialization()",
+                    "...",
+                    _ValidationRequirementMetaDataAssembly,
+                    1,
+                    DataKey.VRMD0)
+            }),
+        new Data(
+            _ValidatorSettings,
+            _ValidatorSettings,
+            $"Class in {typeof(ValidatorSettings).Namespace}\nInherits from {nameof(ScriptableObject)}",
+            _ValidatorSettingsAssembly,
+            0,
+            DataKey.VS,
+            new List <Data>
             {
-                new()
-                {
-                    title =
-                        "List <ScriptableValidationRequirement> : Requirements(bool = false)",
-                    displayName = "Requirements()",
-                    indentLevel = 1
-                },
-                new()
-                {
-                    title = "void : SetRequirements(List <ScriptableValidationRequirement>)",
-                    displayName = "SetRequirements()",
-                    indentLevel = 1
-                }
-            }
-        },
-        new Data
-        {
-            title = "SerializeReferenceDropdownAttribute",
-            displayName = "SerializeReferenceDropdownAttribute",
-            indentLevel = 0
-        },
-        new Data
-        {
-            title = "ValidationRequirementTooltipAttribute",
-            displayName = "ValidationRequirementTooltipAttribute",
-            indentLevel = 0
-        },
-        new Data {title = "ToggleableSetting", displayName = "ToggleableSetting", indentLevel = 0},
-        new Data {title = "ValidationState", displayName = "ValidationState", indentLevel = 0}*/
+                new(
+                    $"<link={DataKey.VS}>{_ValidatorSettings}</link>.<m>Requirements()</m>",
+                    "Requirements()",
+                    "...",
+                    _ValidatorSettingsAssembly,
+                    1,
+                    DataKey.VS0),
+                new(
+                    $"<link={DataKey.VS}>{_ValidatorSettings}</link>.<m>SetRequirements()</m>",
+                    "SetRequirements()",
+                    "...",
+                    _ValidatorSettingsAssembly,
+                    1,
+                    DataKey.VS1)
+            }),
+        new Data(
+            _SerializeReferenceDropdownAttribute,
+            _SerializeReferenceDropdownAttribute,
+            $"Class in {typeof(SerializeReferenceDropdownAttribute).Namespace}\nInherits from {nameof(PropertyAttribute)}",
+            _SerializeReferenceDropdownAttributeAssembly,
+            0,
+            DataKey.SRDAttr),
+        new Data(
+            _ValidationRequirementTooltipAttribute,
+            _ValidationRequirementTooltipAttribute,
+            $"Class in {typeof(ValidationRequirementTooltipAttribute).Namespace}\nInherits from {nameof(TooltipAttribute)}",
+            _ValidationRequirementTooltipAttributeAssembly,
+            0,
+            DataKey.VRTAttr),
+        new Data(
+            "ToggleableSetting",
+            "ToggleableSetting",
+            $"Struct in {typeof(ToggleableSetting <>).Namespace}",
+            _ToggleableSettingAssembly,
+            0,
+            DataKey.TS),
+        new Data(
+            _ValidationState,
+            _ValidationState,
+            $"Enum in {typeof(ToggleableSetting <>).Namespace}",
+            _ValidationStateAssembly,
+            0,
+            DataKey.VState)
     };
+
+    #region Public Methods
+
+    /// <summary> Get all data </summary>
+    /// <returns> All data </returns>
+    public static List <Data> Get()
+    {
+        return s_data;
+    }
+
+    /// <summary> Get a specific data by their key </summary>
+    /// <param name="key"> Target key </param>
+    /// <returns> Found data </returns>
+    public static Data Get(DataKey key)
+    {
+        return s_data.FirstOrDefault(data => data.key == key);
+    }
+
+    #endregion
 
     #region ValidationRequirement
 
     private static string _ValidationRequirementNameAttribute =>
         s_validationRequirementNameAttribute ??= nameof(ValidationRequirementAttribute);
-    
+
     private static string _ValidationRequirementNameAttributeAssembly =>
         s_validationRequirementNameAttributeAssembly ??= typeof(ValidationRequirementAttribute).Assembly.GetName().Name;
 
@@ -440,7 +482,7 @@ internal static class APIData
 
     private static string _ValidationRequirementMetaData =>
         s_validationRequirementMetaData ??= nameof(ValidationRequirementMetaData);
-    
+
     private static string _ValidationRequirementMetaDataAssembly =>
         s_validationRequirementMetaDataAssembly ??= typeof(ValidationRequirementMetaData).Assembly.GetName().Name;
 
@@ -448,42 +490,66 @@ internal static class APIData
 
     #region ValidatableMonoBehaviour
 
-    private static string _ValidatableMonoBehaviour =>
-        s_validatableMonoBehaviour ??= nameof(ValidatableMonoBehaviour);
-    
+    private static string _ValidatableMonoBehaviour => s_validatableMonoBehaviour ??= nameof(ValidatableMonoBehaviour);
+
     private static string _ValidatableMonoBehaviourAssembly =>
         s_validatableMonoBehaviourAssembly ??= typeof(ValidatableMonoBehaviour).Assembly.GetName().Name;
 
     #endregion
 
     #region ValidationError
-    
-    private static string _ValidationError =>
-        s_validationError ??= nameof(ValidationError);
-    
+
+    private static string _ValidationError => s_validationError ??= nameof(ValidationError);
+
     private static string _ValidationErrorAssembly =>
         s_validationErrorAssembly ??= typeof(ValidationError).Assembly.GetName().Name;
 
     #endregion
 
+    #region ValidatorSettings
 
+    private static string _ValidatorSettings => s_validatorSettings ??= nameof(ValidatorSettings);
 
-    #region Public Methods
+    private static string _ValidatorSettingsAssembly =>
+        s_validatorSettingsAssembly ??= typeof(ValidatorSettings).Assembly.GetName().Name;
 
-    /// <summary> Get all data </summary>
-    /// <returns> All data </returns>
-    public static List <Data> Get()
-    {
-        return s_data;
-    }
+    #endregion
 
-    /// <summary> Get a specific data by their key </summary>
-    /// <param name="key"> Target key </param>
-    /// <returns> Found data </returns>
-    public static Data Get(DataKey key)
-    {
-        return s_data.FirstOrDefault(data => data.key == key);
-    }
+    #region SerializeReferenceDropdownAttribute
+
+    private static string _SerializeReferenceDropdownAttribute =>
+        s_serializeReferenceDropdownAttribute ??= nameof(SerializeReferenceDropdownAttribute);
+
+    private static string _SerializeReferenceDropdownAttributeAssembly =>
+        s_serializeReferenceDropdownAttributeAssembly ??=
+            typeof(SerializeReferenceDropdownAttribute).Assembly.GetName().Name;
+
+    #endregion
+
+    #region ValidationRequirementTooltipAttribute
+
+    private static string _ValidationRequirementTooltipAttribute =>
+        s_validationRequirementTooltipAttribute ??= nameof(ValidationRequirementTooltipAttribute);
+
+    private static string _ValidationRequirementTooltipAttributeAssembly =>
+        s_validationRequirementTooltipAttributeAssembly ??=
+            typeof(ValidationRequirementTooltipAttribute).Assembly.GetName().Name;
+
+    #endregion
+
+    #region ToggleableSetting
+    
+    private static string _ToggleableSettingAssembly =>
+        s_toggleableSettingAssembly ??= typeof(ToggleableSetting <>).Assembly.GetName().Name;
+
+    #endregion
+
+    #region ValidationState
+
+    private static string _ValidationState => s_validationState ??= nameof(ValidationState);
+
+    private static string _ValidationStateAssembly =>
+        s_validationStateAssembly ??= typeof(ValidationState).Assembly.GetName().Name;
 
     #endregion
 }
