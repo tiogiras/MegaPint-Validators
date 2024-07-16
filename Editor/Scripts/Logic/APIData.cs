@@ -453,7 +453,43 @@ internal static class APIData
     /// <returns> Found data </returns>
     public static Data Get(DataKey key)
     {
-        return s_data.FirstOrDefault(data => data.key == key);
+        Data output = null;
+
+        foreach (Data data in s_data)
+        {
+            if (TryGet(key, data, out output))
+                break;
+        }
+        
+        return output;
+    }
+
+    /// <summary> Try to get the wanted data in this data or any of it's children </summary>
+    /// <param name="key"> Target key </param>
+    /// <param name="source"> Source data of the search </param>
+    /// <param name="data"> Found data </param>
+    /// <returns> If the data was found </returns>
+    private static bool TryGet(DataKey key, Data source, out Data data)
+    {
+        data = null;
+        
+        if (source.key == key)
+        {
+            data = source;
+            
+            return true;
+        }
+
+        if (source.subAPIs is not {Count: > 0})
+            return false;
+
+        foreach (Data subAPI in source.subAPIs)
+        {
+            if (TryGet(key, subAPI, out data))
+                return true;
+        }
+
+        return false;
     }
 
     #endregion
