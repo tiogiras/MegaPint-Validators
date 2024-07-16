@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,6 +7,7 @@ using MegaPint.Editor.Scripts.GUI;
 using MegaPint.Editor.Scripts.GUI.Utility;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.UIElements.Experimental;
 using GUIUtility = MegaPint.Editor.Scripts.GUI.Utility.GUIUtility;
 
 namespace MegaPint.Editor.Scripts.Logic
@@ -134,8 +136,8 @@ internal static class APILogic
         s_description.text = data.description;
         s_assembly.text = data.assembly;
         
-        s_title.ActivateLinks(APILinks.LinkCallback);
-        s_description.ActivateLinks(APILinks.LinkCallback);
+        s_title.ActivateLinks(LinkCallback);
+        s_description.ActivateLinks(LinkCallback);
         
         s_content.Clear();
 
@@ -151,7 +153,7 @@ internal static class APILogic
         }
 
         VisualElement instantiatedContent = GUIUtility.Instantiate(loadedContent);
-        instantiatedContent.ActivateLinks(APILinks.LinkCallback);
+        instantiatedContent.ActivateLinks(LinkCallback);
         
         s_content.Add(instantiatedContent);
     }
@@ -251,6 +253,27 @@ internal static class APILogic
         s_listView.RefreshItems();
 
         s_listView.selectedIndex = -1;
+    }
+
+    public static void LinkCallback(PointerUpLinkTagEvent evt)
+    {
+        var link = evt.linkID;
+        
+        if (string.IsNullOrEmpty(link))
+            return;
+
+        if (!Enum.TryParse(link, out APIData.DataKey key))
+        {
+            Debug.LogWarning($"No key found for link {link}");
+            return;
+        }
+        
+        s_listView.SetSelectionWithoutNotify(null);
+
+        s_selectedAPI = APIData.Get(key);
+        s_listView.RefreshItems();
+        
+        DisplayRightPane(s_selectedAPI);
     }
 
     /// <summary> Remove all subAPIs of the target data from the displayed apis </summary>
