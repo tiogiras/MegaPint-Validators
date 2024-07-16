@@ -4,7 +4,7 @@
     <Style src="project://database/Packages/com.tiogiras.megapint/Editor/Resources/MegaPint/User%20Interface/MegaPintAttributes.uss?fileID=7433441132597879392&amp;guid=db4b42bc58d645b8ab6f8c0e914c2a0c&amp;type=3#MegaPintAttributes" />
     <MegaPint.Editor.Scripts.GUI.Factories.RootElement style="flex-direction: column; flex-grow: 1;">
         <MegaPint.Editor.Scripts.GUI.Factories.Headings.HeadingPrimary tabindex="-1" text="Description" style="white-space: normal; -unity-font-style: bold; margin-bottom: 5px;" />
-        <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="The ValidationRequirementAttribute is used to specify all needed settings in order to draw a &lt;link=ScriptableValidationRequirement&gt;ScriptableValidationRequirement&lt;/link&gt; in the requirements dropdown of either a &lt;link=ValidatableMonoBehaviour&gt;ValidatableMonoBehaviour&lt;/link&gt; or &lt;link=ValidatorSettings&gt;ValidatorSettings&lt;/link&gt; file." class="mp_link" style="white-space: normal;" />
+        <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="..." class="mp_link" style="white-space: normal;" />
         <MegaPint.Editor.Scripts.GUI.Factories.Headings.HeadingPrimary tabindex="-1" text="Properties" style="white-space: normal; -unity-font-style: bold; margin-bottom: 5px; margin-top: 15px;" />
         <MegaPint.Editor.Scripts.GUI.Factories.Headings.HeadingPrimary tabindex="-1" text="Public Methods" style="white-space: normal; -unity-font-style: bold; margin-bottom: 5px; margin-top: 15px;" />
         <MegaPint.Editor.Scripts.GUI.Factories.Headings.HeadingPrimary tabindex="-1" text="Protected Methods" style="white-space: normal; -unity-font-style: bold; margin-bottom: 5px; margin-top: 15px;" />
