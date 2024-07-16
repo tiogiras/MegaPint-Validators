@@ -130,6 +130,9 @@ internal static class APILogic
     /// <param name="data"> Target data </param>
     private static void DisplayRightPane(APIData.Data data)
     {
+        if (data == null)
+            return;
+        
         s_rightPane.style.display = DisplayStyle.Flex;
 
         s_title.text = data.title;
@@ -255,22 +258,30 @@ internal static class APILogic
         s_listView.selectedIndex = -1;
     }
 
-    public static void LinkCallback(PointerUpLinkTagEvent evt)
+    /// <summary> Callback when clicking a link </summary>
+    /// <param name="evt"> Callback event </param>
+    private static void LinkCallback(PointerUpLinkTagEvent evt)
     {
         var link = evt.linkID;
         
         if (string.IsNullOrEmpty(link))
             return;
 
+        Debug.Log(link); // TODO remove
+
         if (!Enum.TryParse(link, out APIData.DataKey key))
         {
             Debug.LogWarning($"No key found for link {link}");
             return;
         }
+
+        Debug.Log(key);
         
         s_listView.SetSelectionWithoutNotify(null);
 
         s_selectedAPI = APIData.Get(key);
+        Debug.Log(s_selectedAPI);
+        
         s_listView.RefreshItems();
         
         DisplayRightPane(s_selectedAPI);
