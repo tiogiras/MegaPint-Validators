@@ -11,7 +11,7 @@ namespace MegaPint.ValidationRequirement.Requirements.GameObjectValidation
 /// <summary> Validation requirement requires specific static flags on the gameObject </summary>
 [Serializable]
 [ValidationRequirementTooltip("This requirement enforces the static flags of the gameObject.")]
-[ValidationRequirementName("GameObject/Is Static", typeof(RequireIsStatic), -30, 3)]
+[ValidationRequirement("GameObject/Is Static", typeof(RequireIsStatic), -30, 3)]
 internal class RequireIsStatic : ScriptableValidationRequirement
 {
 #if UNITY_EDITOR

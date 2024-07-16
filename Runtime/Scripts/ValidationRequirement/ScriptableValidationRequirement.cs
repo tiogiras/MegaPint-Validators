@@ -261,7 +261,7 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
                 continue;
 
             Type hpType = hpRequirement.GetType();
-            var hpAttr = hpType.GetCustomAttribute <ValidationRequirementNameAttribute>();
+            var hpAttr = hpType.GetCustomAttribute <ValidationRequirementAttribute>();
 
             if (lpType == hpType && !hpAttr.allowMultiple)
                 compatible = false;

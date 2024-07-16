@@ -1,5 +1,7 @@
 ﻿#if UNITY_EDITOR
 using System.Collections.Generic;
+using MegaPint.SerializeReferenceDropdown.Runtime;
+using UnityEngine;
 
 namespace MegaPint.Editor.Scripts.Logic
 {
@@ -10,54 +12,85 @@ internal static class APIData
     /// <summary> Data container for any api </summary>
     public class Data
     {
-        public string displayName;
-        public int indentLevel;
-        public List <Data> subAPIs;
-        public string title;
+        public readonly string description;
+        public readonly string displayName;
+        public readonly string assembly;
+
+        public readonly int indentLevel;
+        public readonly DataKey key;
+        public readonly List <Data> subAPIs;
+        public readonly string title;
+
+        public Data(
+            string title,
+            string displayName,
+            string description,
+            string assembly,
+            int indentLevel,
+            DataKey key = DataKey.Undefined,
+            List <Data> subAPIs = null)
+        {
+            this.title = title;
+            this.displayName = displayName;
+            this.description = description;
+            this.assembly = assembly;
+            this.indentLevel = indentLevel;
+            this.key = key;
+            this.subAPIs = subAPIs;
+        }
     }
+
+    public enum DataKey
+    {
+        Undefined, ValidationRequirementAttribute
+    }
+
+    private static string s_validationRequirementNameAttribute;
+    private static string s_validationRequirementNameAttributeAssembly;
 
     private static readonly List <Data> s_data = new()
     {
-        new Data
-        {
-            title = "ValidationRequirementNameAttribute",
-            displayName = "ValidationRequirementNameAttribute",
-            indentLevel = 0,
-            subAPIs = new List <Data>
+        new Data(
+            _ValidationRequirementNameAttribute,
+            _ValidationRequirementNameAttribute,
+            $"Class in {typeof(ValidationRequirementAttribute).Namespace}\nInherits from {typeof(PropertyAttribute)}",
+            _ValidationRequirementNameAttributeAssembly,
+            0,
+            DataKey.ValidationRequirementAttribute,
+            new List <Data>
             {
-                new()
-                {
-                    title = "bool : ValidationRequirementNameAttribute.allowMultiple",
-                    displayName = "allowMultiple",
-                    indentLevel = 1
-                },
-                new()
-                {
-                    title =
-                        "List<Type> : ValidationRequirementNameAttribute.incompatibleRequirements",
-                    displayName = "incompatibleRequirements",
-                    indentLevel = 1
-                },
-                new()
-                {
-                    title = "int[] : ValidationRequirementNameAttribute.menuOrder",
-                    displayName = "menuOrder",
-                    indentLevel = 1
-                },
-                new()
-                {
-                    title = "string : ValidationRequirementNameAttribute.name",
-                    displayName = "name",
-                    indentLevel = 1
-                },
-                new()
-                {
-                    title = "Type : ValidationRequirementNameAttribute.requirementType",
-                    displayName = "requirementType",
-                    indentLevel = 1
-                }
-            }
-        },
+                new(
+                    $"<link={_ValidationRequirementNameAttribute}>{_ValidationRequirementNameAttribute}</link>.allowMultiple",
+                    "allowMultiple",
+                    "Type of boolean",
+                    _ValidationRequirementNameAttributeAssembly,
+                    1),
+                new(
+                    $"<link={_ValidationRequirementNameAttribute}>{_ValidationRequirementNameAttribute}</link>.incompatibleRequirements",
+                    "incompatibleRequirements",
+                    "Type of List<Type>",
+                    _ValidationRequirementNameAttributeAssembly,
+                    1),
+                new(
+                    $"<link={_ValidationRequirementNameAttribute}>{_ValidationRequirementNameAttribute}</link>.menuOrder",
+                    "menuOrder",
+                    "Type of int[] (params)",
+                    _ValidationRequirementNameAttributeAssembly,
+                    1),
+                new(
+                    $"<link={_ValidationRequirementNameAttribute}>{_ValidationRequirementNameAttribute}</link>.name",
+                    "name",
+                    "Type of string",
+                    _ValidationRequirementNameAttributeAssembly,
+                    1),
+                new(
+                    $"<link={_ValidationRequirementNameAttribute}>{_ValidationRequirementNameAttribute}</link>.requirementType",
+                    "requirementType",
+                    "Type of Type",
+                    _ValidationRequirementNameAttributeAssembly,
+                    1)
+            })
+        /*
         new Data
         {
             title = "ScriptableValidationRequirement",
@@ -291,8 +324,14 @@ internal static class APIData
             indentLevel = 0
         },
         new Data {title = "ToggleableSetting", displayName = "ToggleableSetting", indentLevel = 0},
-        new Data {title = "ValidationState", displayName = "ValidationState", indentLevel = 0}
+        new Data {title = "ValidationState", displayName = "ValidationState", indentLevel = 0}*/
     };
+
+    private static string _ValidationRequirementNameAttribute =>
+        s_validationRequirementNameAttribute ??= nameof(ValidationRequirementAttribute);
+    
+    private static string _ValidationRequirementNameAttributeAssembly =>
+        s_validationRequirementNameAttributeAssembly ??= typeof(ValidationRequirementAttribute).Assembly.GetName().Name;
 
     #region Public Methods
 

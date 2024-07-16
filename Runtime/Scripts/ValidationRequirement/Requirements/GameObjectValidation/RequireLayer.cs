@@ -8,7 +8,7 @@ namespace MegaPint.ValidationRequirement.Requirements.GameObjectValidation
 /// <summary> Requirement requires a specific layer on the gameObject </summary>
 [Serializable]
 [ValidationRequirementTooltip("This requirement enforces the layer of the gameObject.")]
-[ValidationRequirementName("GameObject/Layer", typeof(RequireLayer), -30, 1)]
+[ValidationRequirement("GameObject/Layer", typeof(RequireLayer), -30, 1)]
 internal class RequireLayer : ScriptableValidationRequirement
 {
     [SerializeField] private string _layerName;

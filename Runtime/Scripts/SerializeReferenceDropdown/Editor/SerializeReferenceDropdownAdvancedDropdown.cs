@@ -49,7 +49,7 @@ internal class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
 
     private readonly Type[] _addedRequirements;
 
-    private readonly IEnumerable <ValidationRequirementNameAttribute> _attributes;
+    private readonly IEnumerable <ValidationRequirementAttribute> _attributes;
 
     private readonly Type _currentValue;
     private readonly Dictionary <string, TreeElement> _dropdownTree = new();
@@ -63,7 +63,7 @@ internal class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
 
     public SerializeReferenceDropdownAdvancedDropdown(
         AdvancedDropdownState state,
-        IEnumerable <ValidationRequirementNameAttribute> attributes,
+        IEnumerable <ValidationRequirementAttribute> attributes,
         Type[] addedRequirements,
         Type currentValue,
         Action <int> onSelectedNewType) :
@@ -91,7 +91,7 @@ internal class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
 
         var index = 0;
 
-        foreach (ValidationRequirementNameAttribute attribute in _attributes)
+        foreach (ValidationRequirementAttribute attribute in _attributes)
         {
             if (attribute.name.Contains("/"))
             {

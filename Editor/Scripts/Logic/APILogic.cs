@@ -1,7 +1,9 @@
 ﻿#if UNITY_EDITOR
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using MegaPint.Editor.Scripts.GUI;
+using MegaPint.Editor.Scripts.GUI.Utility;
 using UnityEngine;
 using UnityEngine.UIElements;
 using GUIUtility = MegaPint.Editor.Scripts.GUI.Utility.GUIUtility;
@@ -24,7 +26,10 @@ internal static class APILogic
 
     private static VisualElement s_rightPane;
     private static VisualElement s_content;
+    
     private static Label s_title;
+    private static Label s_description;
+    private static Label s_assembly;
 
     #region Public Methods
 
@@ -39,6 +44,8 @@ internal static class APILogic
 
         s_listView = leftPane.Q <ListView>("Entries");
         s_title = s_rightPane.Q <Label>("Title");
+        s_description = s_rightPane.Q <Label>("Description");
+        s_assembly = s_rightPane.Q <Label>("Assembly");
         s_content = s_rightPane.Q <VisualElement>("Content");
 
         s_listItemTemplate ??= Resources.Load <VisualTreeAsset>(Constants.Validators.UserInterface.APIItem);
@@ -119,14 +126,34 @@ internal static class APILogic
 
     /// <summary> Display the right pane </summary>
     /// <param name="data"> Target data </param>
-    /// <param name="rightPane"> Right pane </param>
-    /// <param name="title"> Title inside the right pane </param>
-    /// <param name="content"> Content inside the right pane </param>
-    private static void DisplayRightPane(APIData.Data data, VisualElement rightPane, Label title, VisualElement content)
+    private static void DisplayRightPane(APIData.Data data)
     {
-        rightPane.style.display = DisplayStyle.Flex;
+        s_rightPane.style.display = DisplayStyle.Flex;
 
-        title.text = data.title;
+        s_title.text = data.title;
+        s_description.text = data.description;
+        s_assembly.text = data.assembly;
+        
+        s_title.ActivateLinks(APILinks.LinkCallback);
+        s_description.ActivateLinks(APILinks.LinkCallback);
+        
+        s_content.Clear();
+
+        var path = Path.Combine(Constants.Validators.UserInterface.APIItems, data.key.ToString());
+        var loadedContent = Resources.Load <VisualTreeAsset>(path);
+
+        if (loadedContent == null)
+        {
+            var label = new Label($"No content found for the key {data.key}");
+            s_content.Add(label);
+            
+            return;
+        }
+
+        VisualElement instantiatedContent = GUIUtility.Instantiate(loadedContent);
+        instantiatedContent.ActivateLinks(APILinks.LinkCallback);
+        
+        s_content.Add(instantiatedContent);
     }
 
     /// <summary> Draw a hierarchy corner </summary>
@@ -220,7 +247,7 @@ internal static class APILogic
         }
 
         s_selectedAPI = api;
-        DisplayRightPane(api, s_rightPane, s_title, s_content);
+        DisplayRightPane(api);
         s_listView.RefreshItems();
 
         s_listView.selectedIndex = -1;

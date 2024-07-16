@@ -9,7 +9,7 @@ namespace MegaPint.ValidationRequirement.Requirements.TransformValidation
 /// <summary> Validation requirement for default values on a transform component </summary>
 [Serializable]
 [ValidationRequirementTooltip("This requirement enforces the default values of the transform component.")]
-[ValidationRequirementName(
+[ValidationRequirement(
     "Transform/Default",
     typeof(RequireDefaultTransform),
     false,

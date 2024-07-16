@@ -14,7 +14,7 @@ namespace MegaPint.ValidationRequirement.Requirements.GameObjectValidation
 /// <summary> Validation requirement requiring a custom name based on a defined regex ruleset </summary>
 [Serializable]
 [Tooltip("With this requirement you can specify a component that is required on this gameObject.")]
-[ValidationRequirementName("GameObject/Component", typeof(RequireComponent), true, -30, 20)]
+[ValidationRequirement("GameObject/Component", typeof(RequireComponent), true, -30, 20)]
 internal class RequireComponent : ScriptableValidationRequirement
 {
     public Properties properties;
