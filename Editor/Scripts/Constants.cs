@@ -138,6 +138,8 @@ internal static partial class Constants
             public static readonly string Variable = Path.Combine(s_windows, "Variable");
             
             public static readonly string APIItem = Path.Combine(s_userInterface, "Display Content", "API", "Api Item");
+
+            public static readonly string APIItems = Path.Combine(s_userInterface, "Display Content", "API", "Items");
         }
 
         private static readonly string s_base = Path.Combine("MegaPint", "Validators");

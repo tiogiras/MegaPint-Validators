@@ -12,7 +12,7 @@ namespace MegaPint.ValidationRequirement.Requirements.GameObjectValidation
 /// <summary> Requirement requires specific tag on the gameObject </summary>
 [Serializable]
 [ValidationRequirementTooltip("This requirement enforces the tag of the gameObject.")]
-[ValidationRequirementName("GameObject/Tag", typeof(RequireTag), -30, 2)]
+[ValidationRequirement("GameObject/Tag", typeof(RequireTag), -30, 2)]
 internal class RequireTag : ScriptableValidationRequirement
 {
     [SerializeField] private string _tagName;

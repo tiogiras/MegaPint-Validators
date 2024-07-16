@@ -13,7 +13,7 @@ namespace MegaPint.ValidationRequirement.Requirements.CSharp
 [Serializable]
 [ValidationRequirementTooltip(
     "With this requirement you can specify a class with it's assembly qualified name (Namespace, Class, Assembly) and enforce different settings for specific variables.")]
-[ValidationRequirementName("C#/Variables", typeof(Variables), true, -40)]
+[ValidationRequirement("C#/Variables", typeof(Variables), true, -40)]
 internal class Variables : ScriptableValidationRequirement
 {
     [SerializeField] private string _classNamespace;

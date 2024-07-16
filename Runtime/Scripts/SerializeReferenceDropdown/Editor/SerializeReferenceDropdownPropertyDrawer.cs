@@ -109,12 +109,12 @@ internal class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
                };
     }
 
-    private static ValidationRequirementNameAttribute GetType(Type type)
+    private static ValidationRequirementAttribute GetType(Type type)
     {
         if (type == null)
-            return new ValidationRequirementNameAttribute(NullName, null, int.MinValue + 1);
+            return new ValidationRequirementAttribute(NullName, null, int.MinValue + 1);
 
-        return type.GetCustomAttribute <ValidationRequirementNameAttribute>();
+        return type.GetCustomAttribute <ValidationRequirementAttribute>();
     }
 
     private static string GetTypeTooltip(Type type)

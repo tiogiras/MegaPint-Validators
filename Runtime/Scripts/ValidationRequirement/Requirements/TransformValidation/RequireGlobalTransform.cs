@@ -10,7 +10,7 @@ namespace MegaPint.ValidationRequirement.Requirements.TransformValidation
 [Serializable]
 [ValidationRequirementTooltip(
     "This requirement enforces the transform component to have a specific global position, rotation and scale.")]
-[ValidationRequirementName(
+[ValidationRequirement(
     "Transform/Custom Global",
     typeof(RequireGlobalTransform),
     false,

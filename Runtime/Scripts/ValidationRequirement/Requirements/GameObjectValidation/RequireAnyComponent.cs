@@ -15,7 +15,7 @@ namespace MegaPint.ValidationRequirement.Requirements.GameObjectValidation
 [Serializable]
 [Tooltip(
     "With this requirement you can specify a list of components of which at least one must be on the gameObject.\nWhen fixed automatically the first selected component will be added to the gameObject.")]
-[ValidationRequirementName("GameObject/Component (Any)", typeof(RequireAnyComponent), true, -30, 21)]
+[ValidationRequirement("GameObject/Component (Any)", typeof(RequireAnyComponent), true, -30, 21)]
 internal class RequireAnyComponent : ScriptableValidationRequirement
 {
     public List <Properties> properties;

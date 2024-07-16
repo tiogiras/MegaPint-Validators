@@ -123,11 +123,11 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 
         if (disabledRequirements.Count > 0)
         {
-            List <ValidationRequirementNameAttribute> attributes = disabledRequirements.ConvertAll(
+            List <ValidationRequirementAttribute> attributes = disabledRequirements.ConvertAll(
                 requirement =>
                     requirement.GetType().
                                 GetCustomAttribute <
-                                    ValidationRequirementNameAttribute>());
+                                    ValidationRequirementAttribute>());
 
             var tooltip = $"- {string.Join("\n- ", attributes.Select(attr => attr.name))}";
 
