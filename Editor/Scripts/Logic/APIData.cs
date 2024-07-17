@@ -378,9 +378,9 @@ internal static class APIData
             new List <Data>
             {
                 new(
-                    $"<link={DataKey.VRMD}>{_ValidationRequirementMetaData}</link>.<m>OnInitialization()</m>",
+                    $"<link={DataKey.VRMD}>{_ValidationRequirementMetaData}</link>.OnInitialization()",
                     "OnInitialization()",
-                    "...",
+                    "protected abstract void",
                     _ValidationRequirementMetaDataAssembly,
                     1,
                     DataKey.VRMD0)
@@ -395,16 +395,16 @@ internal static class APIData
             new List <Data>
             {
                 new(
-                    $"<link={DataKey.VS}>{_ValidatorSettings}</link>.<m>Requirements()</m>",
+                    $"<link={DataKey.VS}>{_ValidatorSettings}</link>.Requirements()",
                     "Requirements()",
-                    "...",
+                    "public List <ScriptableValidationRequirement> : (bool = false)",
                     _ValidatorSettingsAssembly,
                     1,
                     DataKey.VS0),
                 new(
-                    $"<link={DataKey.VS}>{_ValidatorSettings}</link>.<m>SetRequirements()</m>",
+                    $"<link={DataKey.VS}>{_ValidatorSettings}</link>.SetRequirements()",
                     "SetRequirements()",
-                    "...",
+                    "public void : (List <ScriptableValidationRequirement>)",
                     _ValidatorSettingsAssembly,
                     1,
                     DataKey.VS1)
