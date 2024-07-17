@@ -134,6 +134,7 @@ internal static class APILogic
             return;
         
         s_rightPane.style.display = DisplayStyle.Flex;
+        s_rightPane.Q<ScrollView>().scrollOffset = Vector2.zero;
 
         s_title.text = data.title;
         s_description.text = data.description;
@@ -275,13 +276,9 @@ internal static class APILogic
             return;
         }
 
-        Debug.Log(key);
-        
         s_listView.SetSelectionWithoutNotify(null);
-
         s_selectedAPI = APIData.Get(key);
-        Debug.Log(s_selectedAPI);
-        
+
         s_listView.RefreshItems();
         
         DisplayRightPane(s_selectedAPI);

@@ -4,9 +4,26 @@
     <Style src="project://database/Packages/com.tiogiras.megapint/Editor/Resources/MegaPint/User%20Interface/MegaPintAttributes.uss?fileID=7433441132597879392&amp;guid=db4b42bc58d645b8ab6f8c0e914c2a0c&amp;type=3#MegaPintAttributes" />
     <MegaPint.Editor.Scripts.GUI.Factories.RootElement style="flex-direction: column; flex-grow: 1;">
         <MegaPint.Editor.Scripts.GUI.Factories.Headings.HeadingPrimary tabindex="-1" text="Description" style="white-space: normal; -unity-font-style: bold; margin-bottom: 5px;" />
-        <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="..." class="mp_link" style="white-space: normal;" />
-        <MegaPint.Editor.Scripts.GUI.Factories.Headings.HeadingPrimary tabindex="-1" text="Properties" style="white-space: normal; -unity-font-style: bold; margin-bottom: 5px; margin-top: 15px;" />
-        <MegaPint.Editor.Scripts.GUI.Factories.Headings.HeadingPrimary tabindex="-1" text="Public Methods" style="white-space: normal; -unity-font-style: bold; margin-bottom: 5px; margin-top: 15px;" />
-        <MegaPint.Editor.Scripts.GUI.Factories.Headings.HeadingPrimary tabindex="-1" text="Protected Methods" style="white-space: normal; -unity-font-style: bold; margin-bottom: 5px; margin-top: 15px;" />
+        <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="RemoveImportedSetting removes the defined setting from this &lt;link=VMB&gt;ValidatableMonoBehaviour&lt;/link&gt;." class="mp_link" style="white-space: normal;" />
+        <MegaPint.Editor.Scripts.GUI.Factories.TextElements.CodeExample _string-attr="&lt;m&gt;RemoveImportedSetting&lt;/m&gt;(&lt;c&gt;ValidatorSettings&lt;/c&gt; setting);" style="margin-top: 10px;" />
+        <MegaPint.Editor.Scripts.GUI.Factories.Headings.HeadingPrimary tabindex="-1" text="Parameters" style="white-space: normal; -unity-font-style: bold; margin-bottom: 5px; margin-top: 15px;" />
+        <MegaPint.Editor.Scripts.GUI.Factories.Backgrounds.BackgroundQuaternary>
+            <ui:VisualElement class="mp_border-color--secondary" style="flex-grow: 1; flex-direction: column; border-top-width: 1px;">
+                <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
+                    <ui:VisualElement class="mp_border-color--secondary" style="width: 200px; border-top-width: 0; border-right-width: 0; border-bottom-width: 1px; border-left-width: 1px;">
+                        <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="setting" class="mp_link" style="white-space: normal; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px; font-size: 10px;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="mp_border-color--secondary" style="flex-grow: 1; border-top-width: 0; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px;">
+                        <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="Settings file to be removed." style="white-space: normal; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px; font-size: 10px;" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </MegaPint.Editor.Scripts.GUI.Factories.Backgrounds.BackgroundQuaternary>
+        <MegaPint.Editor.Scripts.GUI.Factories.Headings.HeadingPrimary tabindex="-1" text="Examples" style="white-space: normal; -unity-font-style: bold; margin-bottom: 5px; margin-top: 30px;" />
+        <MegaPint.Editor.Scripts.GUI.Factories.TextElements.CodeExample _string-attr="&lt;c&gt;ValidatableMonoBehaviour&lt;/c&gt; behaviour;\n&lt;c&gt;ValidatorSettings&lt;/c&gt; setting;\n\nbehaviour.&lt;m&gt;RemoveImportedSetting&lt;/m&gt;(setting);" style="margin-top: 10px;" />
+        <ui:VisualElement style="margin-top: 30px;">
+            <MegaPint.Editor.Scripts.GUI.Factories.Structure.Separator />
+            <MegaPint.Editor.Scripts.GUI.Factories.TextElements.TextSecondary tabindex="-1" text="MegaPint - API&#10;17.07.2024&#10;&#10;Written By: Tiogiras" style="white-space: normal; font-size: 10px;" />
+        </ui:VisualElement>
     </MegaPint.Editor.Scripts.GUI.Factories.RootElement>
 </ui:UXML>

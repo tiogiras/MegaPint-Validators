@@ -4,9 +4,10 @@
     <Style src="project://database/Packages/com.tiogiras.megapint/Editor/Resources/MegaPint/User%20Interface/MegaPintAttributes.uss?fileID=7433441132597879392&amp;guid=db4b42bc58d645b8ab6f8c0e914c2a0c&amp;type=3#MegaPintAttributes" />
     <MegaPint.Editor.Scripts.GUI.Factories.RootElement style="flex-direction: column; flex-grow: 1;">
         <MegaPint.Editor.Scripts.GUI.Factories.Headings.HeadingPrimary tabindex="-1" text="Description" style="white-space: normal; -unity-font-style: bold; margin-bottom: 5px;" />
-        <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="..." class="mp_link" style="white-space: normal;" />
-        <MegaPint.Editor.Scripts.GUI.Factories.Headings.HeadingPrimary tabindex="-1" text="Properties" style="white-space: normal; -unity-font-style: bold; margin-bottom: 5px; margin-top: 15px;" />
-        <MegaPint.Editor.Scripts.GUI.Factories.Headings.HeadingPrimary tabindex="-1" text="Public Methods" style="white-space: normal; -unity-font-style: bold; margin-bottom: 5px; margin-top: 15px;" />
-        <MegaPint.Editor.Scripts.GUI.Factories.Headings.HeadingPrimary tabindex="-1" text="Protected Methods" style="white-space: normal; -unity-font-style: bold; margin-bottom: 5px; margin-top: 15px;" />
+        <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="Defines the displayed severity of the error. Values can be &quot;Ok&quot;, &quot;Warning&quot; and &quot;Error&quot;.&#10;&#10;&#x9;- Ok: No issue found (Error not displayed)&#10;&#x9;- Warning: The error should be fixed but it is not mandatory&#10;&#x9;- Error: The error must be fixed" class="mp_link" style="white-space: normal;" />
+        <ui:VisualElement style="margin-top: 30px;">
+            <MegaPint.Editor.Scripts.GUI.Factories.Structure.Separator />
+            <MegaPint.Editor.Scripts.GUI.Factories.TextElements.TextSecondary tabindex="-1" text="MegaPint - API&#10;17.07.2024&#10;&#10;Written By: Tiogiras" style="white-space: normal; font-size: 10px;" />
+        </ui:VisualElement>
     </MegaPint.Editor.Scripts.GUI.Factories.RootElement>
 </ui:UXML>
