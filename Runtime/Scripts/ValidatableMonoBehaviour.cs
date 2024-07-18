@@ -312,7 +312,8 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
             if (setting is null)
                 continue;
 
-            defaultSettings.Add(setting);
+            if (!defaultSettings.Contains(setting))
+                defaultSettings.Add(setting);
         }
 
 #if UNITY_EDITOR

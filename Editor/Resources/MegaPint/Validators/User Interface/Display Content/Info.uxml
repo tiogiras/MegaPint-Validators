@@ -6,7 +6,7 @@
         <ui:VisualElement style="flex-grow: 1; margin-top: 10px; margin-right: 10px; margin-bottom: 10px; margin-left: 10px;">
             <MegaPint.Editor.Scripts.GUI.Factories.TextElements.TextSecondary tabindex="-1" text="Package Info" name="PackageInfo" style="-unity-font-style: italic; white-space: normal;" />
             <MegaPint.Editor.Scripts.GUI.Factories.Structure.Separator />
-            <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="For instructions on how to setup your own Validators and &lt;link=&quot;info_requirement&quot;&gt;Requirements&lt;/link&gt; see the guides tab." class="mp_link" style="white-space: normal;" />
+            <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="For instructions on how to setup your own Validators and &lt;link=&quot;info_requirement&quot;&gt;Requirements&lt;/link&gt; see the guides tab. If require further information about the codebase of the validators see the api tab." class="mp_link" style="white-space: normal;" />
             <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="&lt;link=&quot;validatorView&quot;&gt;Validator View&lt;/link&gt;" class="mp_link" style="margin-top: 20px; margin-left: 15px; white-space: normal; -unity-font-style: bold;" />
             <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="Find and resolve all issues in either the open scene or the project files." style="white-space: normal; margin-left: 15px;" />
         </ui:VisualElement>
