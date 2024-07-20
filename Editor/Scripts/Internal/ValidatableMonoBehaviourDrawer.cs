@@ -3,11 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using MegaPint.SerializeReferenceDropdown.Runtime;
 using MegaPint.ValidationRequirement;
 using UnityEditor;
 using UnityEngine;
 
+[assembly: InternalsVisibleTo("tiogiras.megapint.editor")]
 namespace MegaPint.Editor.Scripts.Internal
 {
 
@@ -15,6 +17,9 @@ namespace MegaPint.Editor.Scripts.Internal
 [CustomEditor(typeof(ValidatableMonoBehaviour), true)]
 internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 {
+    public static Action <string> onImport;
+    public static Action <string> onExport;
+    
     private static readonly string[] s_exclusion = {"m_Script", "_importedSettings"};
 
     private bool _listening;
@@ -43,9 +48,11 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
         {
             _listening = false;
 
-            castedTarget.ImportSetting(
-                (ValidatorSettings)EditorGUIUtility.GetObjectPickerObject());
-
+            var obj = (ValidatorSettings)EditorGUIUtility.GetObjectPickerObject();
+            
+            onImport?.Invoke(AssetDatabase.GetAssetPath(obj));
+            
+            castedTarget.ImportSetting(obj);
             castedTarget.OnValidate();
         }
 
@@ -242,6 +249,8 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 
             if (string.IsNullOrEmpty(path))
                 return;
+
+            onExport?.Invoke(path);
 
             var settingsFile = CreateInstance <ValidatorSettings>();
 

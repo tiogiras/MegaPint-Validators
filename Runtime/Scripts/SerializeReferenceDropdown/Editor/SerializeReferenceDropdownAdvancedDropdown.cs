@@ -2,11 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using MegaPint.SerializeReferenceDropdown.Runtime;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
+[assembly: InternalsVisibleTo("tiogiras.megapint.editor")]
 namespace MegaPint.SerializeReferenceDropdown.Editor
 {
 
@@ -60,6 +62,7 @@ internal class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
     private readonly Dictionary <AdvancedDropdownItem, Type> _itemTypes = new();
 
     private readonly Action <int> _onSelectedTypeIndex;
+    public static Action <string> onSelectedItem;
 
     public SerializeReferenceDropdownAdvancedDropdown(
         AdvancedDropdownState state,
@@ -186,8 +189,11 @@ internal class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
             return;
         }
 
-        if (_itemAndIndexes.TryGetValue(item, out var index))
-            _onSelectedTypeIndex.Invoke(index);
+        if (!_itemAndIndexes.TryGetValue(item, out var index))
+            return;
+
+        _onSelectedTypeIndex.Invoke(index);
+        onSelectedItem?.Invoke(item.name);
     }
 
     #endregion

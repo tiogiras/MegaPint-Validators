@@ -22,6 +22,10 @@ namespace MegaPint
 [RequireComponent(typeof(ValidatableMonoBehaviourStatus))]
 public abstract class ValidatableMonoBehaviour : MonoBehaviour
 {
+    internal static Action <string> onValidate;
+    internal static Action <string, int, string, int> onPrioritiesChanged;
+    internal static Action <string, bool> onRequirementsChanged;
+    
     [Serializable]
     public struct SettingPriority
     {
@@ -44,10 +48,27 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     private readonly List <ScriptableValidationRequirement> _activeRequirements = new();
     private ValidatableMonoBehaviourStatus _status;
 
+    private int _lastRequirementCount;
+    private bool _lastRequirementCountInitialized;
+
     #region Unity Event Functions
 
     internal void OnValidate()
     {
+        if (!_lastRequirementCountInitialized)
+        {
+            _lastRequirementCount = _requirements.Count;
+            _lastRequirementCountInitialized = true;
+        }
+        else
+        {
+            if (_lastRequirementCount != _requirements.Count)
+            {
+                onRequirementsChanged?.Invoke(gameObject.name, _lastRequirementCount < _requirements.Count);
+                _lastRequirementCount = _requirements.Count;
+            }
+        }
+        
         TryImportDefaultImports();
 
         BeforeValidation();
@@ -69,7 +90,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
         if (GetActiveRequirements() is not {Count: > 0})
             return;
-
+        
         _status.ValidateStatus();
     }
 
@@ -156,6 +177,8 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     /// <returns> Validation state after validation </returns>
     public ValidationState Validate(out List <ValidationError> errors)
     {
+        onValidate?.Invoke(gameObject.name);
+
         var state = ValidationState.Ok;
         errors = new List <ValidationError>();
 
@@ -262,7 +285,8 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     internal void SetSettingPriority(ValidatorSettings setting, int newPriority)
     {
         var oldPriority = settingPriorities.FirstOrDefault(s => s.setting == setting).priority;
-
+        var indexOfOtherSetting = -1;
+        
         for (var i = 0; i < settingPriorities.Count; i++)
         {
             SettingPriority settingPriority = settingPriorities[i];
@@ -280,7 +304,15 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
             settingPriority.priority = oldPriority;
             settingPriorities[i] = settingPriority;
+
+            indexOfOtherSetting = i;
         }
+
+        onPrioritiesChanged?.Invoke(
+            setting.name,
+            newPriority,
+            settingPriorities[indexOfOtherSetting].setting.name,
+            oldPriority);
 
 #if UNITY_EDITOR
         EditorUtility.SetDirty(this);
