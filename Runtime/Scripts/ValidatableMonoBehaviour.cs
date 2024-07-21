@@ -25,6 +25,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     internal static Action <string> onValidate;
     internal static Action <string, int, string, int> onPrioritiesChanged;
     internal static Action <string, bool> onRequirementsChanged;
+    internal static Action <string> onImportRemoved;
     
     [Serializable]
     public struct SettingPriority
@@ -131,6 +132,8 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     /// <param name="setting"> Target setting </param>
     public void RemoveImportedSetting(ValidatorSettings setting)
     {
+        onImportRemoved?.Invoke(setting.name);
+        
         _importedSettings.Remove(setting);
 
         var index = -1;
