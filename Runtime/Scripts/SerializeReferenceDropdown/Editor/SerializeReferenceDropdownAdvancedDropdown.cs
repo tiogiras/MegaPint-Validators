@@ -9,6 +9,8 @@ using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
 [assembly: InternalsVisibleTo("tiogiras.megapint.editor")]
+[assembly: InternalsVisibleTo("tiogiras.megapint.batesting.editor")]
+
 namespace MegaPint.SerializeReferenceDropdown.Editor
 {
 
