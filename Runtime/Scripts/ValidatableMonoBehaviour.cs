@@ -14,6 +14,7 @@ using UnityEditor;
 [assembly: InternalsVisibleTo("tiogiras.megapint.editor")]
 [assembly: InternalsVisibleTo("tiogiras.megapint.validators.editor")]
 [assembly: InternalsVisibleTo("tiogiras.megapint.validators.runtime.serializereferencedropdown.editor")]
+[assembly: InternalsVisibleTo("tiogiras.megapint.batesting.editor")]
 
 namespace MegaPint
 {
