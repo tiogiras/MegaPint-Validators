@@ -10,6 +10,7 @@ using UnityEditor;
 using UnityEngine;
 
 [assembly: InternalsVisibleTo("tiogiras.megapint.editor")]
+
 namespace MegaPint.Editor.Scripts.Internal
 {
 
@@ -19,7 +20,7 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 {
     public static Action <string> onImport;
     public static Action <string> onExport;
-    
+
     private static readonly string[] s_exclusion = {"m_Script", "_importedSettings"};
 
     private bool _listening;
@@ -31,12 +32,12 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
         var castedTarget = (ValidatableMonoBehaviour)target;
 
         serializedObject.Update();
-
+        
         EditorGUILayout.BeginHorizontal();
 
         if (GUILayout.Button("Export Requirements"))
             ExportRequirements();
-
+        
         if (GUILayout.Button("Import Requirements"))
         {
             _listening = true;
@@ -44,19 +45,19 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
             EditorGUIUtility.ShowObjectPicker <ValidatorSettings>(null, false, "", controlID);
         }
 
+        EditorGUILayout.EndHorizontal();
+
         if (Event.current.commandName == "ObjectSelectorClosed" && _listening)
         {
             _listening = false;
 
             var obj = (ValidatorSettings)EditorGUIUtility.GetObjectPickerObject();
-            
+
             onImport?.Invoke(AssetDatabase.GetAssetPath(obj));
-            
+
             castedTarget.ImportSetting(obj);
             castedTarget.OnValidate();
         }
-
-        EditorGUILayout.EndHorizontal();
 
         var hasImportedSettings = castedTarget.HasImportedSettings;
 
@@ -69,6 +70,25 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
     }
 
     #endregion
+
+    private void ApplyOverrides(ValidatableMonoBehaviour castedTarget, SerializedProperty property)
+    {
+        ValidatableMonoBehaviour prefab = PrefabUtility.GetCorrespondingObjectFromSource(castedTarget);
+                
+        var path = AssetDatabase.GetAssetPath(prefab);
+
+        PrefabUtility.ApplyPropertyOverride(
+            property,
+            path,
+            InteractionMode.UserAction);
+    }
+    
+    private void RevertOverrides(SerializedProperty property)
+    {
+        PrefabUtility.RevertPropertyOverride(
+            property,
+            InteractionMode.UserAction);
+    }
 
     #region Private Methods
 
@@ -115,7 +135,7 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
                 castedTarget.RemoveImportedSetting(setting);
 
             GUILayout.FlexibleSpace();
-            EditorGUILayout.EndVertical();   
+            EditorGUILayout.EndVertical();
         }
 
         var labelWidth = windowWidth * (disabledRequirements.Count > 0 ? .6f : 1f);
@@ -182,7 +202,7 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
                 castedTarget.SetSettingPriority(setting, newPriority);
 
             GUILayout.FlexibleSpace();
-            EditorGUILayout.EndVertical();   
+            EditorGUILayout.EndVertical();
         }
 
         EditorGUILayout.EndHorizontal();
@@ -190,6 +210,7 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 
     /// <summary> Draw all imported settings </summary>
     /// <param name="castedTarget"> Target as ValidatableMonoBehaviour </param>
+    // ReSharper disable once CognitiveComplexity
     private void DrawImportedSettings(ValidatableMonoBehaviour castedTarget)
     {
         SerializedProperty foldoutState = serializedObject.FindProperty("importedSettingsFoldout");
@@ -199,6 +220,24 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 
         if (foldoutState.boolValue)
         {
+            EditorGUILayout.BeginHorizontal();
+            
+            if (PrefabUtility.GetPrefabInstanceStatus(castedTarget) == PrefabInstanceStatus.Connected)
+            {
+                SerializedProperty importedSettingsProperty = serializedObject.FindProperty("_importedSettings");
+
+                if (importedSettingsProperty.prefabOverride)
+                {
+                    if (GUILayout.Button("Apply Overrides", GUILayout.MaxWidth(120)))
+                        ApplyOverrides(castedTarget, importedSettingsProperty);
+
+                    if (GUILayout.Button("Revert Overrides", GUILayout.MaxWidth(120)))
+                        RevertOverrides(importedSettingsProperty);   
+                }
+            }
+            
+            EditorGUILayout.EndHorizontal();
+            
             DrawImportedSettingsFor(castedTarget.defaultSettings, true);
             DrawImportedSettingsFor(castedTarget.GetImportedSettings());
         }
@@ -238,6 +277,7 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
             {
                 Debug.LogWarning("Nothing to export!");
 
+                GUIUtility.ExitGUI();
                 return;
             }
 
@@ -248,7 +288,10 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
                 "Hello World");
 
             if (string.IsNullOrEmpty(path))
+            {
+                GUIUtility.ExitGUI();
                 return;
+            }
 
             onExport?.Invoke(path);
 
@@ -273,6 +316,8 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
         {
             // ignored
         }
+        
+        GUIUtility.ExitGUI();
     }
 
     #endregion

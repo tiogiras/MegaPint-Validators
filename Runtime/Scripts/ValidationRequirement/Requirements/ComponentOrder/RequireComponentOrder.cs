@@ -99,8 +99,13 @@ internal class RequireComponentOrder : ScriptableValidationRequirement
                 currentCategoryElementIndex = 0;
             }
 
+            Debug.Log($"CategoryName: {currentCategory.type.componentName} | {component.GetType().Name}"); // TODO remove
+
             if (!currentCategory.components.Contains(component))
+            {
+                Debug.Log("False"); // TODO remove
                 return false;
+            }
 
             currentCategoryElementIndex++;
         }
@@ -210,16 +215,19 @@ internal class RequireComponentOrder : ScriptableValidationRequirement
         if (status == PrefabInstanceStatus.Connected)
         {
             GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
+
             var assetPath = AssetDatabase.GetAssetPath(prefab);
-
             var statusComp = prefab.GetComponent <ValidatableMonoBehaviourStatus>();
-            statusComp.ValidateStatus();
+            
+            if (statusComp != null)
+            {
+                statusComp.ValidateStatus();
+                statusComp.FixAll();
 
-            statusComp.FixAll();
+                PrefabUtility.SaveAsPrefabAsset(prefab, assetPath);
 
-            PrefabUtility.SaveAsPrefabAsset(prefab, assetPath);
-
-            return;
+                return;
+            }
         }
 #endif
 

@@ -15,6 +15,7 @@ using UnityEditor;
 [assembly: InternalsVisibleTo("tiogiras.megapint.validators.editor")]
 [assembly: InternalsVisibleTo("tiogiras.megapint.validators.runtime.serializereferencedropdown.editor")]
 [assembly: InternalsVisibleTo("tiogiras.megapint.batesting.editor")]
+[assembly: InternalsVisibleTo("tiogiras.megapint.batesting.runtime")]
 
 namespace MegaPint
 {
@@ -24,6 +25,7 @@ namespace MegaPint
 public abstract class ValidatableMonoBehaviour : MonoBehaviour
 {
     internal static Action <string> onValidate;
+    internal static Action <string, ValidationState> onValidated;
     internal static Action <string, int, string, int> onPrioritiesChanged;
     internal static Action <string, bool> onRequirementsChanged;
     internal static Action <string> onImportRemoved;
@@ -187,7 +189,10 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         errors = new List <ValidationError>();
 
         if (GetActiveRequirements() is not {Count: > 0})
-            return state;
+        {
+            onValidated?.Invoke(gameObject.name, state);
+            return state;   
+        }
 
         foreach (ScriptableValidationRequirement requirement in
                  GetActiveRequirements().Where(requirement => requirement != null))
@@ -203,6 +208,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
                 state = requirementState;
         }
 
+        onValidated?.Invoke(gameObject.name, state);
         return state;
     }
 
