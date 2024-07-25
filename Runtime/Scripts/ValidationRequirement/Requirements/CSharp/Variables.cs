@@ -32,17 +32,45 @@ internal class Variables : ScriptableValidationRequirement
     {
     }
 
+    protected override void OnRequirementValidation()
+    {
+        validation.foundClass = TryGetClassType(out Type type);
+        
+        if (!validation.foundClass)
+            return;
+        
+        if (_variables.Count == 0)
+            return;
+
+        foreach (Variable variable in _variables)
+        {
+            var variableName = variable.properties.name;
+
+            if (string.IsNullOrEmpty(variableName))
+                continue;
+            
+            FieldInfo field = type.GetField(
+                variableName,
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Default);
+
+            var fieldFound = field != null;
+
+            variable.properties.fieldFound = fieldFound;
+
+            if (fieldFound)
+                variable.SetTypeIndex(field.FieldType);
+        }
+    }
+    
+    // TODO SOMEHOW IT WORKS BUT WITH THE WRONG TYPE
+
     protected override void Validate(GameObject gameObject)
     {
-        validation.foundClass = false;
-
         if (!TryGetClassType(out Type type))
             return;
 
         if (!TryGetClassComponent(gameObject, type, out Component comp))
             return;
-
-        validation.foundClass = true;
 
         if (_variables.Count == 0)
             return;
@@ -59,8 +87,6 @@ internal class Variables : ScriptableValidationRequirement
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Default);
 
             var fieldFound = field != null;
-
-            variable.properties.fieldFound = fieldFound;
 
             if (!fieldFound)
                 continue;

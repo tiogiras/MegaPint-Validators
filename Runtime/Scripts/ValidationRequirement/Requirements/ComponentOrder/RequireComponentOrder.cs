@@ -98,14 +98,9 @@ internal class RequireComponentOrder : ScriptableValidationRequirement
                 currentCategory = GetNextCategory(allCategories, ref currentCategoryIndex);
                 currentCategoryElementIndex = 0;
             }
-
-            Debug.Log($"CategoryName: {currentCategory.type.componentName} | {component.GetType().Name}"); // TODO remove
-
+            
             if (!currentCategory.components.Contains(component))
-            {
-                Debug.Log("False"); // TODO remove
                 return false;
-            }
 
             currentCategoryElementIndex++;
         }
