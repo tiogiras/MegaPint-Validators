@@ -33,7 +33,8 @@ internal class RequireAnyComponent : ScriptableValidationRequirement
         if (properties.Count == 0)
             return;
 
-        GetTypes();
+        if (_types == null)
+            GetTypes();
     }
 
     protected override void Validate(GameObject gameObject)

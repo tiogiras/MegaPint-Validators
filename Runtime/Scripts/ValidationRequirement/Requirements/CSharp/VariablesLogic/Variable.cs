@@ -78,6 +78,22 @@ internal class Variable
 
     #region Public Methods
 
+    /// <summary> Set the index based on the type of the variable value </summary>
+    /// <param name="type"> Type of the variable </param>
+    public void SetTypeIndex(System.Type type)
+    {
+        if (type == typeof(Object))
+            properties.typeIndex = 0;
+        else if (type == typeof(string))
+            properties.typeIndex = 1;
+        else if (type == typeof(bool))
+            properties.typeIndex = 2;
+        else if (type == typeof(int))
+            properties.typeIndex = 3;
+        else if (type == typeof(float))
+            properties.typeIndex = 4;
+    }
+
     /// <summary> Validate the variable based on it's type and requirement </summary>
     /// <param name="value"> Value of the variable </param>
     /// <param name="errors"> Validation errors </param>

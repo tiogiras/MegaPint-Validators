@@ -27,12 +27,15 @@ internal class RequireComponentForbidden : ScriptableValidationRequirement
     protected override void OnInitialization()
     {
     }
-
-    protected override void Validate(GameObject gameObject)
+    
+    protected override void OnRequirementValidation()
     {
         if (_types == null)
             GetTypes();
+    }
 
+    protected override void Validate(GameObject gameObject)
+    {
         if (string.IsNullOrEmpty(properties.typeName))
             return;
 

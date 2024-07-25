@@ -27,11 +27,14 @@ internal class RequireComponent : ScriptableValidationRequirement
     {
     }
 
-    protected override void Validate(GameObject gameObject)
+    protected override void OnRequirementValidation()
     {
         if (_types == null)
             GetTypes();
+    }
 
+    protected override void Validate(GameObject gameObject)
+    {
         if (string.IsNullOrEmpty(properties.typeName))
             return;
 
@@ -76,7 +79,6 @@ internal class RequireComponent : ScriptableValidationRequirement
 #if UNITY_EDITOR
         _types.AddRange(TypeCache.GetTypesDerivedFrom <Component>());
 #endif
-
         properties.types.Clear();
 
         foreach (Type type in _types)
