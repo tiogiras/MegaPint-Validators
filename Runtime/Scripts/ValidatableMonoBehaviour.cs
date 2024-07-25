@@ -24,18 +24,18 @@ namespace MegaPint
 [RequireComponent(typeof(ValidatableMonoBehaviourStatus))]
 public abstract class ValidatableMonoBehaviour : MonoBehaviour
 {
-    internal static Action <string> onValidate;
-    internal static Action <string, ValidationState> onValidated;
-    internal static Action <string, int, string, int> onPrioritiesChanged;
-    internal static Action <string, bool> onRequirementsChanged;
-    internal static Action <string> onImportRemoved;
-    
     [Serializable]
     public struct SettingPriority
     {
         public ValidatorSettings setting;
         public int priority;
     }
+
+    internal static Action <string> onValidate;
+    internal static Action <string, ValidationState> onValidated;
+    internal static Action <string, int, string, int> onPrioritiesChanged;
+    internal static Action <string, bool> onRequirementsChanged;
+    internal static Action <string> onImportRemoved;
 
     public bool HasImportedSettings => _importedSettings?.Count > 0 || defaultSettings?.Count > 0;
 
@@ -50,10 +50,10 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     [HideInInspector] public List <SettingPriority> settingPriorities = new();
 
     private readonly List <ScriptableValidationRequirement> _activeRequirements = new();
-    private ValidatableMonoBehaviourStatus _status;
 
     private int _lastRequirementCount;
     private bool _lastRequirementCountInitialized;
+    private ValidatableMonoBehaviourStatus _status;
 
     #region Unity Event Functions
 
@@ -72,7 +72,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
                 _lastRequirementCount = _requirements.Count;
             }
         }
-        
+
         TryImportDefaultImports();
 
         BeforeValidation();
@@ -94,7 +94,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
         if (GetActiveRequirements() is not {Count: > 0})
             return;
-        
+
         _status.ValidateStatus();
     }
 
@@ -136,7 +136,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     public void RemoveImportedSetting(ValidatorSettings setting)
     {
         onImportRemoved?.Invoke(setting.name);
-        
+
         _importedSettings.Remove(setting);
 
         var index = -1;
@@ -191,7 +191,8 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         if (GetActiveRequirements() is not {Count: > 0})
         {
             onValidated?.Invoke(gameObject.name, state);
-            return state;   
+
+            return state;
         }
 
         foreach (ScriptableValidationRequirement requirement in
@@ -209,6 +210,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         }
 
         onValidated?.Invoke(gameObject.name, state);
+
         return state;
     }
 
@@ -226,20 +228,15 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         return null;
     }
 
-    /// <summary> Overwrite the requirements </summary>
-    /// <param name="requirements"> new requirements </param>
-    protected void SetRequirements(List <ScriptableValidationRequirement> requirements)
-    {
-        _requirements = requirements;
-
-#if UNITY_EDITOR
-        EditorUtility.SetDirty(this);
-#endif
-    }
-
     #endregion
 
     #region Internal Methods
+
+    internal void ClearImportedSettings()
+    {
+        _importedSettings.Clear();
+        settingPriorities.Clear();
+    }
 
     /// <summary> All requirements that contribute to the validation process of the behaviour </summary>
     internal List <ScriptableValidationRequirement> GetActiveRequirements()
@@ -289,6 +286,17 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
         return settingPriorities.FirstOrDefault(s => s.setting == setting).priority;
     }
 
+    /// <summary> Overwrite the requirements </summary>
+    /// <param name="requirements"> new requirements </param>
+    internal void SetRequirements(List <ScriptableValidationRequirement> requirements)
+    {
+        _requirements = requirements;
+
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(this);
+#endif
+    }
+
     /// <summary> Set the priority of a setting </summary>
     /// <param name="setting"> Targeted setting </param>
     /// <param name="newPriority"> New priority value </param>
@@ -296,7 +304,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
     {
         var oldPriority = settingPriorities.FirstOrDefault(s => s.setting == setting).priority;
         var indexOfOtherSetting = -1;
-        
+
         for (var i = 0; i < settingPriorities.Count; i++)
         {
             SettingPriority settingPriority = settingPriorities[i];
