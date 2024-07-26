@@ -216,9 +216,6 @@ internal class RequireComponentOrder : ScriptableValidationRequirement
             
             if (statusComp != null)
             {
-                statusComp.ValidateStatus();
-                statusComp.FixAll();
-
                 PrefabUtility.SaveAsPrefabAsset(prefab, assetPath);
 
                 return;
