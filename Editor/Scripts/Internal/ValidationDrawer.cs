@@ -18,7 +18,7 @@ internal class ValidationDrawer : UnityEditor.Editor
     public static Action <string> onValidateButton;
     public static Action <string> onFixAll;
     public static Action <string, string> onIssueFixed;
-    
+
     private static readonly string s_basePath = Constants.Validators.UserInterface.Status;
 
     private VisualTreeAsset _behaviourEntry;
@@ -62,7 +62,7 @@ internal class ValidationDrawer : UnityEditor.Editor
         root.Q <Button>("BTN_Validate").clicked += () =>
         {
             onValidateButton?.Invoke(_status.gameObject.name);
-            
+
             _status.ValidateStatus();
         };
 
@@ -72,7 +72,7 @@ internal class ValidationDrawer : UnityEditor.Editor
         _fixAllButton.clicked += () =>
         {
             onFixAll?.Invoke(_status.gameObject.name);
-            
+
             _status.FixAll();
         };
 
@@ -136,7 +136,7 @@ internal class ValidationDrawer : UnityEditor.Editor
                     button.clicked += () =>
                     {
                         onIssueFixed?.Invoke(_status.gameObject.name, error.errorName);
-                        
+
                         error.fixAction.Invoke(error.gameObject);
                         _status.ValidateStatus();
                     };

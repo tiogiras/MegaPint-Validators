@@ -27,7 +27,7 @@ internal class RequireComponentForbidden : ScriptableValidationRequirement
     protected override void OnInitialization()
     {
     }
-    
+
     protected override void OnRequirementValidation()
     {
         if (_types == null)

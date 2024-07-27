@@ -1,6 +1,5 @@
 ﻿#if UNITY_EDITOR
 using System.Collections.Generic;
-using System.Linq;
 using MegaPint.SerializeReferenceDropdown.Runtime;
 using MegaPint.ValidationRequirement;
 using UnityEngine;
@@ -82,7 +81,7 @@ internal static class APIData
 
     private static string s_validationRequirementTooltipAttribute;
     private static string s_validationRequirementTooltipAttributeAssembly;
-    
+
     private static string s_toggleableSettingAssembly;
 
     private static string s_validationState;
@@ -439,6 +438,13 @@ internal static class APIData
             DataKey.VState)
     };
 
+    #region ToggleableSetting
+
+    private static string _ToggleableSettingAssembly =>
+        s_toggleableSettingAssembly ??= typeof(ToggleableSetting <>).Assembly.GetName().Name;
+
+    #endregion
+
     #region Public Methods
 
     /// <summary> Get all data </summary>
@@ -460,9 +466,13 @@ internal static class APIData
             if (TryGet(key, data, out output))
                 break;
         }
-        
+
         return output;
     }
+
+    #endregion
+
+    #region Private Methods
 
     /// <summary> Try to get the wanted data in this data or any of it's children </summary>
     /// <param name="key"> Target key </param>
@@ -472,11 +482,11 @@ internal static class APIData
     private static bool TryGet(DataKey key, Data source, out Data data)
     {
         data = null;
-        
+
         if (source.key == key)
         {
             data = source;
-            
+
             return true;
         }
 
@@ -570,13 +580,6 @@ internal static class APIData
     private static string _ValidationRequirementTooltipAttributeAssembly =>
         s_validationRequirementTooltipAttributeAssembly ??=
             typeof(ValidationRequirementTooltipAttribute).Assembly.GetName().Name;
-
-    #endregion
-
-    #region ToggleableSetting
-    
-    private static string _ToggleableSettingAssembly =>
-        s_toggleableSettingAssembly ??= typeof(ToggleableSetting <>).Assembly.GetName().Name;
 
     #endregion
 

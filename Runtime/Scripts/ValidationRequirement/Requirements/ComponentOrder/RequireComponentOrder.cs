@@ -98,7 +98,7 @@ internal class RequireComponentOrder : ScriptableValidationRequirement
                 currentCategory = GetNextCategory(allCategories, ref currentCategoryIndex);
                 currentCategoryElementIndex = 0;
             }
-            
+
             if (!currentCategory.components.Contains(component))
                 return false;
 
@@ -213,7 +213,7 @@ internal class RequireComponentOrder : ScriptableValidationRequirement
 
             var assetPath = AssetDatabase.GetAssetPath(prefab);
             var statusComp = prefab.GetComponent <ValidatableMonoBehaviourStatus>();
-            
+
             if (statusComp != null)
             {
                 PrefabUtility.SaveAsPrefabAsset(prefab, assetPath);

@@ -16,7 +16,7 @@ public class ValidatorSettings : ScriptableObject
 
     [SerializeReferenceDropdown] [SerializeReference]
     private List <ScriptableValidationRequirement> _requirements;
-    
+
     private int _lastRequirementCount;
     private bool _lastRequirementCountInitialized;
 
@@ -37,7 +37,7 @@ public class ValidatorSettings : ScriptableObject
                 _lastRequirementCount = _requirements.Count;
             }
         }
-        
+
         foreach (ScriptableValidationRequirement requirement in _requirements)
             requirement?.OnValidate(this);
     }

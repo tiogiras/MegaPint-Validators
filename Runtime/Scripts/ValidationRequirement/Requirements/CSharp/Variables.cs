@@ -35,10 +35,10 @@ internal class Variables : ScriptableValidationRequirement
     protected override void OnRequirementValidation()
     {
         validation.foundClass = TryGetClassType(out Type type);
-        
+
         if (!validation.foundClass)
             return;
-        
+
         if (_variables.Count == 0)
             return;
 
@@ -48,7 +48,7 @@ internal class Variables : ScriptableValidationRequirement
 
             if (string.IsNullOrEmpty(variableName))
                 continue;
-            
+
             FieldInfo field = type.GetField(
                 variableName,
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Default);
@@ -61,7 +61,7 @@ internal class Variables : ScriptableValidationRequirement
                 variable.SetTypeIndex(field.FieldType);
         }
     }
-    
+
     // TODO SOMEHOW IT WORKS BUT WITH THE WRONG TYPE
 
     protected override void Validate(GameObject gameObject)

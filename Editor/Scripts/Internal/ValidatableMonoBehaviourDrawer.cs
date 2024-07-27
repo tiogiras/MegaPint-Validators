@@ -32,12 +32,12 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
         var castedTarget = (ValidatableMonoBehaviour)target;
 
         serializedObject.Update();
-        
+
         EditorGUILayout.BeginHorizontal();
 
         if (GUILayout.Button("Export Requirements"))
             ExportRequirements();
-        
+
         if (GUILayout.Button("Import Requirements"))
         {
             _listening = true;
@@ -71,10 +71,15 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 
     #endregion
 
-    private void ApplyOverrides(ValidatableMonoBehaviour castedTarget, SerializedProperty property)
+    #region Private Methods
+
+    /// <summary> Apply all prefab overrides of the imported Requirements </summary>
+    /// <param name="castedTarget"> Target </param>
+    /// <param name="property"> Imported Requirements property </param>
+    private static void ApplyOverrides(ValidatableMonoBehaviour castedTarget, SerializedProperty property)
     {
         ValidatableMonoBehaviour prefab = PrefabUtility.GetCorrespondingObjectFromSource(castedTarget);
-                
+
         var path = AssetDatabase.GetAssetPath(prefab);
 
         PrefabUtility.ApplyPropertyOverride(
@@ -82,15 +87,15 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
             path,
             InteractionMode.UserAction);
     }
-    
-    private void RevertOverrides(SerializedProperty property)
+
+    /// <summary> Revert all prefab overrides of the imported Requirements </summary>
+    /// <param name="property"> Imported Requirements property </param>
+    private static void RevertOverrides(SerializedProperty property)
     {
         PrefabUtility.RevertPropertyOverride(
             property,
             InteractionMode.UserAction);
     }
-
-    #region Private Methods
 
     /// <summary> Draw one imported setting </summary>
     /// <param name="setting"> Targeted setting </param>
@@ -210,6 +215,7 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
 
     /// <summary> Draw all imported settings </summary>
     /// <param name="castedTarget"> Target as ValidatableMonoBehaviour </param>
+
     // ReSharper disable once CognitiveComplexity
     private void DrawImportedSettings(ValidatableMonoBehaviour castedTarget)
     {
@@ -221,7 +227,7 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
         if (foldoutState.boolValue)
         {
             EditorGUILayout.BeginHorizontal();
-            
+
             if (PrefabUtility.GetPrefabInstanceStatus(castedTarget) == PrefabInstanceStatus.Connected)
             {
                 SerializedProperty importedSettingsProperty = serializedObject.FindProperty("_importedSettings");
@@ -232,12 +238,12 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
                         ApplyOverrides(castedTarget, importedSettingsProperty);
 
                     if (GUILayout.Button("Revert Overrides", GUILayout.MaxWidth(120)))
-                        RevertOverrides(importedSettingsProperty);   
+                        RevertOverrides(importedSettingsProperty);
                 }
             }
-            
+
             EditorGUILayout.EndHorizontal();
-            
+
             DrawImportedSettingsFor(castedTarget.defaultSettings, true);
             DrawImportedSettingsFor(castedTarget.GetImportedSettings());
         }
@@ -278,6 +284,7 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
                 Debug.LogWarning("Nothing to export!");
 
                 GUIUtility.ExitGUI();
+
                 return;
             }
 
@@ -290,6 +297,7 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
             if (string.IsNullOrEmpty(path))
             {
                 GUIUtility.ExitGUI();
+
                 return;
             }
 
@@ -316,7 +324,7 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
         {
             // ignored
         }
-        
+
         GUIUtility.ExitGUI();
     }
 

@@ -339,7 +339,7 @@ internal class ValidatorView : EditorWindowBase
     private static void FixAll()
     {
         onFixAll?.Invoke();
-        
+
         ValidatableMonoBehaviourStatus[] behaviours = GetFixableBehaviours();
 
         foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
@@ -411,7 +411,7 @@ internal class ValidatorView : EditorWindowBase
         var status = (ValidatableMonoBehaviourStatus)s_gameObjectsView.selectedItem;
 
         onItemSelected?.Invoke(status.gameObject.name);
-        
+
         var parentPath = GetParentPath(status.transform);
         var path = s_isSceneMode ? parentPath : $"{AssetDatabase.GetAssetPath(status)} => {parentPath}";
 

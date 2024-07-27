@@ -51,6 +51,8 @@ internal class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
         #endregion
     }
 
+    public static Action <string> onSelectedItem;
+
     private readonly Type[] _addedRequirements;
 
     private readonly IEnumerable <ValidationRequirementAttribute> _attributes;
@@ -64,7 +66,6 @@ internal class SerializeReferenceDropdownAdvancedDropdown : AdvancedDropdown
     private readonly Dictionary <AdvancedDropdownItem, Type> _itemTypes = new();
 
     private readonly Action <int> _onSelectedTypeIndex;
-    public static Action <string> onSelectedItem;
 
     public SerializeReferenceDropdownAdvancedDropdown(
         AdvancedDropdownState state,

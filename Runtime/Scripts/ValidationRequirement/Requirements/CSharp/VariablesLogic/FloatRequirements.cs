@@ -1,5 +1,4 @@
-﻿// TODO commenting
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MegaPint.ValidationRequirement.Requirements.CSharp.VariablesLogic
