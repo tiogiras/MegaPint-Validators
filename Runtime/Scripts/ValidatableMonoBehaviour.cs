@@ -8,7 +8,7 @@ using MegaPint.ValidationRequirement;
 using MegaPint.ValidationRequirement.Requirements;
 using UnityEngine;
 #if UNITY_EDITOR
-using UnityEditor;
+//using UnityEditor;
 #endif
 
 [assembly: InternalsVisibleTo("tiogiras.megapint.editor")]
@@ -356,6 +356,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
 
         defaultSettings.Clear();
 
+#if UNITY_EDITOR
         foreach (var import in DefaultImports())
         {
             var setting = AssetDatabase.LoadAssetAtPath <ValidatorSettings>(import);
@@ -366,8 +367,7 @@ public abstract class ValidatableMonoBehaviour : MonoBehaviour
             if (!defaultSettings.Contains(setting))
                 defaultSettings.Add(setting);
         }
-
-#if UNITY_EDITOR
+        
         EditorUtility.SetDirty(this);
 #endif
     }
