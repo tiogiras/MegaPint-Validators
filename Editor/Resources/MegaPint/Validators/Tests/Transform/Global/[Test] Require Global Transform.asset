@@ -20,6 +20,12 @@ MonoBehaviour:
     - rid: 2612410337079328776
       type: {class: RequireGlobalTransform, ns: MegaPint.ValidationRequirement.Requirements.TransformValidation, asm: tiogiras.megapint.validators.runtime}
       data:
+        preventListHeaderIssues: 
+        initialized: 1
+        uniqueID: 438594d4-1a41-4623-a981-85e99020b3f7
+        severityOverwrite: 0
+        targetGameObject: {fileID: 0}
+        objectReference: {fileID: 11400000}
         _globalPosition:
           enabled: 0
           value: {x: 0, y: 0, z: 0}
@@ -28,4 +34,4 @@ MonoBehaviour:
           value: {x: 0, y: 0, z: 0}
         _globalScale:
           enabled: 0
-          value: {x: 0, y: 0, z: 0}
+          value: {x: 1, y: 1, z: 1}
