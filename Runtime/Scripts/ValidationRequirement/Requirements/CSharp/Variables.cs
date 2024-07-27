@@ -62,8 +62,6 @@ internal class Variables : ScriptableValidationRequirement
         }
     }
 
-    // TODO SOMEHOW IT WORKS BUT WITH THE WRONG TYPE
-
     protected override void Validate(GameObject gameObject)
     {
         if (!TryGetClassType(out Type type))
