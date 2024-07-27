@@ -102,7 +102,7 @@ internal static class RightPane
     private static void FixAll()
     {
         ValidatorView.onAllIssueFixed?.Invoke(s_status.gameObject.name);
-        
+
         s_status.FixAll();
         ValidatorView.UpdateBehaviourBasedOnState(s_status);
 
@@ -226,7 +226,7 @@ internal static class RightPane
                 () =>
                 {
                     ValidatorView.onIssueFixed?.Invoke(s_status.gameObject.name, error.errorName);
-                    
+
                     ValidationState status = s_status.State;
 
                     error.fixAction.Invoke(error.gameObject);

@@ -15,7 +15,7 @@ internal static partial class ContextMenu
         {
             package = PackageKey.PlayModeStartScene, signature = "Validator View"
         };
-        
+
         #region Private Methods
 
         [MenuItem(MenuItemPackages + "/Validator View", false, 13)]
@@ -24,7 +24,7 @@ internal static partial class ContextMenu
             TryOpen <ValidatorView>(false, s_validatorViewSignature);
         }
 
-        #endregion   
+        #endregion
     }
 }
 

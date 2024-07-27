@@ -16,8 +16,8 @@ namespace MegaPint.ValidationRequirement
 [Serializable]
 public abstract class ScriptableValidationRequirement : ValidationRequirementMetaData
 {
-    internal static Action<ValidationState, Type, string> onSeverityOverwrite;
-    
+    internal static Action <ValidationState, Type, string> onSeverityOverwrite;
+
     [HideInInspector] public string preventListHeaderIssues;
 
     [HideInInspector] public bool initialized;
@@ -148,7 +148,7 @@ public abstract class ScriptableValidationRequirement : ValidationRequirementMet
                                 ValidationState.Error => ValidationState.Unknown,
                                 var _ => throw new ArgumentOutOfRangeException()
                             };
-        
+
         onSeverityOverwrite?.Invoke(severityOverwrite, GetType(), objectReference.name);
 
         SetDirty();

@@ -60,7 +60,7 @@ internal class PackageTests
 
         TestsUtility.ValidateResource <VisualTreeAsset>(ref isValid, Constants.Validators.UserInterface.StatusError);
         TestsUtility.ValidateResource <VisualTreeAsset>(ref isValid, Constants.Validators.UserInterface.ValidatorView);
-        
+
         TestsUtility.ValidateResource <VisualTreeAsset>(ref isValid, Constants.Validators.UserInterface.Variable);
 
         TestsUtility.ValidateResource <VisualTreeAsset>(

@@ -134,9 +134,9 @@ internal static partial class Constants
 
             public static readonly string ValidatorView = Path.Combine(s_windows, "Validator View");
             public static readonly string ValidatorViewItem = Path.Combine(ValidatorView, "Item");
-            
+
             public static readonly string Variable = Path.Combine(s_windows, "Variable");
-            
+
             public static readonly string APIItem = Path.Combine(s_userInterface, "Display Content", "API", "Api Item");
 
             public static readonly string APIItems = Path.Combine(s_userInterface, "Display Content", "API", "Items");

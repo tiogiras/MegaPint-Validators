@@ -28,7 +28,7 @@ internal static class APILogic
 
     private static VisualElement s_rightPane;
     private static VisualElement s_content;
-    
+
     private static Label s_title;
     private static Label s_description;
     private static Label s_assembly;
@@ -132,17 +132,17 @@ internal static class APILogic
     {
         if (data == null)
             return;
-        
+
         s_rightPane.style.display = DisplayStyle.Flex;
-        s_rightPane.Q<ScrollView>().scrollOffset = Vector2.zero;
+        s_rightPane.Q <ScrollView>().scrollOffset = Vector2.zero;
 
         s_title.text = data.title;
         s_description.text = data.description;
         s_assembly.text = data.assembly;
-        
+
         s_title.ActivateLinks(LinkCallback);
         s_description.ActivateLinks(LinkCallback);
-        
+
         s_content.Clear();
 
         var path = Path.Combine(Constants.Validators.UserInterface.APIItems, data.key.ToString());
@@ -152,13 +152,13 @@ internal static class APILogic
         {
             var label = new Label($"No content found for the key {data.key}");
             s_content.Add(label);
-            
+
             return;
         }
 
         VisualElement instantiatedContent = GUIUtility.Instantiate(loadedContent);
         instantiatedContent.ActivateLinks(LinkCallback);
-        
+
         s_content.Add(instantiatedContent);
     }
 
@@ -230,6 +230,30 @@ internal static class APILogic
         return ve;
     }
 
+    /// <summary> Callback when clicking a link </summary>
+    /// <param name="evt"> Callback event </param>
+    private static void LinkCallback(PointerUpLinkTagEvent evt)
+    {
+        var link = evt.linkID;
+
+        if (string.IsNullOrEmpty(link))
+            return;
+
+        if (!Enum.TryParse(link, out APIData.DataKey key))
+        {
+            Debug.LogWarning($"No key found for link {link}");
+
+            return;
+        }
+
+        s_listView.SetSelectionWithoutNotify(null);
+        s_selectedAPI = APIData.Get(key);
+
+        s_listView.RefreshItems();
+
+        DisplayRightPane(s_selectedAPI);
+    }
+
     /// <summary> List View selection event </summary>
     /// <param name="_"> Callback event </param>
     private static void OnSelection(IEnumerable <int> _)
@@ -257,31 +281,6 @@ internal static class APILogic
         s_listView.RefreshItems();
 
         s_listView.selectedIndex = -1;
-    }
-
-    /// <summary> Callback when clicking a link </summary>
-    /// <param name="evt"> Callback event </param>
-    private static void LinkCallback(PointerUpLinkTagEvent evt)
-    {
-        var link = evt.linkID;
-        
-        if (string.IsNullOrEmpty(link))
-            return;
-
-        Debug.Log(link); // TODO remove
-
-        if (!Enum.TryParse(link, out APIData.DataKey key))
-        {
-            Debug.LogWarning($"No key found for link {link}");
-            return;
-        }
-
-        s_listView.SetSelectionWithoutNotify(null);
-        s_selectedAPI = APIData.Get(key);
-
-        s_listView.RefreshItems();
-        
-        DisplayRightPane(s_selectedAPI);
     }
 
     /// <summary> Remove all subAPIs of the target data from the displayed apis </summary>

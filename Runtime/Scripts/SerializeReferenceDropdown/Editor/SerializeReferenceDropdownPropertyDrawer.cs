@@ -122,7 +122,8 @@ internal class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
         if (type == null)
             return string.Empty;
 
-        TypeCache.TypeCollection typesWithTooltip = TypeCache.GetTypesWithAttribute(typeof(ValidationRequirementTooltipAttribute));
+        TypeCache.TypeCollection typesWithTooltip =
+            TypeCache.GetTypesWithAttribute(typeof(ValidationRequirementTooltipAttribute));
 
         if (!typesWithTooltip.Contains(type))
             return string.Empty;
@@ -179,7 +180,7 @@ internal class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
             GetTypeTooltip(referenceType));
 
         if (currentRequirement != null)
-            DrawSeverityOverwriteButton(dropdownRect, (ScriptableValidationRequirement)currentRequirement);
+            DrawSeverityOverwriteButton(dropdownRect, currentRequirement);
 
         if (EditorGUI.DropdownButton(dropdownRect, dropdownTypeContent, FocusType.Keyboard))
         {
