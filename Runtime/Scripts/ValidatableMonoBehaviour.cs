@@ -8,7 +8,7 @@ using MegaPint.ValidationRequirement;
 using MegaPint.ValidationRequirement.Requirements;
 using UnityEngine;
 #if UNITY_EDITOR
-//using UnityEditor;
+using UnityEditor;
 #endif
 
 [assembly: InternalsVisibleTo("tiogiras.megapint.editor")]
