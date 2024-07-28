@@ -51,8 +51,8 @@ internal static partial class SaveValues
         {
             get
             {
-                if (MegaPintSettings.Exists())
-                    return s_settings ??= MegaPintSettings.instance.GetSetting("Validators");
+                if (MegaPintMainSettings.Exists())
+                    return s_settings ??= MegaPintMainSettings.instance.GetSetting("Validators");
 
                 return null;
             }
