@@ -7,6 +7,7 @@ namespace MegaPint
 {
 
 /// <summary> Behaviour to display the status of a gameObject with <see cref="ValidatableMonoBehaviour" /> </summary>
+[AddComponentMenu("")]
 internal class ValidatableMonoBehaviourStatus : MonoBehaviour, IComparable <ValidatableMonoBehaviourStatus>
 {
     public ValidationState State {get; private set;}
