@@ -274,56 +274,49 @@ internal class ValidatableMonoBehaviourDrawer : UnityEditor.Editor
     /// <summary> Export the saved requirements to an external file </summary>
     private void ExportRequirements()
     {
-        try
+        List <ScriptableValidationRequirement> sourceRequirements =
+            ((ValidatableMonoBehaviour)target).Requirements(true);
+
+        if (sourceRequirements.Count == 0)
         {
-            List <ScriptableValidationRequirement> sourceRequirements =
-                ((ValidatableMonoBehaviour)target).Requirements(true);
+            Debug.LogWarning("Nothing to export!");
 
-            if (sourceRequirements.Count == 0)
-            {
-                Debug.LogWarning("Nothing to export!");
+            GUIUtility.ExitGUI();
 
-                GUIUtility.ExitGUI();
-
-                return;
-            }
-
-            var path = EditorUtility.SaveFilePanelInProject(
-                "Export Requirements",
-                "Requirements",
-                "asset",
-                "Hello World");
-
-            if (string.IsNullOrEmpty(path))
-            {
-                GUIUtility.ExitGUI();
-
-                return;
-            }
-
-            onExport?.Invoke(path);
-
-            var settingsFile = CreateInstance <ValidatorSettings>();
-
-            List <ScriptableValidationRequirement> requirements = new();
-
-            foreach (ScriptableValidationRequirement requirement in sourceRequirements)
-            {
-                ScriptableValidationRequirement clone = requirement.Clone();
-                clone.GenerateUniqueID();
-
-                requirements.Add(clone);
-            }
-
-            settingsFile.SetRequirements(requirements);
-
-            AssetDatabase.CreateAsset(settingsFile, path);
-            AssetDatabase.Refresh();
+            return;
         }
-        catch (Exception)
+
+        var path = EditorUtility.SaveFilePanelInProject(
+            "Export Requirements",
+            "Requirements",
+            "asset",
+            "Hello World");
+
+        if (string.IsNullOrEmpty(path))
         {
-            // ignored
+            GUIUtility.ExitGUI();
+
+            return;
         }
+
+        onExport?.Invoke(path);
+
+        var settingsFile = CreateInstance <ValidatorSettings>();
+
+        List <ScriptableValidationRequirement> requirements = new();
+
+        foreach (ScriptableValidationRequirement requirement in sourceRequirements)
+        {
+            ScriptableValidationRequirement clone = requirement.Clone();
+            clone.GenerateUniqueID();
+
+            requirements.Add(clone);
+        }
+
+        settingsFile.SetRequirements(requirements);
+
+        AssetDatabase.CreateAsset(settingsFile, path);
+        AssetDatabase.Refresh();
 
         GUIUtility.ExitGUI();
     }
