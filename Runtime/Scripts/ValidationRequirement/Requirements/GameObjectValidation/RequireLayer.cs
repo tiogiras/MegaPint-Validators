@@ -13,6 +13,11 @@ internal class RequireLayer : ScriptableValidationRequirement
 {
     [SerializeField] private string _layerName;
 
+    public RequireLayer(string layerName)
+    {
+        _layerName = layerName;
+    }
+    
     #region Protected Methods
 
     protected override void OnInitialization()
