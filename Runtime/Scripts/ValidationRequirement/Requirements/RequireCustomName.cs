@@ -8,11 +8,11 @@ namespace MegaPint.ValidationRequirement.Requirements
 
 /// <summary> Validation requirement requiring a custom name based on a defined regex ruleset </summary>
 [Serializable]
-[SerializeReferenceDropdownName("Regex Naming Validation", typeof(RequireCustomName), 101)]
-public class RequireCustomName : ScriptableValidationRequirement
+[ValidationRequirementTooltip(
+    "With this requirement you can specify custom naming rules for the gameObject based on a regex pattern.")]
+[ValidationRequirement("Regex Naming Validation", typeof(RequireCustomName), -8)]
+internal class RequireCustomName : ScriptableValidationRequirement
 {
-    [HideInInspector] public string name;
-
     [SerializeField] [Tooltip("Regex expression after which the name of the gameObject is validated")]
     [TextArea] private string _regexPattern;
 
@@ -24,10 +24,8 @@ public class RequireCustomName : ScriptableValidationRequirement
 
     protected override void Validate(GameObject gameObject)
     {
-        if (Regex.IsMatch(gameObject.name, _regexPattern))
-            return;
-
-        AddError(
+        AddErrorIf(
+            !Regex.IsMatch(gameObject.name, _regexPattern),
             "Invalid gameObject naming",
             "The name of the gameObject does not correspond to the specified regexPattern",
             ValidationState.Warning,

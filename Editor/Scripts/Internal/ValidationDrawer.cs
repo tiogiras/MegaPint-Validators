@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MegaPint.Editor.Scripts.GUI;
@@ -14,6 +15,10 @@ namespace MegaPint.Editor.Scripts.Internal
 [CustomEditor(typeof(ValidatableMonoBehaviourStatus), true)]
 internal class ValidationDrawer : UnityEditor.Editor
 {
+    public static Action <string> onValidateButton;
+    public static Action <string> onFixAll;
+    public static Action <string, string> onIssueFixed;
+
     private static readonly string s_basePath = Constants.Validators.UserInterface.Status;
 
     private VisualTreeAsset _behaviourEntry;
@@ -54,12 +59,22 @@ internal class ValidationDrawer : UnityEditor.Editor
 
         _status.onStatusUpdate += StatusUpdate;
 
-        root.Q <Button>("BTN_Validate").clicked += () => {_status.ValidateStatus();};
+        root.Q <Button>("BTN_Validate").clicked += () =>
+        {
+            onValidateButton?.Invoke(_status.gameObject.name);
+
+            _status.ValidateStatus();
+        };
 
         _fixAllButton = root.Q <Button>("BTN_FixAll");
         UpdateFixAllButton();
 
-        _fixAllButton.clicked += _status.FixAll;
+        _fixAllButton.clicked += () =>
+        {
+            onFixAll?.Invoke(_status.gameObject.name);
+
+            _status.FixAll();
+        };
 
         _noFixAction = root.Q <VisualElement>("NoFixAction");
         UpdateNoFixAction();
@@ -120,6 +135,8 @@ internal class ValidationDrawer : UnityEditor.Editor
                 {
                     button.clicked += () =>
                     {
+                        onIssueFixed?.Invoke(_status.gameObject.name, error.errorName);
+
                         error.fixAction.Invoke(error.gameObject);
                         _status.ValidateStatus();
                     };

@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 using MegaPint.Editor.Scripts.GUI.Utility;
+using MegaPint.Editor.Scripts.Logic;
 using UnityEditor;
 using UnityEngine.UIElements;
 
@@ -16,10 +17,13 @@ internal static partial class DisplayContent
     {
         InitializeDisplayContent(
             refs,
-            new TabSettings {info = true, guides = true, help = true},
+            new TabSettings {info = true, guides = true, help = true, api = true},
             new TabActions
             {
-                info = ValidatorsActivateLinks, guides = ValidatorsActivateLinks, help = ValidatorsActivateLinks
+                info = ValidatorsActivateLinks,
+                guides = ValidatorsActivateLinks,
+                help = ValidatorsActivateLinks,
+                api = APILogic.ValidatorsAPILogic
             });
     }
 

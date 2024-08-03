@@ -21,7 +21,17 @@ namespace MegaPint.Editor.Scripts.Windows
 /// </summary>
 internal class ValidatorView : EditorWindowBase
 {
+    public static Action onOpen;
+    public static Action onClose;
+
     public static Action onRefresh;
+
+    public static Action onRefreshed;
+    public static Action <bool> onTabChange;
+    public static Action <string> onItemSelected;
+    public static Action <string, string> onIssueFixed;
+    public static Action <string> onAllIssueFixed;
+    public static Action onFixAll;
 
     private static Button s_btnSceneMode;
     private static Button s_btnProjectMode;
@@ -112,6 +122,8 @@ internal class ValidatorView : EditorWindowBase
 
         s_isSceneMode = true;
 
+        onOpen?.Invoke();
+
         if (!SaveValues.Validators.ApplyPSValidatorView)
             return this;
 
@@ -195,7 +207,7 @@ internal class ValidatorView : EditorWindowBase
         s_btnProjectMode.clickable = new Clickable(() => {ChangeMode(false);});
 
         s_btnFixAll.clicked += FixAll;
-        s_btnRefresh.clicked += UpdateLeftPane;
+        s_btnRefresh.clicked += OnRefresh;
 
         s_btnErrors.clicked += OnErrorButton;
         s_btnWarnings.clicked += OnWarningButton;
@@ -235,7 +247,7 @@ internal class ValidatorView : EditorWindowBase
         s_btnProjectMode.clickable = null;
 
         s_btnFixAll.clicked -= FixAll;
-        s_btnRefresh.clicked -= UpdateLeftPane;
+        s_btnRefresh.clicked -= OnRefresh;
 
         s_btnErrors.clicked -= OnErrorButton;
         s_btnWarnings.clicked -= OnWarningButton;
@@ -248,6 +260,8 @@ internal class ValidatorView : EditorWindowBase
 
         EditorSceneManager.sceneOpened -= OnSceneLoaded;
         EditorSceneManager.sceneClosed -= OnSceneClosed;
+
+        onClose?.Invoke();
     }
 
     #endregion
@@ -258,6 +272,8 @@ internal class ValidatorView : EditorWindowBase
     /// <param name="isSceneMode"> New mode </param>
     private static void ChangeMode(bool isSceneMode)
     {
+        onTabChange?.Invoke(isSceneMode);
+
         s_isSceneMode = isSceneMode;
         UpdateLeftPane();
 
@@ -322,6 +338,8 @@ internal class ValidatorView : EditorWindowBase
     /// <summary> Fix all displayed behaviours that can be fixed </summary>
     private static void FixAll()
     {
+        onFixAll?.Invoke();
+
         ValidatableMonoBehaviourStatus[] behaviours = GetFixableBehaviours();
 
         foreach (ValidatableMonoBehaviourStatus behaviour in behaviours)
@@ -392,6 +410,8 @@ internal class ValidatorView : EditorWindowBase
 
         var status = (ValidatableMonoBehaviourStatus)s_gameObjectsView.selectedItem;
 
+        onItemSelected?.Invoke(status.gameObject.name);
+
         var parentPath = GetParentPath(status.transform);
         var path = s_isSceneMode ? parentPath : $"{AssetDatabase.GetAssetPath(status)} => {parentPath}";
 
@@ -416,6 +436,13 @@ internal class ValidatorView : EditorWindowBase
         DisplayBySearchField();
         UpdateBehaviourButtons();
         RightPane.Clear();
+    }
+
+    /// <summary> Refresh left pane </summary>
+    private static void OnRefresh()
+    {
+        onRefreshed?.Invoke();
+        UpdateLeftPane();
     }
 
     /// <summary> Scene closed event callback </summary>
@@ -629,7 +656,7 @@ internal class ValidatorView : EditorWindowBase
         s_btnErrors.text = $"Errors ({s_errorGameObjects.Count})";
         s_btnWarnings.text = $"Warnings ({s_warningGameObjects.Count})";
         s_btnOk.text = $"Ok ({s_okGameObjects.Count})";
-        
+
         if (s_displayedListIndex < 0)
             return;
 

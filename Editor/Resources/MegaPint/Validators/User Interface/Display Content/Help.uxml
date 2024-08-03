@@ -4,11 +4,18 @@
     <Style src="project://database/Packages/com.tiogiras.megapint/Editor/Resources/MegaPint/User%20Interface/MegaPintAttributes.uss?fileID=7433441132597879392&amp;guid=db4b42bc58d645b8ab6f8c0e914c2a0c&amp;type=3#MegaPintAttributes" />
     <MegaPint.Editor.Scripts.GUI.Factories.RootElement>
         <ui:VisualElement class="mp_border-color--secondary" style="flex-grow: 1; margin-left: 20px; margin-top: 10px; margin-right: 10px; margin-bottom: 10px; overflow: hidden;">
-            <ui:Foldout text="Cannot select reference in dropdown" value="false" class="mp_link mp_background-color--quaternary mp_border-color--secondary" style="-unity-font-style: bold; padding-top: 2px; padding-right: 2px; padding-bottom: 2px; padding-left: 2px; border-top-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px;">
+            <ui:Foldout text="Cannot select reference in dropdown" value="false" class="mp_link mp_background-color--quaternary mp_border-color--secondary" style="-unity-font-style: bold; padding-top: 2px; padding-right: 2px; padding-bottom: 2px; padding-left: 2px; border-top-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; margin-bottom: 5px;">
                 <ui:VisualElement style="flex-grow: 1; margin-top: 5px; margin-bottom: 15px;">
                     <MegaPint.Editor.Scripts.GUI.Factories.TextElements.TextSecondary tabindex="-1" text="NullReferenceException: Object reference not set to an instance of an object&#10;SerializeReferenceDropdown.Editor.SerializeReferenceDropdownAdvancedDropdown.BuildRoot ()" style="-unity-font-style: italic; font-size: 10px; white-space: normal;" />
                     <MegaPint.Editor.Scripts.GUI.Factories.Structure.Separator />
                     <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="This issue occures when a class inherits from &lt;link=&quot;info_scriptableValidationRequirement&quot;&gt;ScriptableValidationRequirement&lt;/link&gt; but has not the required attributes to be displayed in the dropdown. Solve this by adding the required attributes, shown in the guide on how to create a requirement." class="mp_link" style="margin-top: 10px; -unity-font-style: normal; white-space: normal;" />
+                </ui:VisualElement>
+            </ui:Foldout>
+            <ui:Foldout text="Cannot Export Requirements" value="false" class="mp_link mp_background-color--quaternary mp_border-color--secondary" style="-unity-font-style: bold; padding-top: 2px; padding-right: 2px; padding-bottom: 2px; padding-left: 2px; border-top-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px;">
+                <ui:VisualElement style="flex-grow: 1; margin-top: 5px; margin-bottom: 15px;">
+                    <MegaPint.Editor.Scripts.GUI.Factories.TextElements.TextSecondary tabindex="-1" text="MissingMethodException: Default constructor not found for type ..." style="-unity-font-style: italic; font-size: 10px; white-space: normal;" />
+                    <MegaPint.Editor.Scripts.GUI.Factories.Structure.Separator />
+                    <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="If you try to export requirements containing custom written requirements that have a constructor, you need to add a default constructor with no parameters as well." class="mp_link" style="margin-top: 10px; -unity-font-style: normal; white-space: normal;" />
                 </ui:VisualElement>
             </ui:Foldout>
         </ui:VisualElement>

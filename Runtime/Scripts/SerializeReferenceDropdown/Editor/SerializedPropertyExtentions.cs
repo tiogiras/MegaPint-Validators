@@ -7,7 +7,7 @@ using UnityEditor;
 namespace MegaPint.SerializeReferenceDropdown.Editor
 {
 
-public static class SerializedPropertyExtentions
+internal static class SerializedPropertyExtentions
 {
     private static readonly Regex s_arrayIndexCapturePattern = new(@"\[(\d*)\]");
 

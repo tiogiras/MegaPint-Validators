@@ -12,8 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74d3942af42a4cdf99dcbb5260b15292, type: 3}
   m_Name: '[Test] Require Default Transform 4'
   m_EditorClassIdentifier: 
-  initializedRequirements:
-  - MegaPint.ValidationRequirement.Requirements.TransformValidation.RequireDefaultTransform
   _requirements:
   - rid: 2612410337079328775
   references:
@@ -22,6 +20,12 @@ MonoBehaviour:
     - rid: 2612410337079328775
       type: {class: RequireDefaultTransform, ns: MegaPint.ValidationRequirement.Requirements.TransformValidation, asm: tiogiras.megapint.validators.runtime}
       data:
+        preventListHeaderIssues: 
+        initialized: 1
+        uniqueID: 081848b2-012e-4ab6-a5d4-3aac5b066d51
+        severityOverwrite: 0
+        targetGameObject: {fileID: 0}
+        objectReference: {fileID: 11400000}
         _defaultPosition: 1
         _defaultRotation: 1
         _defaultScale: 1

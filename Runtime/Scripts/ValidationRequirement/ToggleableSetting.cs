@@ -17,7 +17,7 @@ public struct ToggleableSetting <T>
 #if UNITY_EDITOR
 /// <summary> Drawer class of the <see cref="ToggleableSetting{T}" /> </summary>
 [CustomPropertyDrawer(typeof(ToggleableSetting <>))]
-public class Drawer : PropertyDrawer
+internal class Drawer : PropertyDrawer
 {
     #region Public Methods
 

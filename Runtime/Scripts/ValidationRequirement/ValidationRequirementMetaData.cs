@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace MegaPint.ValidationRequirement
+﻿namespace MegaPint.ValidationRequirement
 {
 
 /// <summary>
@@ -17,36 +15,25 @@ public abstract class ValidationRequirementMetaData
     /// </summary>
     protected abstract void OnInitialization();
 
-    /// <summary>
-    ///     Calls <see cref="OnInitialization" /> when the <see cref="ScriptableValidationRequirement" /> has not been
-    ///     initialized
-    /// </summary>
-    /// <param name="behaviour"> The <see cref="ValidatableMonoBehaviour" /> that is validated </param>
-    /// <param name="requirement"> The <see cref="IValidationRequirement" /> that is validated </param>
-    protected void TryInitialize(ValidatableMonoBehaviour behaviour, IValidationRequirement requirement)
-    {
-        if (behaviour.IsInitialized(requirement))
-            return;
-        
-        OnInitialization();
+    #endregion
 
-        behaviour.OnRequirementInitialization(requirement);
-    }
+    #region Internal Methods
 
     /// <summary>
     ///     Calls <see cref="OnInitialization" /> when the <see cref="ScriptableValidationRequirement" /> has not been
     ///     initialized
     /// </summary>
-    /// <param name="settings"> The <see cref="ValidatorSettings" /> that is validated </param>
-    /// <param name="requirement"> The <see cref="IValidationRequirement" /> that is validated </param>
-    protected void TryInitialize(ValidatorSettings settings, IValidationRequirement requirement)
+    /// <param name="requirement"> The requirement that is validated </param>
+    internal void TryInitialize(ScriptableValidationRequirement requirement)
     {
-        if (settings.IsInitialized(requirement))
+        if (requirement.initialized)
             return;
 
         OnInitialization();
 
-        settings.OnRequirementInitialization(requirement);
+        requirement.initialized = true;
+        requirement.GenerateUniqueID();
+        requirement.SetDirty();
     }
 
     #endregion

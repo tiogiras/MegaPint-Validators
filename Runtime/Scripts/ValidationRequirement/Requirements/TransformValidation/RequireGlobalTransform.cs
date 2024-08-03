@@ -8,8 +8,16 @@ namespace MegaPint.ValidationRequirement.Requirements.TransformValidation
 
 /// <summary> Validation requirement for custom values on a transform component </summary>
 [Serializable]
-[SerializeReferenceDropdownName("Transform/Custom Global", typeof(RequireGlobalTransform), -10, 2)]
-public class RequireGlobalTransform : ScriptableValidationRequirement
+[ValidationRequirementTooltip(
+    "This requirement enforces the transform component to have a specific global position, rotation and scale.")]
+[ValidationRequirement(
+    "Transform/Custom Global",
+    typeof(RequireGlobalTransform),
+    false,
+    new[] {typeof(RequireDefaultTransform), typeof(RequireLocalTransform)},
+    -29,
+    2)]
+internal class RequireGlobalTransform : ScriptableValidationRequirement
 {
     [SerializeField] [Tooltip("The transform is required to have this specified global position")]
     private ToggleableSetting <Vector3> _globalPosition;
@@ -41,13 +49,13 @@ public class RequireGlobalTransform : ScriptableValidationRequirement
         var errorText = new StringBuilder();
 
         if (!validPosition)
-            errorText.AppendLine($"Position should be {_globalPosition}");
+            errorText.AppendLine($"Position should be {_globalPosition.value}");
 
         if (!validRotation)
-            errorText.AppendLine($"Rotation should be {_globalRotation}");
+            errorText.AppendLine($"Rotation should be {_globalRotation.value}");
 
         if (!validScale)
-            errorText.Append($"Scale should be {_globalScale}");
+            errorText.Append($"Scale should be {_globalScale.value}");
 
         AddError("Transform differs from specifications", errorText.ToString(), ValidationState.Warning, FixAction);
     }

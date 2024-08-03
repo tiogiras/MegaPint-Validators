@@ -17,7 +17,7 @@ namespace MegaPint.SerializeReferenceDropdown.Editor
 {
 
 [CustomPropertyDrawer(typeof(SerializeReferenceDropdownAttribute))]
-public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
+internal class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
 {
     private const string NullName = "None";
     private List <Type> _assignableTypes;
@@ -83,12 +83,38 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
         }
     }
 
-    private static SerializeReferenceDropdownNameAttribute GetType(Type type)
+    private static GUIContent GetButtonContent(ScriptableValidationRequirement requirement)
+    {
+        return requirement.severityOverwrite switch
+               {
+                   ValidationState.Unknown or ValidationState.Ok => new GUIContent {tooltip = "No Severity Overwrite"},
+                   ValidationState.Warning => new GUIContent {tooltip = "Severity Overwrite: Warning"},
+                   ValidationState.Error => new GUIContent {tooltip = "Severity Overwrite: Error"},
+                   var _ => throw new ArgumentOutOfRangeException()
+               };
+    }
+
+    private static Color GetColorBySeverityOverwrite(Color baseColor, ScriptableValidationRequirement requirement)
+    {
+        return requirement.severityOverwrite switch
+               {
+                   ValidationState.Unknown or ValidationState.Ok => new Color(
+                       baseColor.r,
+                       baseColor.g,
+                       baseColor.b,
+                       .5f),
+                   ValidationState.Warning => new Color(1f, 0.65f, 0.13f),
+                   ValidationState.Error => new Color(1f, 0.17f, 0.17f),
+                   var _ => throw new ArgumentOutOfRangeException()
+               };
+    }
+
+    private static ValidationRequirementAttribute GetType(Type type)
     {
         if (type == null)
-            return new SerializeReferenceDropdownNameAttribute(NullName, null, -30);
+            return new ValidationRequirementAttribute(NullName, null, int.MinValue + 1);
 
-        return type.GetCustomAttribute <SerializeReferenceDropdownNameAttribute>();
+        return type.GetCustomAttribute <ValidationRequirementAttribute>();
     }
 
     private static string GetTypeTooltip(Type type)
@@ -96,24 +122,28 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
         if (type == null)
             return string.Empty;
 
-        TypeCache.TypeCollection typesWithTooltip = TypeCache.GetTypesWithAttribute(typeof(TypeTooltipAttribute));
+        TypeCache.TypeCollection typesWithTooltip =
+            TypeCache.GetTypesWithAttribute(typeof(ValidationRequirementTooltipAttribute));
 
         if (!typesWithTooltip.Contains(type))
             return string.Empty;
 
-        var tooltipAttribute = type.GetCustomAttribute <TypeTooltipAttribute>();
+        var tooltipAttribute = type.GetCustomAttribute <ValidationRequirementTooltipAttribute>();
 
         return tooltipAttribute.tooltip;
     }
 
     private void DrawIMGUITypeDropdown(Rect rect, SerializedProperty property, GUIContent label)
     {
-        var index = int.Parse(label.text.Replace("Element ", ""));
+        if (!int.TryParse(label.text.Replace("Element ", ""), out var index))
+            return;
 
         Type currentValue = null;
         List <Type> addedRequirements = new();
-        List <IValidationRequirement> requirements = new();
-        
+        List <ScriptableValidationRequirement> requirements = new();
+
+        ScriptableValidationRequirement currentRequirement = null;
+
         switch (property.serializedObject.targetObject)
         {
             case ValidatableMonoBehaviour validatableMonoBehaviour:
@@ -126,7 +156,7 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
 
                 break;
         }
-        
+
         if (requirements is {Count: > 0})
         {
             addedRequirements.AddRange(
@@ -134,7 +164,8 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
                 where requirement != null
                 select requirement.GetType());
 
-            currentValue = requirements[index]?.GetType();
+            currentRequirement = requirements[index];
+            currentValue = currentRequirement?.GetType();
         }
 
         _assignableTypes ??= GetAssignableTypes(property);
@@ -147,6 +178,9 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
         var dropdownTypeContent = new GUIContent(
             GetType(referenceType).name,
             GetTypeTooltip(referenceType));
+
+        if (currentRequirement != null)
+            DrawSeverityOverwriteButton(dropdownRect, currentRequirement);
 
         if (EditorGUI.DropdownButton(dropdownRect, dropdownTypeContent, FocusType.Keyboard))
         {
@@ -172,6 +206,26 @@ public class SerializeReferenceDropdownPropertyDrawer : PropertyDrawer
 
             return mRect;
         }
+    }
+
+    private void DrawSeverityOverwriteButton(Rect dropdownRect, ScriptableValidationRequirement requirement)
+    {
+        const int ButtonWidth = 15;
+        const int ButtonOffset = 5;
+
+        var rect = new Rect(
+            dropdownRect.x - (ButtonWidth + ButtonOffset),
+            dropdownRect.y + dropdownRect.height * .125f,
+            ButtonWidth,
+            dropdownRect.height * .75f);
+
+        Color color = GUI.color;
+        GUI.color = GetColorBySeverityOverwrite(color, requirement);
+
+        if (GUI.Button(rect, GetButtonContent(requirement)))
+            requirement.ChangeSeverityOverwrite();
+
+        GUI.color = color;
     }
 
     private void WriteNewInstanceByIndexType(int typeIndex, SerializedProperty property)
